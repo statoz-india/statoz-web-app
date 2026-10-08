@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="100 -4 120 128" role="img" aria-label="Circuit telemetry with a car on the racing line">
+  <title>Circuit telemetry with a car on the racing line</title>
+  <g fill="none" stroke-linecap="round">
+  <path d="M140 -12C202 12 136 51.6 168 73.2C196 93.6 144 104.4 192 129.6" stroke="#314158" stroke-width="42"/>
+  <path d="M140 -12C202 12 136 51.6 168 73.2C196 93.6 144 104.4 192 129.6" stroke="#f42d29" stroke-opacity="0.22" stroke-width="46"/>
+  <path d="M140 -12C202 12 136 51.6 168 73.2C196 93.6 144 104.4 192 129.6" stroke="#5cdfff" stroke-opacity="0.34" stroke-width="1.3"/>
+  </g>
+  <g transform="rotate(-12.6 164 72)">
+  <rect x="140" y="63" width="48" height="18" rx="5" fill="#f42d29"/>
+  <rect x="157.5" y="66" width="17" height="12" rx="5" fill="#0d111a"/>
+  <g fill="#0d111a">
+  <rect x="145.5" y="59.5" width="13" height="5" rx="2"/>
+  <rect x="171.5" y="59.5" width="13" height="5" rx="2"/>
+  <rect x="145.5" y="79.5" width="13" height="5" rx="2"/>
+  <rect x="171.5" y="79.5" width="13" height="5" rx="2"/>
+  </g>
+  </g>
+</svg>

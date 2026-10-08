@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="100 -4 120 128" role="img" aria-label="Street basketball court in perspective">
+  <title>Street basketball court in perspective</title>
+  <path d="M128 19.2H200V120H104Z" fill="#665116" stroke="#fdc700" stroke-opacity="0.58" stroke-width="1.2"/>
+  <g fill="none" stroke="#fdc700" stroke-opacity="0.58" stroke-width="1.2">
+  <ellipse cx="158" cy="87.6" rx="54" ry="38"/>
+  <path d="M164 19.2V62.4"/>
+  </g>
+  <path d="M148 33.6H182" stroke="#ffffff" stroke-opacity="0.55" stroke-width="3"/>
+  <ellipse cx="164" cy="46.8" rx="18" ry="5" fill="none" stroke="#fdc700" stroke-width="3"/>
+  <circle cx="182" cy="72" r="17" fill="#fdc700"/>
+  <g fill="none" stroke="#17120a" stroke-opacity="0.78" stroke-width="1.4">
+  <path d="M165 72H199"/>
+  <path d="M182 55V89"/>
+  <ellipse cx="182" cy="72" rx="8" ry="17"/>
+  </g>
+</svg>

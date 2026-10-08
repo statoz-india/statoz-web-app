@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="100 -4 120 128" role="img" aria-label="Tennis court in perspective with the ball mid-air">
+  <title>Tennis court in perspective with the ball mid-air</title>
+  <path d="M134 14.4H188L216 123.6H96Z" fill="#1f475e" stroke="#5cdfff" stroke-opacity="0.52"/>
+  <g fill="none" stroke="#5cdfff" stroke-opacity="0.52">
+  <path d="M114 68.4H200"/>
+  <path d="M150 14.4 134 120"/>
+  </g>
+  <ellipse cx="166" cy="93.6" rx="13.5" ry="4.5" fill="none" stroke="#51ff94" stroke-opacity="0.36" stroke-width="1.5"/>
+  <circle cx="166" cy="46.8" r="6" fill="#51ff94"/>
+</svg>

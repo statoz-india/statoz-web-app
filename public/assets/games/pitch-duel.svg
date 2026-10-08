@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="100 -4 120 128" role="img" aria-label="Tactics board with a passing route">
+  <title>Tactics board with a passing route</title>
+  <g fill="none" stroke="#ffffff" stroke-opacity="0.42" stroke-width="1.2">
+  <rect x="114" y="12" width="92" height="110.4" fill="#124b43"/>
+  <path d="M114 67.2H206"/>
+  <circle cx="160" cy="67.2" r="27"/>
+  <rect x="119" y="-14" width="82" height="52"/>
+  </g>
+  <polyline points="138,92.4 172,69.6 150,40.8 188,27.6" fill="none" stroke="#5cdfff" stroke-opacity="0.65" stroke-width="1.5"/>
+  <circle cx="138" cy="92.4" r="11" fill="none" stroke="#5cdfff" stroke-opacity="0.34"/>
+  <circle cx="138" cy="92.4" r="7" fill="#5cdfff"/>
+  <circle cx="172" cy="69.6" r="11" fill="none" stroke="#5cdfff" stroke-opacity="0.34"/>
+  <circle cx="172" cy="69.6" r="7" fill="#5cdfff"/>
+  <circle cx="150" cy="40.8" r="11" fill="none" stroke="#5cdfff" stroke-opacity="0.34"/>
+  <circle cx="150" cy="40.8" r="7" fill="#5cdfff"/>
+  <circle cx="188" cy="27.6" r="11" fill="none" stroke="#5cdfff" stroke-opacity="0.34"/>
+  <circle cx="188" cy="27.6" r="7" fill="#fdc700"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="100 -4 120 128" role="img" aria-label="Redacted driver helmet">
+  <title>Redacted driver helmet</title>
+  <path d="M114 78C114 48 134 28 160 28C186 28 206 48 206 78C206 96 196 110 180 116L134 116C122 110 114 96 114 78Z" fill="#16241d" stroke="#ff94c1" stroke-opacity="0.55" stroke-width="1.4"/>
+  <path d="M128 74C128 62 140 54 160 54C180 54 192 62 192 74L192 84L128 84Z" fill="#ff94c1" fill-opacity="0.22" stroke="#ff94c1" stroke-opacity="0.5" stroke-width="1.2"/>
+  <rect x="104" y="66" width="112" height="9" fill="#ff94c1" fill-opacity="0.5"/>
+  <g fill="#ff94c1" fill-opacity="0.3">
+  <rect x="132" y="98" width="30" height="7"/>
+  <rect x="168" y="98" width="16" height="7"/>
+  </g>
+</svg>
