@@ -2,7 +2,8 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import type { CSSProperties } from "react";
 
-import { PlatformNav } from "@/widgets/nav/platform-nav";
+import { AppNav } from "@/widgets/nav/app-nav";
+import { AppTopBar } from "@/widgets/nav/app-top-bar";
 
 import "./globals.css";
 
@@ -61,19 +62,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             {/* Side rail: lg and up */}
             <div className="hidden shrink-0 lg:block lg:w-56">
               <div className="sticky top-0 h-dvh">
-                <PlatformNav orientation="rail" />
+                <AppNav orientation="rail" />
               </div>
             </div>
 
             <div className="flex min-w-0 flex-1 flex-col">
-              {/* top bar / breadcrumbs go here */}
+              <AppTopBar />
               <main className="flex min-h-0 flex-1 flex-col pb-[env(safe-area-inset-bottom)]">
                 {children}
               </main>
             </div>
 
             {/* Bottom bar: below lg */}
-            <PlatformNav className="sticky bottom-0 z-20 h-[calc(var(--platform-nav-height)+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] lg:hidden" />
+            <AppNav className="sticky bottom-0 z-20 h-[calc(var(--platform-nav-height)+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] lg:hidden" />
           </div>
         </div>
       </body>

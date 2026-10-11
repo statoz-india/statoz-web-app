@@ -1,0 +1,404 @@
+/*
+ * The coming-soon screen is one 3D scene: a chamfered card floating over a grid
+ * floor. Everything that moves animates a transform or an opacity, and every
+ * resting style is the still frame that reduced motion is left with.
+ *
+ * Depth only survives where nothing flattens it, so no element between the
+ * stage and a raised layer may take a clip-path, a filter or an opacity. Those
+ * go on the leaves.
+ */
+
+.stage {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  perspective: 1100px;
+}
+
+/* Backlight: a haze behind the card, where the floor meets the horizon. */
+.stage::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 52% 36% at 50% 50%,
+    color-mix(in srgb, var(--ds-color-accent-cyan) 14%, transparent),
+    transparent 72%
+  );
+  content: "";
+  pointer-events: none;
+  animation: breathe 6s ease-in-out infinite;
+}
+
+/*
+ * The floor. A flat grid tipped back from the horizon, which is the top edge of
+ * this box. It slides one cell toward the viewer and repeats, so it never
+ * arrives.
+ */
+.floor {
+  --cell: 44px;
+  --line: color-mix(in srgb, var(--ds-color-accent-cyan) 26%, transparent);
+  position: absolute;
+  z-index: -1;
+  inset: 50% 0 0;
+  overflow: hidden;
+  perspective: 460px;
+  perspective-origin: 50% 0;
+  /* Fades out toward the horizon, the near edge and both sides. */
+  mask-image:
+    linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent),
+    linear-gradient(to right, transparent, #000 24%, #000 76%, transparent);
+  mask-composite: intersect;
+  pointer-events: none;
+}
+
+.floor::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 560px;
+  background-image:
+    linear-gradient(to right, var(--line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+  background-position: center top;
+  background-size: var(--cell) var(--cell);
+  content: "";
+  transform: rotateX(64deg) translateY(calc(-1 * var(--cell)));
+  transform-origin: 50% 0;
+  animation: floor 3.2s linear infinite;
+}
+
+/* Stands the card up off the floor, once, when the screen opens. */
+.rise {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: rise 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* The card's shadow on the floor. It shrinks as the card lifts away from it. */
+.shadow {
+  position: absolute;
+  inset: 100% 10% auto;
+  height: 28px;
+  margin-top: 18px;
+  background: radial-gradient(
+    ellipse closest-side,
+    rgb(0 0 0 / 62%),
+    transparent
+  );
+  filter: blur(5px);
+  pointer-events: none;
+  animation: shade 6s ease-in-out infinite;
+}
+
+/*
+ * Three movements share the card without fighting over one property: it bobs
+ * with `translate`, rocks with `rotate`, and leans toward the pointer with
+ * `transform`.
+ */
+.card {
+  position: relative;
+  transform: rotateX(calc(var(--pointer-y, 0) * -8deg))
+    rotateY(calc(var(--pointer-x, 0) * 10deg));
+  transform-style: preserve-3d;
+  transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation:
+    bob 6s ease-in-out infinite,
+    rock 9s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* The 1px chamfered frame. */
+.edge {
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  background: var(--ds-color-border-muted);
+  clip-path: var(--ds-clip-panel);
+  animation: fade 500ms ease-out both;
+}
+
+/*
+ * A light that runs round the frame. It is a wide conic sweep turning behind
+ * the face; the 1px gap round the face is all of it that shows.
+ */
+.edge::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  aspect-ratio: 1;
+  background: conic-gradient(
+    transparent 0 62%,
+    var(--ds-color-accent-violet) 80%,
+    var(--ds-color-accent-cyan) 94%,
+    transparent 100%
+  );
+  content: "";
+  translate: -50% -50%;
+  animation: orbit 7s linear infinite;
+}
+
+.face {
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  background:
+    var(--ds-gradient-hud-edge) top / 100% 2px no-repeat,
+    var(--ds-gradient-hud-sheet);
+  clip-path: var(--ds-clip-panel);
+}
+
+/* A soft light on the face that moves to wherever the pointer is. */
+.face::before {
+  position: absolute;
+  inset: -35%;
+  background: radial-gradient(
+    circle closest-side,
+    color-mix(in srgb, var(--ds-color-accent-cyan) 13%, transparent),
+    transparent
+  );
+  content: "";
+  transform: translate3d(
+    calc(var(--pointer-x, 0) * 32%),
+    calc(var(--pointer-y, 0) * 32% - 16%),
+    0
+  );
+  transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* A band of glare that crosses the face, then waits out of sight. */
+.face::after {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 45%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgb(255 255 255 / 7%) 50%,
+    transparent
+  );
+  content: "";
+  transform: translateX(-160%) skewX(-18deg);
+  animation: sheen 7s ease-in-out 1.2s infinite;
+}
+
+.content {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+/* Each layer stands off the face by a different amount, so they part as the
+   card turns. */
+.emblem {
+  position: relative;
+  display: grid;
+  width: 7rem;
+  height: 5.25rem;
+  place-items: start center;
+  transform: translateZ(64px);
+  transform-style: preserve-3d;
+}
+
+.title {
+  transform: translateZ(36px);
+  animation: reveal 600ms cubic-bezier(0.22, 1, 0.36, 1) 220ms both;
+}
+
+.note {
+  transform: translateZ(18px);
+  animation: reveal 600ms cubic-bezier(0.22, 1, 0.36, 1) 300ms both;
+}
+
+.action {
+  transform: translateZ(30px);
+  animation: reveal 600ms cubic-bezier(0.22, 1, 0.36, 1) 380ms both;
+}
+
+/*
+ * The glow behind the icon. A plain gradient rather than a drop-shadow on the
+ * icon: the rings cut through the icon's plane, and a filtered layer that gets
+ * cut shows its bounding box.
+ */
+.emblem::before {
+  position: absolute;
+  top: -1rem;
+  left: calc(50% - 2.75rem);
+  width: 5.5rem;
+  height: 5.5rem;
+  background: radial-gradient(
+    circle closest-side,
+    color-mix(in srgb, var(--ds-color-accent-cyan) 30%, transparent),
+    transparent
+  );
+  content: "";
+  /* Far enough back that the icon never swings through it. */
+  transform: translateZ(-14px);
+  animation: breathe 5s ease-in-out infinite;
+}
+
+.icon {
+  animation:
+    hover 5s ease-in-out infinite,
+    pop 600ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
+}
+
+/*
+ * Rings sent out across the pad the icon hovers over: an octagon outline,
+ * laid nearly flat, that widens and fades. At rest there are none.
+ */
+.ping {
+  position: absolute;
+  bottom: -2.75rem;
+  left: calc(50% - 2.75rem);
+  width: 5.5rem;
+  height: 5.5rem;
+  background: currentcolor;
+  clip-path: polygon(
+    evenodd,
+    15% 0,
+    85% 0,
+    100% 15%,
+    100% 85%,
+    85% 100%,
+    15% 100%,
+    0 85%,
+    0 15%,
+    15% 0,
+    19% 6%,
+    81% 6%,
+    94% 19%,
+    94% 81%,
+    81% 94%,
+    19% 94%,
+    6% 81%,
+    6% 19%,
+    19% 6%
+  );
+  opacity: 0;
+  transform: rotateX(70deg) scale(0.3);
+  animation: ping 3.6s cubic-bezier(0.2, 0.6, 0.35, 1) infinite;
+}
+
+.ping:nth-child(2) {
+  animation-delay: 1.2s;
+}
+
+.ping:nth-child(3) {
+  animation-delay: 2.4s;
+}
+
+/* Someone who asked for less motion gets the card flat and still. */
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .face::before {
+    transform: none;
+  }
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes floor {
+  to {
+    transform: rotateX(64deg);
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translate3d(0, 56px, -140px) rotateX(42deg);
+  }
+}
+
+@keyframes shade {
+  50% {
+    opacity: 0.5;
+    scale: 0.86;
+  }
+}
+
+@keyframes bob {
+  50% {
+    translate: 0 -10px;
+  }
+}
+
+@keyframes rock {
+  0%,
+  100% {
+    rotate: 0.4 1 0 -5deg;
+  }
+
+  50% {
+    rotate: 0.4 1 0 5deg;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes orbit {
+  to {
+    rotate: 1turn;
+  }
+}
+
+@keyframes sheen {
+  0% {
+    transform: translateX(-160%) skewX(-18deg);
+  }
+
+  24%,
+  100% {
+    transform: translateX(340%) skewX(-18deg);
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
+@keyframes hover {
+  0%,
+  100% {
+    rotate: y -16deg;
+    translate: 0 0;
+  }
+
+  50% {
+    rotate: y 16deg;
+    translate: 0 -7px;
+  }
+}
+
+@keyframes ping {
+  0% {
+    opacity: 0;
+    transform: rotateX(70deg) scale(0.3);
+  }
+
+  14% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 0;
+    transform: rotateX(70deg) scale(1.35);
+  }
+}

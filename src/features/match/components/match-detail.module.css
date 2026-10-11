@@ -1,0 +1,416 @@
+.page {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  padding-top: env(safe-area-inset-top);
+  background: var(--ds-gradient-app-background);
+}
+
+.frame {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--ds-color-background-quiz-hub);
+  box-shadow: 0 0 40px rgb(0 0 0 / 34%);
+}
+
+/* The way out on a phone, where the page covers the app's own navigation. */
+.backBar {
+  display: flex;
+  flex: none;
+  padding: var(--ds-space-8) var(--ds-space-8) 0;
+}
+
+.backButton {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 var(--ds-space-8);
+  border: 0;
+  background: transparent;
+  color: var(--ds-color-text-muted);
+  cursor: pointer;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-2xs);
+  font-weight: 800;
+  letter-spacing: var(--ds-tracking-wide);
+}
+
+.backButton:hover {
+  color: var(--ds-color-text-default);
+}
+
+.boardMeta {
+  font-family: var(--font-display, ui-sans-serif, system-ui, sans-serif);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.summary {
+  flex: none;
+  padding: var(--ds-space-8) var(--ds-space-14) var(--ds-space-14);
+  background: transparent;
+}
+
+.summaryBracket {
+  --summary-bracket: color-mix(
+    in srgb,
+    var(--ds-color-accent-cyan) 46%,
+    transparent
+  );
+  position: relative;
+  padding: var(--ds-space-12) var(--ds-space-8) 0;
+  background:
+    linear-gradient(var(--summary-bracket), var(--summary-bracket)) left top /
+      17px 1px no-repeat,
+    linear-gradient(var(--summary-bracket), var(--summary-bracket)) left top /
+      1px 17px no-repeat,
+    linear-gradient(var(--summary-bracket), var(--summary-bracket)) right top /
+      17px 1px no-repeat,
+    linear-gradient(var(--summary-bracket), var(--summary-bracket)) right top /
+      1px 17px no-repeat;
+  background-color: transparent;
+}
+
+.summaryStatus {
+  display: block;
+  min-height: 14px;
+  text-align: center;
+  font-family: var(--font-display, ui-sans-serif, system-ui, sans-serif);
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.summaryTeams {
+  display: flex;
+  min-height: 65px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Both sides take an equal share of what the badges and score leave, so a
+   long club name ellipsises instead of crushing the side opposite it. */
+.summaryTeam {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  justify-items: start;
+  gap: 2px;
+}
+
+.summaryTeamEnd {
+  justify-items: end;
+  text-align: right;
+}
+
+.teamName {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--ds-color-text-default);
+  font-family: var(--ds-font-body);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Cricket's innings ride under the name -- 161/5 (18.2) never fits a slot. */
+.teamInnings {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--ds-color-text-default);
+  font-family: var(--ds-font-display);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* At least the width a football score takes, and wider for a basketball one,
+   which must stay on its line. */
+.summaryScore {
+  min-width: 72px;
+  flex: none;
+  white-space: nowrap;
+  text-align: center;
+  color: var(--ds-color-text-default);
+  font-family: var(--font-display, ui-sans-serif, system-ui, sans-serif);
+  font-size: var(--ds-text-xl);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+/* Nothing to show yet: a lone dash, in the width one takes. */
+.summaryScoreEmpty {
+  width: 22px;
+  color: var(--ds-color-text-muted);
+  font-size: 17px;
+}
+
+.summaryVs {
+  flex: none;
+  padding: 0 8px;
+  color: var(--ds-color-text-muted);
+  font-family: var(--font-display, ui-sans-serif, system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.summarySplit {
+  display: flex;
+  height: 3px;
+  gap: 3px;
+}
+.summarySplit span {
+  flex: 1;
+}
+
+.tabsBody {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  background: transparent;
+}
+.teamQualifier {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--ds-color-text-muted);
+  font-family: var(--ds-font-display);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.mainTabs {
+  min-height: 50px;
+  background: transparent;
+}
+.mainTabs :global(button) {
+  background: transparent !important;
+}
+.mainTabs :global(button:focus-visible) {
+  outline: 2px solid var(--ds-color-accent-cyan);
+  outline-offset: -2px;
+}
+
+.tabPanel {
+  min-height: 0;
+  flex: 1;
+}
+
+.scrollPanel {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-color: var(--ds-color-border-strong) transparent;
+}
+
+.scrollPanel {
+  padding: 12px 12px 28px;
+}
+
+/* TOPS is a column: the board scrolls, the standing bar stays docked. */
+.topsTab {
+  display: flex;
+  min-height: 0;
+  height: 100%;
+  flex-direction: column;
+}
+.topsPanel {
+  padding: 14px 16px 8px;
+}
+.boardMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 2px;
+  color: var(--ds-color-text-muted);
+  font-size: 9px;
+}
+.boardMeta span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--ds-color-accent-gold);
+}
+.boardState {
+  padding: 0 2px 9px;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--ds-color-accent-gold) 22%, transparent);
+  color: var(--ds-color-accent-gold);
+  font-family: var(--ds-font-display);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.rankList {
+  display: grid;
+  gap: 6px;
+  margin-top: 13px;
+}
+/* Rows arrive in sequence, sliding in from the left as they do in the app. */
+.rankEnter {
+  animation: rankEnter 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes rankEnter {
+  from {
+    opacity: 0;
+    transform: translateX(-48px);
+  }
+}
+.localRankBar {
+  flex: none;
+  padding: 10px 16px 12px;
+  border-top: 1px solid
+    color-mix(in srgb, var(--ds-color-border-strong) 32%, transparent);
+  background: var(--ds-color-background-nav);
+  box-shadow: 0 -8px 18px rgb(0 0 0 / 25%);
+}
+
+.circleCta {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  width: 100%;
+  height: 62px;
+  text-decoration: none;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: env(safe-area-inset-bottom);
+  border: 0;
+  border-top: 1px solid
+    color-mix(in srgb, var(--ds-color-accent-cyan) 16%, transparent);
+  background: var(--ds-gradient-dock-bar);
+  color: var(--ds-color-text-default);
+  cursor: pointer;
+}
+.circleCta:hover {
+  filter: brightness(1.12);
+}
+.circleCta:focus-visible {
+  outline: 2px solid var(--ds-color-accent-cyan);
+  outline-offset: -3px;
+}
+.circleCtaInner {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.circleLabel {
+  font-size: 12px;
+  font-weight: 700;
+}
+.circleCount {
+  margin-left: -4px;
+  color: var(--ds-color-text-muted);
+  font-size: 10px;
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .scrollPanel {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .backBar {
+    display: none;
+  }
+  .page {
+    position: static;
+    z-index: auto;
+    display: block;
+    overflow: visible;
+    padding: 30px clamp(20px, 3vw, 52px) 44px;
+    background: transparent;
+  }
+  .frame {
+    display: grid;
+    /* One column, the full width of the content area. */
+    width: 100%;
+    height: auto;
+    min-height: 700px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "summary" "tabs";
+    align-items: start;
+    overflow: visible;
+    background: transparent;
+    box-shadow: none;
+  }
+  .summary {
+    grid-area: summary;
+  }
+  .tabsBody {
+    grid-area: tabs;
+    min-height: 640px;
+    margin-top: 12px;
+  }
+  .tabPanel {
+    min-height: 590px;
+  }
+  .scrollPanel {
+    height: auto;
+    min-height: 590px;
+    overflow: visible;
+    overscroll-behavior: auto;
+  }
+  .scrollPanel {
+    padding: 18px 18px 24px;
+  }
+  .topsPanel {
+    max-width: 920px;
+  }
+  .topsTab {
+    height: auto;
+  }
+  .localRankBar {
+    position: sticky;
+    bottom: 12px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .tabsBody {
+    min-height: 690px;
+  }
+  .tabPanel {
+    min-height: 640px;
+  }
+  .scrollPanel {
+    min-height: 640px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rankEnter {
+    animation: none;
+  }
+  .frame *,
+  .frame *::before,
+  .frame *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

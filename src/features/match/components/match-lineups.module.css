@@ -1,0 +1,115 @@
+/* The plain two-column team sheet: a starting five, or any line-up with no
+   formation to draw. */
+
+.lineupHeader,
+.lineupColumn header {
+  font-family: var(--font-display, ui-sans-serif, system-ui, sans-serif);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.lineupView {
+  padding: 12px 12px 108px;
+}
+.lineupHeader {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: var(--ds-color-accent-lime);
+  font-size: 10px;
+}
+.lineupPitch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  padding: 8px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--ds-color-accent-lime) 8%, transparent) 0 1px,
+      transparent 1px 32px
+    ),
+    var(--ds-color-background-muted);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--ds-color-accent-lime) 27%, transparent);
+}
+.lineupColumn {
+  min-width: 0;
+  padding: 8px;
+  background: rgb(7 12 31 / 72%);
+}
+.lineupColumnAway {
+  text-align: right;
+}
+.lineupColumn header {
+  display: flex;
+  justify-content: space-between;
+  color: var(--team-color);
+  font-size: 9px;
+}
+.lineupColumnAway header {
+  flex-direction: row-reverse;
+}
+.lineupColumn h2 {
+  min-height: 29px;
+  margin: 5px 0;
+  color: var(--ds-color-text-default);
+  font-family: var(--font-display, ui-sans-serif, system-ui, sans-serif);
+  font-size: 11px;
+  line-height: 1.08;
+}
+.lineupColumn ol {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lineupColumn li {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 27px;
+}
+.lineupColumnAway li {
+  flex-direction: row-reverse;
+}
+.lineupColumn li > span {
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  flex: none;
+  place-items: center;
+  clip-path: var(--ds-clip-octagon);
+  background: var(--team-color);
+  color: var(--ds-color-text-inverse);
+  font-size: 8px;
+  font-weight: 900;
+}
+.lineupColumn li div {
+  min-width: 0;
+}
+.lineupColumn li strong,
+.lineupColumn li small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lineupColumn li strong {
+  color: var(--ds-color-text-subtle);
+  font-size: 9px;
+}
+.lineupColumn li small {
+  margin-top: 1px;
+  color: var(--ds-color-text-muted);
+  font-size: 8px;
+}
+
+@media (min-width: 1024px) {
+  .lineupView {
+    padding: 18px;
+  }
+}

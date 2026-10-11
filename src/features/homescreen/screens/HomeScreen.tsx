@@ -1,7 +1,18 @@
+import { Suspense } from "react";
+
+import { HomeHub } from "../components/home-hub";
+
+/**
+ * The SPORTS destination: the MATCH and GAMES hub.
+ *
+ * The hub reads its tab and sport from the URL, which is only known per
+ * request, so it sits in a Suspense boundary and the rest of the page can
+ * still be prerendered.
+ */
 export default function HomeScreen() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center">
-      <h1 className="text-2xl font-semibold">Welcome to StatOz</h1>
-    </div>
+    <Suspense fallback={<div className="flex-1" />}>
+      <HomeHub />
+    </Suspense>
   );
 }
