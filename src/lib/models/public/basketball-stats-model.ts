@@ -1,4 +1,4 @@
-import type { DeepNullable, StatsSide } from "@/lib/models/types";
+import type { DeepNullable, StatsSide } from "@/lib/types/game-types";
 
 /*
  * A basketball game's stats, as docs/stats.md describes them. A field the

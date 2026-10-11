@@ -1,4 +1,4 @@
-import type { GameType } from "@/lib/models/types";
+import type { GameType } from "@/lib/types/game-types";
 
 /** The tournament fields a trending item carries. */
 export type TournamentSummary = {

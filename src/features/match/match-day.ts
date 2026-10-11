@@ -1,7 +1,8 @@
 import { useSyncExternalStore } from "react";
 
 import { loadedKeys, peekResource } from "@/hooks/useResource";
-import { toISTDate, type TournamentSection, type TrendingMatches } from "@/lib";
+import { toISTDate, type TrendingMatches } from "@/lib";
+import type { TournamentSection } from "@/lib/types/game-types";
 
 /**
  * Which day's fixture list a match is on.

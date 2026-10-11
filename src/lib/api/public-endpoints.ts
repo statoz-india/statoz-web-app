@@ -6,7 +6,7 @@ import type {
 } from "@/lib/models/public/match-model";
 import type { MatchStats, RaceStats } from "@/lib/models/public/stats-model";
 import type { TrendingMatches } from "@/lib/models/public/trending-model";
-import type { MatchGameType, TournamentSection } from "@/lib/models/types";
+import { MatchGameType, TournamentSection } from "../types/game-types";
 
 const istDay = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" });
 

@@ -1,5 +1,6 @@
 import type { Team } from "@/lib/models/common/team-model";
-import type { GameType } from "@/lib/models/types";
+import type { GameType } from "@/lib/types/game-types";
+import type { QuizStatus } from "@/lib/types/quiz-types";
 
 import type { MatchEvent } from "./match-model";
 
@@ -7,7 +8,7 @@ import type { MatchEvent } from "./match-model";
 export type Quiz = {
   _id: string;
   quizId: string;
-  quizStatus: string;
+  quizStatus: QuizStatus;
   isVisible: boolean;
   matchId: string;
   matchStartTime: string;

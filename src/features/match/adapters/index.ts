@@ -5,7 +5,6 @@ import type {
   MatchStats,
   MotorSportMatches,
   Team,
-  TournamentSection,
 } from "@/lib";
 
 import type {
@@ -25,6 +24,7 @@ import {
   side,
   type Side,
 } from "./shared";
+import { TournamentSection } from "@/lib/types/game-types";
 
 /**
  * Turns what the public API sends into what the match page draws.
@@ -70,6 +70,12 @@ const fixtureStatuses: Record<string, MatchStatus> = {
   live: "live",
   ongoing: "live",
 };
+
+/** Whether a start time is still ahead of now. An unreadable time is not. */
+function isAhead(startTime: string | null | undefined): boolean {
+  const start = startTime ? Date.parse(startTime) : NaN;
+  return Number.isFinite(start) && start > Date.now();
+}
 
 function teamFromFixture(team: Team, fallback: string): SportTeam {
   const name = team.displayName || team.name;
@@ -220,7 +226,10 @@ export function toMatch(
   const fixtureHome = aIsAway ? fixture?.teamB : fixture?.teamA;
   const fixtureAway = aIsAway ? fixture?.teamA : fixture?.teamB;
 
-  const team = (which: Side, fromFixture: Team | undefined): SportTeam | null => {
+  const team = (
+    which: Side,
+    fromFixture: Team | undefined,
+  ): SportTeam | null => {
     const told = facts?.[which];
     const base = fromFixture
       ? teamFromFixture(fromFixture, FALLBACK_COLORS[which])
@@ -242,10 +251,13 @@ export function toMatch(
 
   const sportName = (stats?.gameType ?? fixture?.gameType)?.toLowerCase();
   const sport: Sport = isSport(sportName) ? sportName : "football";
-  const status: MatchStatus =
-    facts?.status ??
-    fixtureStatuses[String(fixture?.matchStatus).toLowerCase()] ??
-    "finished";
+  const kickoff = fixture?.matchStartTime ?? facts?.kickoff ?? "";
+  // A match that has not started is upcoming, whatever status it carries.
+  const status: MatchStatus = isAhead(kickoff)
+    ? "scheduled"
+    : (facts?.status ??
+      fixtureStatuses[String(fixture?.matchStatus).toLowerCase()] ??
+      "finished");
 
   return {
     id,
@@ -254,7 +266,7 @@ export function toMatch(
     home,
     away,
     status,
-    kickoff: fixture?.matchStartTime ?? facts?.kickoff ?? "",
+    kickoff,
     // Before the start the feed already reports 0 - 0; that is not a score yet.
     homeScore: status === "scheduled" ? undefined : facts?.home.score,
     awayScore: status === "scheduled" ? undefined : facts?.away.score,
@@ -285,16 +297,18 @@ export function toRaceMatch(
     shortName: race.tournament,
     color: "var(--ds-color-accent-racing)",
   };
+  const kickoff = race.raceStartTime ?? summary?.startDate ?? "";
+  const reported: MatchStatus = summary
+    ? statusFrom(summary.completed, summary.status)
+    : (raceStatuses[String(race.matchStatus).toLowerCase()] ?? "finished");
   return {
     id,
     sport: "racing",
     leagueLabel: race.tournament || "RACE",
     home: name,
     away: name,
-    status: summary
-      ? statusFrom(summary.completed, summary.status)
-      : (raceStatuses[String(race.matchStatus).toLowerCase()] ?? "finished"),
-    kickoff: race.raceStartTime ?? summary?.startDate ?? "",
+    status: isAhead(kickoff) ? "scheduled" : reported,
+    kickoff,
   };
 }
 
@@ -432,9 +446,7 @@ function toFootballScoreboard(summary: FootballSummary): MatchDetailScoreboard {
       competition: details?.league ?? "",
       season: details?.season ?? "",
       venue: details?.location?.venue ?? "",
-      attendance: details?.attendance
-        ? String(details.attendance)
-        : undefined,
+      attendance: details?.attendance ? String(details.attendance) : undefined,
       facts: [],
     },
     stats: present(summary.topStats)

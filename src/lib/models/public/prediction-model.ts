@@ -1,13 +1,17 @@
 import type { Team } from "@/lib/models/common/team-model";
 import type { TournamentSummary } from "@/lib/models/common/tournament-model";
-import type { GameType } from "@/lib/models/types";
+import type { GameType } from "@/lib/types/game-types";
+import type {
+  PredictionSide,
+  PredictionStatus,
+} from "@/lib/types/prediction-type";
 
 import type { MatchEvent } from "./match-model";
 
 export type Prediction = {
   _id: string;
   predictionId: string;
-  predictionStatus: string;
+  predictionStatus: PredictionStatus;
   isVisible: boolean;
   matchId: string;
   matchStartTime: string;
@@ -34,6 +38,6 @@ export type Prediction = {
   oddsDraw: number | null;
   createdAt: string;
   /** Both appear once the result is set. */
-  winningTeam?: unknown;
+  winningTeam?: PredictionSide | null;
   winningTeamId?: string;
 };

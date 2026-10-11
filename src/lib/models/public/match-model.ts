@@ -1,10 +1,6 @@
 import type { Team } from "@/lib/models/common/team-model";
-import type {
-  GameType,
-  MatchGameType,
-  MatchStatus,
-  RaceStatus,
-} from "@/lib/models/types";
+import type { GameType, MatchGameType } from "@/lib/types/game-types";
+import type { MatchStatus, RaceStatus } from "@/lib/types/match-type";
 
 export type MatchEvent = Record<
   | "id"

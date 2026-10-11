@@ -1,4 +1,9 @@
 import type { TournamentSummary } from "@/lib/models/common/tournament-model";
+import type {
+  EventOption,
+  EventPickType,
+  EventStatus,
+} from "@/lib/types/event-type";
 
 export type Event = {
   _id: string;
@@ -7,8 +12,8 @@ export type Event = {
   eventDescription: string;
   eventImage: string;
   eventDescriptionImage: string | null;
-  eventStatus: string;
-  pickType: "EVENT";
+  eventStatus: EventStatus;
+  pickType: EventPickType;
   isRacingMatchEvent: boolean;
   /** The tournament's id here, not its code as on a fixture. */
   tournament: string;
@@ -38,5 +43,5 @@ export type Event = {
   createdAt: string;
   updatedAt: string;
   /** Appears once the result is set. */
-  winningOption?: "Y" | "N" | "M";
+  winningOption?: EventOption;
 };

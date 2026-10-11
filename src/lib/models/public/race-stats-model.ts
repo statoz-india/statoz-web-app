@@ -1,4 +1,4 @@
-import type { DeepNullable } from "@/lib/models/types";
+import type { DeepNullable } from "@/lib/types/game-types";
 
 /*
  * An F1 race's stats, as docs/stats.md describes them. A field the guide names

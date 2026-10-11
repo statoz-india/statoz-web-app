@@ -1,4 +1,4 @@
-import type { StatsGameType } from "@/lib/models/types";
+import type { StatsGameType } from "@/lib/types/game-types";
 
 import type { BasketballSummary } from "./basketball-stats-model";
 import type { CricketSummary } from "./cricket-stats-model";

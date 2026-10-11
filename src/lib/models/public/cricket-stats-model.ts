@@ -2,7 +2,7 @@ import type {
   DeepNullable,
   StatsLocation,
   StatsSide,
-} from "@/lib/models/types";
+} from "@/lib/types/game-types";
 
 /*
  * A cricket match's stats, as docs/stats.md describes them. A field the guide

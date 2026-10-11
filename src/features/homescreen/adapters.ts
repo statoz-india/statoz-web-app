@@ -12,7 +12,6 @@ import type {
   SportTab,
   Team,
   Tournament,
-  TournamentSection,
   TrendingItem,
   TrendingMatch,
 } from "@/lib";
@@ -28,6 +27,7 @@ import type {
   SportTeam,
   TrendingTile,
 } from "./types";
+import { TournamentSection } from "@/lib/types/game-types";
 
 /**
  * Turns the public API's responses into what the hub draws. A record the hub
@@ -93,7 +93,18 @@ const fixtureStates: Record<string, FixtureState> = {
   suspended: { status: "finished", statusNote: "Suspended" },
 };
 
-function stateOf(matchStatus: string): FixtureState {
+/** Whether a start time is still ahead of now. An unreadable time is not. */
+function isAhead(startTime: string | undefined): boolean {
+  const start = startTime ? Date.parse(startTime) : NaN;
+  return Number.isFinite(start) && start > Date.now();
+}
+
+function stateOf(
+  matchStatus: string,
+  startTime: string | undefined,
+): FixtureState {
+  // A match that has not started is upcoming, whatever status it carries.
+  if (isAhead(startTime)) return { status: "scheduled" };
   const key = String(matchStatus).toLowerCase();
   // A status this app has not seen is shown in the server's own words.
   return (
@@ -139,7 +150,7 @@ function scores(
 
 export function toFixture(match: Matches | TrendingMatch): SportFixture | null {
   if (!match.teamA || !match.teamB) return null;
-  const state = stateOf(match.matchStatus);
+  const state = stateOf(match.matchStatus, match.matchStartTime);
   // The live-score object exists before kick-off too, with both scores at 0.
   const [homeScore, awayScore] =
     state.status === "scheduled"
@@ -173,7 +184,7 @@ function toRaceFixture(
     href: matchHref(race.matchId),
     sport: "racing",
     leagueLabel: race.tournament,
-    ...stateOf(race.matchStatus),
+    ...stateOf(race.matchStatus, race.raceStartTime),
     kickoff: race.raceStartTime,
     home: {
       id: race.matchId,
@@ -189,7 +200,9 @@ function toRaceFixture(
   };
 }
 
-function isRace(match: Matches | MotorSportMatches): match is MotorSportMatches {
+function isRace(
+  match: Matches | MotorSportMatches,
+): match is MotorSportMatches {
   return !("teamA" in match);
 }
 
@@ -318,7 +331,10 @@ function futureMarket(future: Future): PickMarket {
         probabilityPercent: choice.odds,
       })),
     volumeOz: future.totalCoinsPlaced,
-    statusLabel: marketStatus(future.futureStatus, future.correctChoice != null),
+    statusLabel: marketStatus(
+      future.futureStatus,
+      future.correctChoice != null,
+    ),
   };
 }
 

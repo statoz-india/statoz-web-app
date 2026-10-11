@@ -1,4 +1,5 @@
 import type { Team } from "@/lib/models/common/team-model";
+import type { FuturePickType, FutureStatus } from "@/lib/types/future-type";
 import type { TournamentSummary } from "@/lib/models/common/tournament-model";
 
 export type FutureChoice = {
@@ -24,8 +25,8 @@ export type Future = {
   eventName: string;
   eventDescription: string;
   eventImage: string;
-  futureStatus: string;
-  pickType: "FUTURE";
+  futureStatus: FutureStatus;
+  pickType: FuturePickType;
   entryStartTime: string;
   entryCloseTime: string;
   totalCoinsPlaced: number;

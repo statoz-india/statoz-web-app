@@ -1,12 +1,6 @@
-/**
- * Response shapes of the public API, as documented in
- * docs/sportsSectionBackend.md. Every date is an ISO string in UTC.
- */
+import { Tournament } from "../models/common/tournament-model";
+import { Matches, MotorSportMatches } from "../models/public/match-model";
 
-import type { Tournament } from "./common/tournament-model";
-import type { Matches, MotorSportMatches } from "./public/match-model";
-
-/** A sport section. `trending` is the curated list, not a sport. */
 export type GameType =
   | "trending"
   | "football"
@@ -18,27 +12,12 @@ export type GameType =
 /** The sections the matches endpoint accepts. Tennis has games only. */
 export type MatchGameType = Exclude<GameType, "tennis">;
 
-export type MatchStatus =
-  | "upcoming"
-  | "live"
-  | "result"
-  | "canceled"
-  | "abandoned"
-  | "no_result"
-  | "postponed"
-  | "unresolved"
-  | "suspended";
-
-/** Capitalised, unlike a team fixture's status. */
-export type RaceStatus = "Upcoming" | "Ongoing" | "Finished" | "Cancelled";
-
 /** The sports that have match stats. */
 export type StatsGameType = Exclude<GameType, "trending" | "tennis">;
 
 /** Which of the two teams a stat, an event or a player belongs to. */
 export type StatsSide = "home" | "away";
 
-/** Where a match is played, as its stats describe it. */
 export type StatsLocation = {
   venue: string;
   city: string;
