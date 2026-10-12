@@ -14,7 +14,7 @@ import type {
   Tournament,
   TrendingItem,
   TrendingMatch,
-} from "@/lib";
+} from "@/core";
 
 import { presentationFor } from "./game-registry";
 import type {
@@ -27,7 +27,7 @@ import type {
   SportTeam,
   TrendingTile,
 } from "./types";
-import { TournamentSection } from "@/lib/types/game-types";
+import { TournamentSection } from "@/core/domain/types/game-types";
 
 /**
  * Turns the public API's responses into what the hub draws. A record the hub

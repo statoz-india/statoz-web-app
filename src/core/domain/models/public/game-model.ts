@@ -1,4 +1,4 @@
-import type { GameType } from "@/lib/types/game-types";
+import type { GameType } from "@/core/domain/types/game-types";
 
 /* -------------------------------------------------------------------------
  * Sports lists and games

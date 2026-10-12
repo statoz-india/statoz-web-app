@@ -5,7 +5,7 @@ import type {
   MatchStats,
   MotorSportMatches,
   Team,
-} from "@/lib";
+} from "@/core";
 
 import type {
   MatchDetailScoreboard,
@@ -24,7 +24,7 @@ import {
   side,
   type Side,
 } from "./shared";
-import { TournamentSection } from "@/lib/types/game-types";
+import { TournamentSection } from "@/core/domain/types/game-types";
 
 /**
  * Turns what the public API sends into what the match page draws.

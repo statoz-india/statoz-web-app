@@ -1,7 +1,7 @@
 "use client";
 
 import { GameIcon } from "@/utils";
-import { BentoGrid, BentoTile } from "@/widgets/ui/components/bento-grid";
+import { BentoGrid, BentoTile } from "@/lib/widgets/ui/components/bento-grid";
 
 import { toGameTiles } from "../../adapters";
 import { useTrendingGames } from "../../queries";

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 
-import { toISTDate } from "@/lib";
+import { toISTDate } from "@/core";
 import { formatKickoffDate, formatKickoffTime, formatOzCompact } from "@/utils";
 
 import type { SportFixture, SportTeam } from "../../types";

@@ -5,7 +5,7 @@ import {
   getMatchStats,
   getRaceStats,
   type MatchStats,
-} from "@/lib";
+} from "@/core";
 
 import { isRace, type Fixture } from "./adapters";
 

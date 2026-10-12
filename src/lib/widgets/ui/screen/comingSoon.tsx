@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { ArrowLeftIcon, BrandIcon, CloseIcon } from "@/utils";
-import { PointerStage } from "@/widgets/ui/components/pointer-stage";
+import { PointerStage } from "@/lib/widgets/ui/components/pointer-stage";
 
 import styles from "./comingSoon.module.css";
 

@@ -3,7 +3,7 @@
 import type { ComponentType, CSSProperties, ReactNode } from "react";
 
 import { SignalOffIcon, accentVar, type IconProps } from "@/utils";
-import { NoDataState } from "@/widgets/ui/components/no-data-state";
+import { NoDataState } from "@/lib/widgets/ui/components/no-data-state";
 import type { MatchDetailStat, MatchIntel, SportMatch } from "@/features/match/types";
 
 import styles from "./match-stats.module.css";

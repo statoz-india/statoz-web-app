@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 
-import { todayInIST } from "@/lib/api/public-endpoints";
+import { todayInIST } from "@/core/data/public-endpoints";
 
 const subscribe = () => () => {};
 const getServerSnapshot = () => null;

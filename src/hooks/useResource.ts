@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useSyncExternalStore } from "react";
 
-import { RateLimitedError } from "@/lib/client";
+import { RateLimitedError } from "@/core/client";
 
 /**
  * A small in-memory store for data the browser fetches. Each key is loaded

@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { GridOnIcon, InsightsIcon, MicIcon, ShowChartIcon, accentVar } from "@/utils";
-import { FilterChips } from "@/widgets/ui/components/filter-chips";
-import { InteractiveLineChart } from "@/widgets/ui/components/interactive-line-chart";
+import { FilterChips } from "@/lib/widgets/ui/components/filter-chips";
+import { InteractiveLineChart } from "@/lib/widgets/ui/components/interactive-line-chart";
 import type { MatchDetailScoreboard, SportMatch } from "@/features/match/types";
 
 import {

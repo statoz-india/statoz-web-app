@@ -1,10 +1,10 @@
-import type { Team } from "@/lib/models/common/team-model";
-import type { TournamentSummary } from "@/lib/models/common/tournament-model";
-import type { GameType } from "@/lib/types/game-types";
+import type { Team } from "@/core/domain/models/common/team-model";
+import type { TournamentSummary } from "@/core/domain/models/common/tournament-model";
+import type { GameType } from "@/core/domain/types/game-types";
 import type {
   PredictionSide,
   PredictionStatus,
-} from "@/lib/types/prediction-type";
+} from "@/core/domain/types/prediction-type";
 
 import type { MatchEvent } from "./match-model";
 

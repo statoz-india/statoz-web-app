@@ -1,7 +1,7 @@
 import { accentVar, formatPercent } from "@/utils";
-import { Badge } from "@/widgets/ui/components/badge";
-import { Progress } from "@/widgets/ui/components/progress";
-import { SignalPanel } from "@/widgets/ui/components/signal-panel";
+import { Badge } from "@/lib/widgets/ui/components/badge";
+import { Progress } from "@/lib/widgets/ui/components/progress";
+import { SignalPanel } from "@/lib/widgets/ui/components/signal-panel";
 
 import type { MarketOutcome, PickMarket } from "../../types";
 import { TileFooter } from "./tile-footer";

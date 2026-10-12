@@ -1,6 +1,6 @@
 import type { Sport } from "@/config/sports";
 import type { AccentName } from "@/utils";
-import type { BentoSpan } from "@/widgets/ui/components/bento-grid";
+import type { BentoSpan } from "@/lib/widgets/ui/components/bento-grid";
 
 /**
  * What the sports hub draws. The API's responses are turned into these in

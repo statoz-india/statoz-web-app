@@ -9,8 +9,8 @@ import {
   TrendingUpIcon,
   accentVar,
 } from "@/utils";
-import { NoDataState } from "@/widgets/ui/components/no-data-state";
-import { UnderlineTabs } from "@/widgets/ui/components/underline-tabs";
+import { NoDataState } from "@/lib/widgets/ui/components/no-data-state";
+import { UnderlineTabs } from "@/lib/widgets/ui/components/underline-tabs";
 
 import type { MatchDetailScoreboard, SportMatch } from "../types";
 import { MatchScoreboard } from "./match-scoreboard";

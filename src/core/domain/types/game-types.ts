@@ -1,5 +1,8 @@
-import { Tournament } from "../models/common/tournament-model";
-import { Matches, MotorSportMatches } from "../models/public/match-model";
+import { Tournament } from "@/core/domain/models/common/tournament-model";
+import {
+  Matches,
+  MotorSportMatches,
+} from "@/core/domain/models/public/match-model";
 
 export type GameType =
   | "trending"

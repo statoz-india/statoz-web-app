@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 
 import { BoltIcon, ShowChartIcon, accentVar } from "@/utils";
-import { FilterChips } from "@/widgets/ui/components/filter-chips";
+import { FilterChips } from "@/lib/widgets/ui/components/filter-chips";
 import type { MatchDetailScoreboard, SportMatch } from "@/features/match/types";
 
 import { CommentaryView, TimelineList } from "./match-report-parts";

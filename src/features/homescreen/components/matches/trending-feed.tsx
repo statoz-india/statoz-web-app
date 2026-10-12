@@ -2,7 +2,7 @@
 
 import { useTodayInIST } from "@/hooks/useTodayInIST";
 import { FlameIcon } from "@/utils";
-import { BentoGrid, BentoTile } from "@/widgets/ui/components/bento-grid";
+import { BentoGrid, BentoTile } from "@/lib/widgets/ui/components/bento-grid";
 
 import { toTrendingTiles } from "../../adapters";
 import { useTrendingMatches } from "../../queries";

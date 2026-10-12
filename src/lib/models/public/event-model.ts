@@ -1,9 +1,9 @@
-import type { TournamentSummary } from "@/lib/models/common/tournament-model";
+import type { TournamentSummary } from "@/core/domain/models/common/tournament-model";
 import type {
   EventOption,
   EventPickType,
   EventStatus,
-} from "@/lib/types/event-type";
+} from "@/core/domain/types/event-type";
 
 export type Event = {
   _id: string;

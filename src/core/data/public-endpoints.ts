@@ -1,12 +1,18 @@
-import { publicGet, type RequestOptions } from "@/lib/client";
-import type { GameSection, SportTab } from "@/lib/models/public/game-model";
+import { publicGet, type RequestOptions } from "@/core/client";
+import type {
+  GameSection,
+  SportTab,
+} from "@/core/domain/models/public/game-model";
 import type {
   MatchFor,
   MotorSportMatches,
-} from "@/lib/models/public/match-model";
-import type { MatchStats, RaceStats } from "@/lib/models/public/stats-model";
-import type { TrendingMatches } from "@/lib/models/public/trending-model";
-import { MatchGameType, TournamentSection } from "../types/game-types";
+} from "@/core/domain/models/public/match-model";
+import type {
+  MatchStats,
+  RaceStats,
+} from "@/core/domain/models/public/stats-model";
+import type { TrendingMatches } from "@/core/domain/models/public/trending-model";
+import { MatchGameType, TournamentSection } from "@/core/domain/types/game-types";
 
 const istDay = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" });
 

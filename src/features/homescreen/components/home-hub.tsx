@@ -8,7 +8,7 @@ import { accentVar, GameIcon, MatchIcon } from "@/utils";
 import {
   GlidingTabs,
   type GlidingTab,
-} from "@/widgets/ui/components/gliding-tabs";
+} from "@/lib/widgets/ui/components/gliding-tabs";
 
 import { useGameSports, useMatchSports } from "../queries";
 import { GamesTrendingFeed } from "./games/games-trending-feed";

@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import type { CSSProperties } from "react";
 
-import { AppNav } from "@/widgets/nav/app-nav";
-import { AppTopBar } from "@/widgets/nav/app-top-bar";
+import { AppNav } from "@/lib/widgets/nav/app-nav";
+import { AppTopBar } from "@/lib/widgets/nav/app-top-bar";
 
 import "./globals.css";
 

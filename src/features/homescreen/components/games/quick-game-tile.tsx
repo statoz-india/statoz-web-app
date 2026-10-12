@@ -12,7 +12,7 @@ import {
   QuizIcon,
   type IconProps,
 } from "@/utils";
-import { HudPanel } from "@/widgets/ui/components/hud-panel";
+import { HudPanel } from "@/lib/widgets/ui/components/hud-panel";
 
 import type { GameSceneId, GameTile } from "../../types";
 import { SportIcon } from "../sport-icon";

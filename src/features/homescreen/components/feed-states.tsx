@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 
-import { RateLimitedError } from "@/lib";
+import { RateLimitedError } from "@/core";
 import { SignalOffIcon } from "@/utils";
 import {
   BentoGrid,
   BentoTile,
   type BentoSpan,
-} from "@/widgets/ui/components/bento-grid";
+} from "@/lib/widgets/ui/components/bento-grid";
 
 /* -------------------------------------------------------------------------
  * What a feed shows in place of its content: while it loads, when the load

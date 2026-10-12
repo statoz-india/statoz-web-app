@@ -2,7 +2,7 @@
 
 import { useAuthSession } from "@/features/auth";
 import { accentVar, LockIcon } from "@/utils";
-import { HudPanel } from "@/widgets/ui/components/hud-panel";
+import { HudPanel } from "@/lib/widgets/ui/components/hud-panel";
 
 import type { GameTile } from "../../types";
 import { useComingSoon } from "./coming-soon-dialog";

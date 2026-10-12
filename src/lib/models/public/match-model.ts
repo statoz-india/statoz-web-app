@@ -1,6 +1,6 @@
-import type { Team } from "@/lib/models/common/team-model";
-import type { GameType, MatchGameType } from "@/lib/types/game-types";
-import type { MatchStatus, RaceStatus } from "@/lib/types/match-type";
+import type { Team } from "@/core/domain/models/common/team-model";
+import type { GameType, MatchGameType } from "@/core/domain/types/game-types";
+import type { MatchStatus, RaceStatus } from "@/core/domain/types/match-type";
 
 export type MatchEvent = Record<
   | "id"

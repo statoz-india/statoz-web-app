@@ -7,7 +7,7 @@ import {
   getMatchSportTabs,
   getTrendingGames,
   getTrendingMatches,
-} from "@/lib";
+} from "@/core";
 
 import { hasTrending, toSports } from "./adapters";
 

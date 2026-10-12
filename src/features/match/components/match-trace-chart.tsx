@@ -9,7 +9,7 @@ import {
 } from "react";
 
 import { FullscreenExitIcon, FullscreenIcon } from "@/utils";
-import { FilterChips } from "@/widgets/ui/components/filter-chips";
+import { FilterChips } from "@/lib/widgets/ui/components/filter-chips";
 
 import type { MatchTrace, SportMatch } from "@/features/match/types";
 

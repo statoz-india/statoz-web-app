@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { BrandIcon } from "@/utils";
-import ComingSoonScreen from "@/widgets/ui/screen/comingSoon";
+import ComingSoonScreen from "@/lib/widgets/ui/screen/comingSoon";
 
 export type ComingSoonDialogProps = {
   /** The game that was asked for. */

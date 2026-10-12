@@ -1,6 +1,8 @@
 /**
  * Client for the login-free, read-only endpoints under /api/v1/public-api
- * (docs/sportsSectionBackend.md). It runs in the browser and on the server.
+ * (docs/sportsSectionBackend.md and docs/stats.md). It runs in the browser and
+ * on the server.
+ * `API_BASE_URL` already ends in /api/v1, so only the last segment is added.
  *
  * Every caller behind one IP shares a budget of 60 requests a minute across
  * all of these endpoints, and each response is cached for 15 seconds. So load
@@ -10,7 +12,7 @@
 
 import { API_BASE_URL } from "@/core/env";
 
-const PUBLIC_API_PATH = "/api/v1/public-api";
+const PUBLIC_API_PATH = "/public-api";
 
 /** The rate limit's window, used when the server's Retry-After is unreadable. */
 const RATE_LIMIT_WINDOW_SECONDS = 60;
@@ -28,7 +30,10 @@ export type RequestOptions = {
 };
 
 type PublicGetOptions<T> = RequestOptions & {
-  /** Returned when the server answers 404, which the day endpoints do for an empty day. */
+  /**
+   * Returned when the server answers 404, which the day endpoints do for an
+   * empty day and the stats endpoints do while there are no stats yet.
+   */
   emptyOn404?: T;
 };
 

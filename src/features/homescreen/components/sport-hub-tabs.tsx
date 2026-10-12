@@ -5,7 +5,7 @@ import { accentVar, FlameIcon } from "@/utils";
 import {
   UnderlineTabs,
   type UnderlineTab,
-} from "@/widgets/ui/components/underline-tabs";
+} from "@/lib/widgets/ui/components/underline-tabs";
 
 import { SportIcon } from "./sport-icon";
 

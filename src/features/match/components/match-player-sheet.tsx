@@ -10,7 +10,7 @@ import {
 } from "react";
 
 import { ChevronLeftIcon, ChevronRightIcon, CloseIcon } from "@/utils";
-import { FilterChips } from "@/widgets/ui/components/filter-chips";
+import { FilterChips } from "@/lib/widgets/ui/components/filter-chips";
 import type {
   MatchDetailLineup,
   MatchDetailPlayer,

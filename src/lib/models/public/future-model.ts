@@ -1,6 +1,6 @@
-import type { Team } from "@/lib/models/common/team-model";
-import type { FuturePickType, FutureStatus } from "@/lib/types/future-type";
-import type { TournamentSummary } from "@/lib/models/common/tournament-model";
+import type { Team } from "@/core/domain/models/common/team-model";
+import type { FuturePickType, FutureStatus } from "@/core/domain/types/future-type";
+import type { TournamentSummary } from "@/core/domain/models/common/tournament-model";
 
 export type FutureChoice = {
   _id: string;

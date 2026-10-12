@@ -1,4 +1,4 @@
-import type { RaceSummary } from "@/lib";
+import type { RaceSummary } from "@/core";
 
 import type {
   F1ClassificationRow,

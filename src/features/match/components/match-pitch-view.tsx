@@ -3,8 +3,8 @@
 import { useState, type CSSProperties } from "react";
 
 import { FootballIcon, GroupsIcon, MyLocationIcon, StadiumIcon, StyleIcon, SwapHorizIcon } from "@/utils";
-import { FilterChips } from "@/widgets/ui/components/filter-chips";
-import { NoDataState } from "@/widgets/ui/components/no-data-state";
+import { FilterChips } from "@/lib/widgets/ui/components/filter-chips";
+import { NoDataState } from "@/lib/widgets/ui/components/no-data-state";
 import type {
   MatchDetailLineup,
   MatchDetailPlayer,

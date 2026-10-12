@@ -1,6 +1,6 @@
-import type { Team } from "@/lib/models/common/team-model";
-import type { GameType } from "@/lib/types/game-types";
-import type { QuizStatus } from "@/lib/types/quiz-types";
+import type { Team } from "@/core/domain/models/common/team-model";
+import type { GameType } from "@/core/domain/types/game-types";
+import type { QuizStatus } from "@/core/domain/types/quiz-types";
 
 import type { MatchEvent } from "./match-model";
 

@@ -2,8 +2,8 @@
 
 import { useMemo, useState, type CSSProperties } from "react";
 
-import { FilterChips } from "@/widgets/ui/components/filter-chips";
-import { GoalMouthDiagram } from "@/widgets/ui/components/goal-mouth-diagram";
+import { FilterChips } from "@/lib/widgets/ui/components/filter-chips";
+import { GoalMouthDiagram } from "@/lib/widgets/ui/components/goal-mouth-diagram";
 import type { MatchShot, ShotOutcome, SportMatch } from "@/features/match/types";
 
 import { EmptyPanel, StatsRow, TeamLegendRow } from "./match-stats-shell";

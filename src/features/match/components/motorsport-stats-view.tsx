@@ -3,9 +3,9 @@
 import Image from "next/image";
 import { useState } from "react";
 
-import { FilterChips } from "@/widgets/ui/components/filter-chips";
-import { HudPanel } from "@/widgets/ui/components/hud-panel";
-import { InteractiveLineChart } from "@/widgets/ui/components/interactive-line-chart";
+import { FilterChips } from "@/lib/widgets/ui/components/filter-chips";
+import { HudPanel } from "@/lib/widgets/ui/components/hud-panel";
+import { InteractiveLineChart } from "@/lib/widgets/ui/components/interactive-line-chart";
 import type { F1RaceReport } from "@/features/match/types";
 
 import { SectionHeading } from "./match-stats-shell";
