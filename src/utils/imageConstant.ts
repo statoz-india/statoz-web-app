@@ -3,12 +3,14 @@
 
 export const IMAGES = {
   icons: {
+    appleIcon: "/assets/icons/apple-icon.png",
     appLogo: "/assets/icons/app_logo.png",
     coin: "/assets/icons/coin.svg",
     game: "/assets/icons/game.svg",
     match: "/assets/icons/match.svg",
     ozCoins: "/assets/icons/oz_coins.svg",
     pick: "/assets/icons/pick.svg",
+    siteIcon: "/assets/icons/site-icon.png",
     streak: "/assets/icons/streak.svg",
   },
 

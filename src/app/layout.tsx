@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 
 import { AppNav } from "@/lib/widgets/nav/app-nav";
 import { AppTopBar } from "@/lib/widgets/nav/app-top-bar";
+import { IMAGES } from "@/utils";
 
 import "./globals.css";
 
@@ -26,6 +27,13 @@ const orbitron = localFont({
 export const metadata: Metadata = {
   title: "StatOz",
   description: "Sports predictions, picks, and games.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "48x48" },
+      { url: IMAGES.icons.siteIcon, type: "image/png", sizes: "192x192" },
+    ],
+    apple: { url: IMAGES.icons.appleIcon, type: "image/png", sizes: "180x180" },
+  },
 };
 
 /**
