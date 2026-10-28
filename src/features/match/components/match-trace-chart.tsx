@@ -8,8 +8,8 @@ import {
   type PointerEvent,
 } from "react";
 
-import { FullscreenExitIcon, FullscreenIcon } from "@/utils";
-import { FilterChips } from "@/lib/widgets/ui/components/filter-chips";
+import { FullscreenExitIcon, FullscreenIcon } from "@/lib/icons";
+import { FilterChips } from "@/lib/ui/filter-chips";
 
 import type { MatchTrace, SportMatch } from "@/features/match/types";
 

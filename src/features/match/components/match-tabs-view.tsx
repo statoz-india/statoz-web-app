@@ -2,15 +2,15 @@
 
 import { useState, type ReactNode } from "react";
 
+import { accentVar } from "@/styles";
 import {
   QuizIcon,
   ScheduleIcon,
   SignalOffIcon,
   TrendingUpIcon,
-  accentVar,
-} from "@/utils";
-import { NoDataState } from "@/lib/widgets/ui/components/no-data-state";
-import { UnderlineTabs } from "@/lib/widgets/ui/components/underline-tabs";
+} from "@/lib/icons";
+import { NoDataState } from "@/lib/ui/no-data-state";
+import { UnderlineTabs } from "@/lib/ui/underline-tabs";
 
 import type { MatchDetailScoreboard, SportMatch } from "../types";
 import { MatchScoreboard } from "./match-scoreboard";

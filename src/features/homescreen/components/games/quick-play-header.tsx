@@ -1,4 +1,4 @@
-import { accentVar } from "@/utils";
+import { accentVar } from "@/styles";
 
 const CYAN = accentVar("cyan");
 

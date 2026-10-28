@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "../utils/design-system/tokens.css";
+@import "../styles/tokens.css";
 
 @theme inline {
   /* Surfaces */

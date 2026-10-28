@@ -3,16 +3,16 @@
 import type { ReactElement } from "react";
 
 import { useAuthSession } from "@/features/auth";
+import { accentVar } from "@/styles";
 import {
-  accentVar,
   GameIcon,
   GridViewIcon,
   LockIcon,
   PersonSearchIcon,
   QuizIcon,
   type IconProps,
-} from "@/utils";
-import { HudPanel } from "@/lib/widgets/ui/components/hud-panel";
+} from "@/lib/icons";
+import { HudPanel } from "@/lib/ui/hud-panel";
 
 import type { GameSceneId, GameTile } from "../../types";
 import { SportIcon } from "../sport-icon";

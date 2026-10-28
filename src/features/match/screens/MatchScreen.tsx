@@ -9,7 +9,7 @@ import {
   FeedError,
 } from "@/features/homescreen/components/feed-states";
 import { useTodayInIST } from "@/hooks/useTodayInIST";
-import { ArrowLeftIcon, SignalOffIcon } from "@/utils";
+import { ArrowLeftIcon, SignalOffIcon } from "@/lib/icons";
 
 import {
   findFixture,

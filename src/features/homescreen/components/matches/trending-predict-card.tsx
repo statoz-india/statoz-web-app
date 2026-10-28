@@ -1,6 +1,6 @@
-import { accentVar } from "@/utils";
-import { Badge } from "@/lib/widgets/ui/components/badge";
-import { SignalPanel } from "@/lib/widgets/ui/components/signal-panel";
+import { accentVar } from "@/styles";
+import { Badge } from "@/lib/ui/badge";
+import { SignalPanel } from "@/lib/ui/signal-panel";
 
 import type { PredictMission } from "../../types";
 import { TeamBadge } from "./team-badge";

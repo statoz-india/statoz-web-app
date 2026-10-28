@@ -1,11 +1,12 @@
 "use client";
 
 import { sportModuleFor, type Sport } from "@/config/sports";
-import { accentVar, FlameIcon } from "@/utils";
+import { accentVar } from "@/styles";
+import { FlameIcon } from "@/lib/icons";
 import {
   UnderlineTabs,
   type UnderlineTab,
-} from "@/lib/widgets/ui/components/underline-tabs";
+} from "@/lib/ui/underline-tabs";
 
 import { SportIcon } from "./sport-icon";
 

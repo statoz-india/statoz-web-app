@@ -27,7 +27,7 @@ import type {
   SportTeam,
   TrendingTile,
 } from "./types";
-import { TournamentSection } from "@/core/domain/types/game-types";
+import type { TournamentSection } from "@/core/models";
 
 /**
  * Turns the public API's responses into what the hub draws. A record the hub

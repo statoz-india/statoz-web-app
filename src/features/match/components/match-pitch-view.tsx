@@ -2,9 +2,16 @@
 
 import { useState, type CSSProperties } from "react";
 
-import { FootballIcon, GroupsIcon, MyLocationIcon, StadiumIcon, StyleIcon, SwapHorizIcon } from "@/utils";
-import { FilterChips } from "@/lib/widgets/ui/components/filter-chips";
-import { NoDataState } from "@/lib/widgets/ui/components/no-data-state";
+import {
+  FootballIcon,
+  GroupsIcon,
+  MyLocationIcon,
+  StadiumIcon,
+  StyleIcon,
+  SwapHorizIcon,
+} from "@/lib/icons";
+import { FilterChips } from "@/lib/ui/filter-chips";
+import { NoDataState } from "@/lib/ui/no-data-state";
 import type {
   MatchDetailLineup,
   MatchDetailPlayer,

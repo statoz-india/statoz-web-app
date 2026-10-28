@@ -1,7 +1,7 @@
 "use client";
 
 import { sportModuleFor, type Sport } from "@/config/sports";
-import { GameIcon } from "@/utils";
+import { GameIcon } from "@/lib/icons";
 
 import { toGameDecks } from "../../adapters";
 import { useAllGames } from "../../queries";

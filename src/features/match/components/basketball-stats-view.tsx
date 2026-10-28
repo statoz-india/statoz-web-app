@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 
-import { GridOnIcon, ShowChartIcon, accentVar } from "@/utils";
-import { FilterChips } from "@/lib/widgets/ui/components/filter-chips";
+import { accentVar } from "@/styles";
+import { GridOnIcon, ShowChartIcon } from "@/lib/icons";
+import { FilterChips } from "@/lib/ui/filter-chips";
 import type { MatchDetailScoreboard, SportMatch } from "@/features/match/types";
 
 import {

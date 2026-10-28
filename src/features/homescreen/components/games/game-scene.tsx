@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { IMAGES } from "@/utils";
+import { IMAGES } from "@/config/images";
 
 import type { GameSceneId } from "../../types";
 

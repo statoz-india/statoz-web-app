@@ -1,4 +1,4 @@
-import ComingSoonScreen from "@/lib/widgets/ui/screen/comingSoon";
+import ComingSoonScreen from "@/lib/screens/coming-soon";
 
 export default function HomeScreen() {
   return <ComingSoonScreen />;

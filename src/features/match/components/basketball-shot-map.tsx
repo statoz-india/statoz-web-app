@@ -3,7 +3,7 @@
 
 import { useMemo, useState, type CSSProperties } from "react";
 
-import { FilterChips } from "@/lib/widgets/ui/components/filter-chips";
+import { FilterChips } from "@/lib/ui/filter-chips";
 import type { BasketballScoringEvent, SportMatch } from "@/features/match/types";
 
 import { EmptyPanel, SectionHeading } from "./match-stats-shell";

@@ -2,7 +2,16 @@
 
 import { useState, type CSSProperties, type ReactNode } from "react";
 
-import { CheckIcon, FootballIcon, GridViewIcon, HistoryIcon, InsightsIcon, MicIcon, SwapHorizIcon, accentVar } from "@/utils";
+import { accentVar } from "@/styles";
+import {
+  CheckIcon,
+  FootballIcon,
+  GridViewIcon,
+  HistoryIcon,
+  InsightsIcon,
+  MicIcon,
+  SwapHorizIcon,
+} from "@/lib/icons";
 import type {
   MatchDetailCommentary,
   MatchDetailScoreboard,

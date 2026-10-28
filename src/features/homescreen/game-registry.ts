@@ -1,5 +1,5 @@
 import { sportModuleFor, type Sport } from "@/config/sports";
-import type { AccentName } from "@/utils";
+import type { AccentName } from "@/styles";
 
 import type { GameSceneId } from "./types";
 

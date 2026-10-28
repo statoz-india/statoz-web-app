@@ -2,8 +2,9 @@
 
 import { useRef, useState } from "react";
 
-import { BoltIcon, ShowChartIcon, accentVar } from "@/utils";
-import { FilterChips } from "@/lib/widgets/ui/components/filter-chips";
+import { accentVar } from "@/styles";
+import { BoltIcon, ShowChartIcon } from "@/lib/icons";
+import { FilterChips } from "@/lib/ui/filter-chips";
 import type { MatchDetailScoreboard, SportMatch } from "@/features/match/types";
 
 import { CommentaryView, TimelineList } from "./match-report-parts";

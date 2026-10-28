@@ -10,14 +10,13 @@ import { useRef, useState } from "react";
 
 import { sportModuleFor, type MatchSport } from "@/config/sports";
 import { useTodayInIST } from "@/hooks/useTodayInIST";
+import { colors, liftForContrast } from "@/styles";
 import {
   CalendarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  colors,
   EventBusyIcon,
-  liftForContrast,
-} from "@/utils";
+} from "@/lib/icons";
 
 import { toLeagueGroups } from "../../adapters";
 import { useDayFixtures } from "../../queries";

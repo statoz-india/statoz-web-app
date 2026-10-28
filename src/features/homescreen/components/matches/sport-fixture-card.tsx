@@ -1,8 +1,12 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 
-import { toISTDate } from "@/core";
-import { formatKickoffDate, formatKickoffTime, formatOzCompact } from "@/utils";
+import {
+  formatKickoffDate,
+  formatKickoffTime,
+  formatOzCompact,
+  toISTDate,
+} from "@/utils";
 
 import type { SportFixture, SportTeam } from "../../types";
 import styles from "./sport-fixture-card.module.css";

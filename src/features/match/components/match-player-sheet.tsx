@@ -9,8 +9,12 @@ import {
   type CSSProperties,
 } from "react";
 
-import { ChevronLeftIcon, ChevronRightIcon, CloseIcon } from "@/utils";
-import { FilterChips } from "@/lib/widgets/ui/components/filter-chips";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CloseIcon,
+} from "@/lib/icons";
+import { FilterChips } from "@/lib/ui/filter-chips";
 import type {
   MatchDetailLineup,
   MatchDetailPlayer,

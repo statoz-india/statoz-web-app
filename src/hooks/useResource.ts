@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useSyncExternalStore } from "react";
 
-import { RateLimitedError } from "@/core/client";
+import { RateLimitedError } from "@/core/api";
 
 /**
  * A small in-memory store for data the browser fetches. Each key is loaded
@@ -170,20 +170,20 @@ export function useResources<T>(requests: ResourceRequest<T>[]): {
   };
 }
 
-/** A null key asks for nothing yet, and reads as still loading. */
+/**
+ * One request, usually from `resources` in `@/core/api`. A null request asks
+ * for nothing yet, and reads as still loading.
+ */
 export function useResource<T>(
-  key: string | null,
-  loader: () => Promise<T>,
+  request: ResourceRequest<T> | null,
 ): Resource<T> & { reload: () => void; refresh: () => void } {
-  const { resources, reload } = useResources(
-    key === null ? [] : [{ key, load: loader }],
-  );
+  const { resources, reload } = useResources(request === null ? [] : [request]);
   return {
     ...(resources[0] ?? (LOADING as Resource<T>)),
     reload,
     /** Fetches again if the value is older than the freshness window. */
     refresh: () => {
-      if (key !== null) load(key, loader, false);
+      if (request !== null) load(request.key, request.load, false);
     },
   };
 }

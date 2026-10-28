@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import type { CSSProperties } from "react";
 
-import { AppNav } from "@/lib/widgets/nav/app-nav";
-import { AppTopBar } from "@/lib/widgets/nav/app-top-bar";
-import { IMAGES } from "@/utils";
+import { AppNav } from "@/lib/layout/app-nav";
+import { AppTopBar } from "@/lib/layout/app-top-bar";
+import { IMAGES } from "@/config/images";
 
 import "./globals.css";
 

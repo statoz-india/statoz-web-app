@@ -4,11 +4,12 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { isMatchSport, isSport, type MatchSport } from "@/config/sports";
-import { accentVar, GameIcon, MatchIcon } from "@/utils";
+import { accentVar } from "@/styles";
+import { GameIcon, MatchIcon } from "@/lib/icons";
 import {
   GlidingTabs,
   type GlidingTab,
-} from "@/lib/widgets/ui/components/gliding-tabs";
+} from "@/lib/ui/gliding-tabs";
 
 import { useGameSports, useMatchSports } from "../queries";
 import { GamesTrendingFeed } from "./games/games-trending-feed";

@@ -24,7 +24,7 @@ import {
   side,
   type Side,
 } from "./shared";
-import { TournamentSection } from "@/core/domain/types/game-types";
+import type { TournamentSection } from "@/core/models";
 
 /**
  * Turns what the public API sends into what the match page draws.

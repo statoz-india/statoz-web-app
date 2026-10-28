@@ -3,9 +3,15 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import { GridOnIcon, InsightsIcon, MicIcon, ShowChartIcon, accentVar } from "@/utils";
-import { FilterChips } from "@/lib/widgets/ui/components/filter-chips";
-import { InteractiveLineChart } from "@/lib/widgets/ui/components/interactive-line-chart";
+import { accentVar } from "@/styles";
+import {
+  GridOnIcon,
+  InsightsIcon,
+  MicIcon,
+  ShowChartIcon,
+} from "@/lib/icons";
+import { FilterChips } from "@/lib/ui/filter-chips";
+import { InteractiveLineChart } from "@/lib/ui/interactive-line-chart";
 import type { MatchDetailScoreboard, SportMatch } from "@/features/match/types";
 
 import {

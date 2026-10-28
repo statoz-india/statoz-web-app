@@ -1,11 +1,6 @@
 import type { MatchSport } from "@/config/sports";
+import { resources, type MatchStats } from "@/core";
 import { useResource, useResources } from "@/hooks/useResource";
-import {
-  getMatches,
-  getMatchStats,
-  getRaceStats,
-  type MatchStats,
-} from "@/core";
 
 import { isRace, type Fixture } from "./adapters";
 
@@ -25,11 +20,11 @@ import { isRace, type Fixture } from "./adapters";
  */
 export function useMatchStats(fixture: Fixture | undefined) {
   return useResource<MatchStats | null>(
-    fixture ? `matchStats/${fixture.matchId}` : null,
-    () =>
-      fixture && isRace(fixture)
-        ? getRaceStats(fixture.matchId)
-        : getMatchStats(fixture?._id ?? ""),
+    !fixture
+      ? null
+      : isRace(fixture)
+        ? resources.raceStats(fixture.matchId)
+        : resources.matchStats(fixture.matchId, fixture._id),
   );
 }
 
@@ -39,9 +34,6 @@ export function useMatchStats(fixture: Fixture | undefined) {
  */
 export function useFixtureDays(requests: { sport: MatchSport; day: string }[]) {
   return useResources(
-    requests.map(({ sport, day }) => ({
-      key: `matches/${sport}/${day}`,
-      load: () => getMatches(sport, day),
-    })),
+    requests.map(({ sport, day }) => resources.matches(sport, day)),
   );
 }

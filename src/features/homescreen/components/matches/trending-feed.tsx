@@ -1,8 +1,8 @@
 "use client";
 
 import { useTodayInIST } from "@/hooks/useTodayInIST";
-import { FlameIcon } from "@/utils";
-import { BentoGrid, BentoTile } from "@/lib/widgets/ui/components/bento-grid";
+import { FlameIcon } from "@/lib/icons";
+import { BentoGrid, BentoTile } from "@/lib/ui/bento-grid";
 
 import { toTrendingTiles } from "../../adapters";
 import { useTrendingMatches } from "../../queries";

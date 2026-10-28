@@ -1,13 +1,6 @@
 import { isMatchSport, type MatchSport, type Sport } from "@/config/sports";
+import { resources } from "@/core";
 import { useResource, useResources } from "@/hooks/useResource";
-import {
-  getGames,
-  getGameSportTabs,
-  getMatches,
-  getMatchSportTabs,
-  getTrendingGames,
-  getTrendingMatches,
-} from "@/core";
 
 import { hasTrending, toSports } from "./adapters";
 
@@ -17,25 +10,20 @@ import { hasTrending, toSports } from "./adapters";
  */
 
 export function useTrendingMatches() {
-  return useResource("trending/matches", () => getTrendingMatches());
+  return useResource(resources.trendingMatches());
 }
 
 export function useTrendingGames() {
-  return useResource("trending/games", () => getTrendingGames());
+  return useResource(resources.trendingGames());
 }
 
 export function useAllGames() {
-  return useResource("games", () => getGames());
+  return useResource(resources.games());
 }
 
 /** One resource per day, in the order of `days` (YYYY-MM-DD in India time). */
 export function useDayFixtures(sport: MatchSport, days: string[]) {
-  return useResources(
-    days.map((day) => ({
-      key: `matches/${sport}/${day}`,
-      load: () => getMatches(sport, day),
-    })),
-  );
+  return useResources(days.map((day) => resources.matches(sport, day)));
 }
 
 /**
@@ -44,12 +32,7 @@ export function useDayFixtures(sport: MatchSport, days: string[]) {
  */
 export function useFixturesBySport(sports: MatchSport[], day: string | null) {
   return useResources(
-    day === null
-      ? []
-      : sports.map((sport) => ({
-          key: `matches/${sport}/${day}`,
-          load: () => getMatches(sport, day),
-        })),
+    day === null ? [] : sports.map((sport) => resources.matches(sport, day)),
   );
 }
 
@@ -65,7 +48,7 @@ export type SportsList<TSport extends Sport = Sport> = {
 
 /** The sports the MATCH tab offers. */
 export function useMatchSports(): SportsList<MatchSport> {
-  const { data } = useResource("sports/matches", () => getMatchSportTabs());
+  const { data } = useResource(resources.matchSportTabs());
   return data
     ? { trending: hasTrending(data), sports: toSports(data).filter(isMatchSport) }
     : { trending: true, sports: [] };
@@ -73,7 +56,7 @@ export function useMatchSports(): SportsList<MatchSport> {
 
 /** The sports the GAMES tab offers. */
 export function useGameSports(): SportsList {
-  const { data } = useResource("sports/games", () => getGameSportTabs());
+  const { data } = useResource(resources.gameSportTabs());
   return data
     ? { trending: hasTrending(data), sports: toSports(data) }
     : { trending: true, sports: [] };

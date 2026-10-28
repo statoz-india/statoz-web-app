@@ -1,4 +1,4 @@
-import { GameType } from "@/core/domain/types/game-types";
+import type { GameType } from "@/core/models";
 
 /**
  * Every sport StatOz covers. The ids are the API's `gameType` values, so a

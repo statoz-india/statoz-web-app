@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
-import { BrandIcon } from "@/utils";
-import ComingSoonScreen from "@/lib/widgets/ui/screen/comingSoon";
+import { BrandIcon } from "@/lib/icons";
+import ComingSoonScreen from "@/lib/screens/coming-soon";
 
 export type ComingSoonDialogProps = {
   /** The game that was asked for. */
