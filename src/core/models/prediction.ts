@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import { gameTypeSchema } from "./game-type";
 import { matchEventSchema } from "./match";
 import { teamSchema } from "./team";
 import { tournamentSummarySchema } from "./tournament";
@@ -78,7 +77,7 @@ export const predictionSchema = z.object({
   matchEvent: matchEventSchema.nullable(),
   matchEventEspnId: z.string().nullable(),
   tag: z.string(),
-  gameType: gameTypeSchema,
+  gameType: z.string(),
   espnLeagueName: z.string(),
   tournament: z.string(),
   tournamentData: tournamentSummarySchema,

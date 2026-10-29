@@ -8,7 +8,7 @@ import type {
 } from "react";
 import { useRef, useState } from "react";
 
-import { sportModuleFor, type MatchSport } from "@/config/sports";
+import { sportModuleFor, type Sport } from "@/config/sports";
 import { useTodayInIST } from "@/hooks/useTodayInIST";
 import { colors, liftForContrast } from "@/styles";
 import {
@@ -40,14 +40,14 @@ const WEEKS_AHEAD = 4;
  *
  * A day is a calendar day in India time, which is how the API files a fixture.
  */
-export function SportMatchFeed({ sport }: { sport: MatchSport }) {
+export function SportMatchFeed({ sport }: { sport: Sport }) {
   const today = useTodayInIST();
   // Which day is "today" is only known in the browser.
   if (today === null) return <CardGridSkeleton />;
   return <DatedFeed sport={sport} today={today} />;
 }
 
-function DatedFeed({ sport, today }: { sport: MatchSport; today: string }) {
+function DatedFeed({ sport, today }: { sport: Sport; today: string }) {
   const weekMode = sport === "racing";
   const periods = weekMode ? weeksAround(today) : daysAround(today);
   const [selectedPeriod, setSelectedPeriod] = useState(() =>

@@ -1,6 +1,6 @@
 "use client";
 
-import { sportModuleFor, type Sport } from "@/config/sports";
+import { sportModuleFor } from "@/config/sports";
 import { accentVar } from "@/styles";
 import { FlameIcon } from "@/lib/icons";
 import {
@@ -8,42 +8,33 @@ import {
   type UnderlineTab,
 } from "@/lib/ui/underline-tabs";
 
+import type { SportHubSelection } from "../types";
 import { SportIcon } from "./sport-icon";
 
-/** `null` is the Trending destination; a sport narrows the feed to that sport. */
-export type SportHubSelection = Sport | null;
-
 export type SportHubTabsProps = {
-  /** The sports the API lists for this tab, in its order. */
-  sports: Sport[];
-  /** Whether the API lists Trending ahead of them. */
-  trending?: boolean;
+  /** The tabs, in the API's order. */
+  destinations: SportHubSelection[];
   selected: SportHubSelection;
   onSelect: (selection: SportHubSelection) => void;
 };
 
-/** Browse strip above the feed: Trending, then every sport the API sent. */
+/** Browse strip above the feed: one tab for each entry the API sent. */
 export function SportHubTabs({
-  sports,
-  trending = true,
+  destinations,
   selected,
   onSelect,
 }: SportHubTabsProps) {
-  const destinations: SportHubSelection[] = [
-    ...(trending ? [null] : []),
-    ...sports,
-  ];
-  const tabs: UnderlineTab[] = destinations.map((sport) =>
-    sport === null
-      ? { id: "trending", label: "TRENDING", icon: <FlameIcon size={21} /> }
+  const tabs: UnderlineTab[] = destinations.map((tab) =>
+    tab === "trending"
+      ? { id: tab, label: "TRENDING", icon: <FlameIcon size={21} /> }
       : {
-          id: sport,
-          label: sportModuleFor(sport).label.toUpperCase(),
-          icon: <SportIcon sport={sport} size={21} />,
+          id: tab,
+          label: sportModuleFor(tab).label.toUpperCase(),
+          icon: <SportIcon sport={tab} size={21} />,
         },
   );
-  const accentOf = (sport: SportHubSelection) =>
-    accentVar(sport ? sportModuleFor(sport).accent : "cyan");
+  const accentOf = (tab: SportHubSelection) =>
+    accentVar(tab === "trending" ? "cyan" : sportModuleFor(tab).accent);
 
   return (
     <UnderlineTabs
@@ -52,7 +43,10 @@ export function SportHubTabs({
       activeIndex={destinations.indexOf(selected)}
       accent={accentOf(selected)}
       iconColors={destinations.map(accentOf)}
-      onChange={(index) => onSelect(destinations[index] ?? null)}
+      onChange={(index) => {
+        const tab = destinations[index];
+        if (tab !== undefined) onSelect(tab);
+      }}
     />
   );
 }

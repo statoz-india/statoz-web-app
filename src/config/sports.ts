@@ -1,13 +1,8 @@
-import type { GameType } from "@/core/models";
-
 /**
  * Every sport StatOz covers. The ids are the API's `gameType` values, so a
  * sport can be sent to an endpoint and read back from a response as it is.
  */
-export type Sport = Exclude<GameType, "trending">;
-
-/** The sports with fixtures. Tennis has games only. */
-export type MatchSport = Exclude<Sport, "tennis">;
+export type Sport = "football" | "cricket" | "basketball" | "racing";
 
 /** Design-system accent token name a sport is identified by. */
 export type SportAccent = "white" | "cyan" | "lime" | "gold" | "racing";
@@ -39,12 +34,6 @@ export const sportModules: Record<Sport, SportModule> = {
     shortLabel: "BALL",
     accent: "gold",
   },
-  tennis: {
-    sport: "tennis",
-    label: "Tennis",
-    shortLabel: "TENNIS",
-    accent: "lime",
-  },
   racing: {
     sport: "racing",
     label: "Motorsport",
@@ -58,15 +47,6 @@ export const sportOrder: Sport[] = [
   "football",
   "cricket",
   "basketball",
-  "tennis",
-  "racing",
-];
-
-/** The sports the MATCH tab offers until the API's own list has loaded. */
-export const matchSports: MatchSport[] = [
-  "football",
-  "cricket",
-  "basketball",
   "racing",
 ];
 
@@ -77,8 +57,4 @@ export function sportModuleFor(sport: Sport): SportModule {
 /** Narrows a value from a URL or a response to a sport this app knows. */
 export function isSport(value: unknown): value is Sport {
   return typeof value === "string" && Object.hasOwn(sportModules, value);
-}
-
-export function isMatchSport(value: unknown): value is MatchSport {
-  return isSport(value) && value !== "tennis";
 }

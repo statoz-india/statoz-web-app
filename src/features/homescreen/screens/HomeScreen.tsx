@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { HomeHub } from "../components/home-hub";
 
 /**
- * The SPORTS destination: the MATCH and GAMES hub.
+ * The SPORTS destination: the sport browse strip and its match feeds.
  *
  * The hub reads its tab and sport from the URL, which is only known per
  * request, so it sits in a Suspense boundary and the rest of the page can

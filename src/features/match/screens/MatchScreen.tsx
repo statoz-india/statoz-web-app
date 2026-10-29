@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useEffectEvent, useMemo } from "react";
 
-import type { MatchSport } from "@/config/sports";
+import type { Sport } from "@/config/sports";
 import {
   FeedEmpty,
   FeedError,
@@ -33,7 +33,7 @@ import { useFixtureDays, useMatchStats } from "../queries";
 const POLL_MS = 30_000;
 
 /** The sports whose day lists a match or a race can be found in. */
-const FIXTURE_SPORTS: MatchSport[] = [
+const FIXTURE_SPORTS: Sport[] = [
   "football",
   "cricket",
   "basketball",

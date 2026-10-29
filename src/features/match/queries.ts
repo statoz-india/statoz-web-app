@@ -1,4 +1,4 @@
-import type { MatchSport } from "@/config/sports";
+import type { Sport } from "@/config/sports";
 import { resources, type MatchStats } from "@/core";
 import { useResource, useResources } from "@/hooks/useResource";
 
@@ -32,7 +32,7 @@ export function useMatchStats(fixture: Fixture | undefined) {
  * The fixture lists to look a match up in. The keys are the hub's own, so a
  * day the visitor has already browsed is not asked for again.
  */
-export function useFixtureDays(requests: { sport: MatchSport; day: string }[]) {
+export function useFixtureDays(requests: { sport: Sport; day: string }[]) {
   return useResources(
     requests.map(({ sport, day }) => resources.matches(sport, day)),
   );

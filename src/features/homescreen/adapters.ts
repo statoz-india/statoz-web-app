@@ -2,28 +2,25 @@ import { isSport, type Sport } from "@/config/sports";
 import type {
   Event as PickEvent,
   Future,
-  Game,
-  GameSection,
   Matches,
   MatchEvent,
   MotorSportMatches,
   Prediction,
   Quiz,
-  SportTab,
+  MatchSportsType,
   Team,
   Tournament,
   TrendingItem,
   TrendingMatch,
 } from "@/core";
 
-import { presentationFor } from "./game-registry";
 import type {
-  GameTile,
   LeagueGroup,
   MarketOutcome,
   PickMarket,
   PredictMission,
   SportFixture,
+  SportHubSelection,
   SportTeam,
   TrendingTile,
 } from "./types";
@@ -388,61 +385,16 @@ export function toTrendingTiles(items: TrendingItem[]): TrendingTile[] {
 }
 
 /* -------------------------------------------------------------------------
- * Games and sports lists
+ * Sports lists
  * ---------------------------------------------------------------------- */
 
-function toGameTile(game: Game): GameTile {
-  const sport = toSport(game.gameType);
-  const presentation = presentationFor(game.key, sport);
-  return {
-    id: game._id,
-    kind: game.isQuickPlay ? "quick" : "hero",
-    title: game.title,
-    subtitle: game.subtitle,
-    sport,
-    accent: presentation.accent,
-    scene: presentation.scene,
-    badgeLabel: presentation.badgeLabel,
-    ctaLabel: presentation.ctaLabel ?? "PLAY NOW",
-    glow: presentation.glow,
-    href: presentation.href,
-    playable: game.isLive,
-    offlineLabel: game.message?.trim() || "COMING SOON",
-  };
+/** The hub's tabs, in the API's order. An entry the app has no feed for is left out. */
+export function toSportTabs(items: MatchSportsType[]): SportHubSelection[] {
+  return items
+    .map((item) => item.gameType.toLowerCase())
+    .filter(isSportHubSelection);
 }
 
-/**
- * Every game in the response, section after section. A game listed under more
- * than one section is shown once, where it first appears.
- */
-export function toGameTiles(sections: GameSection[]): GameTile[] {
-  const games = new Map<string, Game>();
-  for (const game of sections.flatMap((section) => section.games ?? [])) {
-    if (!games.has(game._id)) games.set(game._id, game);
-  }
-  return [...games.values()].map(toGameTile);
-}
-
-/** Each sport's games, already in the order its deck lists them. */
-export function toGameDecks(
-  sections: GameSection[],
-): Partial<Record<Sport, GameTile[]>> {
-  const decks: Partial<Record<Sport, GameTile[]>> = {};
-  for (const section of sections) {
-    const sport = toSport(section.gameType);
-    if (sport) decks[sport] = (section.games ?? []).map(toGameTile);
-  }
-  return decks;
-}
-
-/** Whether a sports list offers the Trending destination. */
-export function hasTrending(tabs: SportTab[]): boolean {
-  return tabs.some((tab) => tab.gameType?.toLowerCase() === "trending");
-}
-
-/** The sports in a sports list that this app can show, in the API's order. */
-export function toSports(tabs: SportTab[]): Sport[] {
-  return tabs
-    .map((tab) => toSport(tab.gameType))
-    .filter((sport) => sport !== undefined);
+export function isSportHubSelection(value: unknown): value is SportHubSelection {
+  return value === "trending" || isSport(value);
 }

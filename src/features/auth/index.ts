@@ -1,8 +1,7 @@
 /**
- * Auth adapter. The game tiles and the primary nav read these two hooks, and
- * they are the seam to wire to the real session once login exists. Until then
- * everyone is treated as signed in, so every tile is a plain link to its game
- * and PROFILE is a plain link to the profile page.
+ * Auth adapter. The primary nav reads these two hooks, and they are the seam
+ * to wire to the real session once login exists. Until then everyone is
+ * treated as signed in, so PROFILE is a plain link to the profile page.
  */
 export type AuthStatus = "hydrating" | "guest" | "authenticated";
 

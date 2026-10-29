@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-import type { StatsGameType } from "../game-type";
+import type { Sport } from "@/config/sports";
+
 import type { BasketballSummary } from "./basketball";
 import type { CricketSummary } from "./cricket";
 import type { FootballSummary } from "./football";
@@ -26,7 +27,7 @@ function summarySchema<TSummary>() {
 }
 
 /** The stats the server holds for one match or race. */
-function statsRecordSchema<G extends StatsGameType, TSummary>(gameType: G) {
+function statsRecordSchema<G extends Sport, TSummary>(gameType: G) {
   return z.object({
     _id: z.string(),
     /** The readable id of the match or race, such as "IPL-M12". */

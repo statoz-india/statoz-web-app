@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import { gameTypeSchema } from "./game-type";
 import { listOf } from "./list-of";
 import type { Matches, MotorSportMatches } from "./match";
 
@@ -17,7 +16,7 @@ export type TournamentSummary = z.infer<typeof tournamentSummarySchema>;
 
 export const tournamentSchema = tournamentSummarySchema.extend({
   _id: z.string(),
-  gameType: gameTypeSchema,
+  gameType: z.string(),
   displayOrder: z.number().nullable(),
 });
 export type Tournament = z.infer<typeof tournamentSchema>;

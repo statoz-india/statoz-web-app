@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-import { gameTypeSchema, type MatchGameType } from "./game-type";
+import type { Sport } from "@/config/sports";
+
 import { teamSchema } from "./team";
 
 /*
@@ -65,7 +66,7 @@ export const matchesSchema = z.object({
   matchEvent: matchEventSchema.nullable(),
   matchBanner: z.string().nullable(),
   tag: z.string(),
-  gameType: gameTypeSchema,
+  gameType: z.string(),
   tournament: z.string(),
   espnLeagueName: z.string(),
   teamA: teamSchema,
@@ -106,12 +107,12 @@ export const motorSportMatchesSchema = z.object({
 export type MotorSportMatches = z.infer<typeof motorSportMatchesSchema>;
 
 /** What a section's `matches` holds: races for `racing`, fixtures otherwise. */
-export type MatchFor<G extends MatchGameType> = G extends "racing"
+export type MatchFor<G extends Sport> = G extends "racing"
   ? MotorSportMatches
   : Matches;
 
 /** The schema for {@link MatchFor}. */
-export function matchForSchema<G extends MatchGameType>(
+export function matchForSchema<G extends Sport>(
   gameType: G,
 ): z.ZodType<MatchFor<G>> {
   // TypeScript cannot narrow a conditional type on a runtime check, so the

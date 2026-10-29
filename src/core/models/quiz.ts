@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import { gameTypeSchema } from "./game-type";
 import { matchEventSchema } from "./match";
 import { teamSchema } from "./team";
 
@@ -62,7 +61,7 @@ export const quizSchema = z.object({
   matchEventEspnId: z.string().nullable(),
   matchBanner: z.string().nullable(),
   tag: z.string(),
-  gameType: gameTypeSchema,
+  gameType: z.string(),
   espnLeagueName: z.string(),
   tournament: z.string(),
   teamA: teamSchema,

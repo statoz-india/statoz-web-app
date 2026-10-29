@@ -1,20 +1,20 @@
+import type { Sport } from "@/config/sports";
 import {
-  gameSectionSchema,
   listOf,
   matchForSchema,
+  matchSportsTypesResponseSchema,
   matchStatsSchema,
   motorSportMatchesSchema,
   raceStatsSchema,
-  sportTabSchema,
+  sportsTypesResponseSchema,
   tournamentSectionSchema,
   trendingMatchesSchema,
-  type GameSection,
   type MatchFor,
-  type MatchGameType,
+  type MatchSportsType,
   type MatchStats,
   type MotorSportMatches,
   type RaceStats,
-  type SportTab,
+  type SportsType,
   type TournamentSection,
   type TrendingMatches,
 } from "@/core/models";
@@ -32,7 +32,7 @@ import { ENDPOINTS } from "./endpoints";
  * One sport's fixtures for a day, grouped by tournament and already in display
  * order. A day with nothing on it resolves to `[]`.
  */
-export function getMatches<G extends MatchGameType>(
+export function getMatches<G extends Sport>(
   gameType: G,
   istDate: string,
   options?: RequestOptions,
@@ -66,33 +66,26 @@ export function getTrendingMatches(
   return publicGet(ENDPOINTS.trendingMatches, trendingMatchesSchema, options);
 }
 
-/** The curated trending mini-games, one section per sport in a fixed order. */
-export function getTrendingGames(
+/** The sports that have fixtures, in the order the home screen shows them. */
+export function getMatchSportsTypes(
   options?: RequestOptions,
-): Promise<GameSection[]> {
-  return publicGet(ENDPOINTS.trendingGames, listOf(gameSectionSchema), options);
+): Promise<MatchSportsType[]> {
+  return publicGet(
+    ENDPOINTS.matchSportsType,
+    matchSportsTypesResponseSchema.shape.data,
+    options,
+  );
 }
 
-/** The sports list for the matches screen. */
-export function getMatchSportTabs(
+/** Every sport the API covers. */
+export function getSportsTypes(
   options?: RequestOptions,
-): Promise<SportTab[]> {
-  return publicGet(ENDPOINTS.matchSportTabs, listOf(sportTabSchema), options);
-}
-
-/**
- * Every mini-game, one section per sport in a fixed order. Games with
- * `isLive: false` are included.
- */
-export function getGames(options?: RequestOptions): Promise<GameSection[]> {
-  return publicGet(ENDPOINTS.games, listOf(gameSectionSchema), options);
-}
-
-/** The sports list for the games screen: the matches list plus tennis. */
-export function getGameSportTabs(
-  options?: RequestOptions,
-): Promise<SportTab[]> {
-  return publicGet(ENDPOINTS.gameSportTabs, listOf(sportTabSchema), options);
+): Promise<SportsType[]> {
+  return publicGet(
+    ENDPOINTS.sportsType,
+    sportsTypesResponseSchema.shape.data,
+    options,
+  );
 }
 
 /**

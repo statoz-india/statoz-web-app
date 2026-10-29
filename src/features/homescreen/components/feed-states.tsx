@@ -48,7 +48,7 @@ export function BentoSkeleton() {
   );
 }
 
-/** Stands in for a list of fixture cards or game banners. */
+/** Stands in for a list of fixture cards. */
 export function CardGridSkeleton({ count = 3 }: { count?: number }) {
   return (
     <div

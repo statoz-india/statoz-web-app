@@ -1,8 +1,9 @@
 /**
- * Client for the login-free, read-only endpoints under /api/v1/public-api
+ * Client for the login-free, read-only endpoints
  * (docs/sportsSectionBackend.md and docs/stats.md). It runs in the browser and
  * on the server.
- * `API_BASE_URL` already ends in /api/v1, so only the last segment is added.
+ * Each path in `ENDPOINTS` is absolute, so only the origin of `API_BASE_URL`
+ * is used and any path it ends in is ignored.
  *
  * Every caller behind one IP shares a budget of 60 requests a minute across
  * all of these endpoints, and each response is cached for 15 seconds. So load
@@ -13,8 +14,6 @@
 import { z } from "zod";
 
 import { API_BASE_URL } from "@/core/env";
-
-const PUBLIC_API_PATH = "/public-api";
 
 /** The rate limit's window, used when the server's Retry-After is unreadable. */
 const RATE_LIMIT_WINDOW_SECONDS = 60;
@@ -108,7 +107,7 @@ export async function publicGet<T>(
 
   // A bare GET. The API ignores a token, and a custom header would add a CORS
   // preflight to every call.
-  const res = await fetch(`${API_BASE_URL}${PUBLIC_API_PATH}${path}`, {
+  const res = await fetch(new URL(path, API_BASE_URL), {
     credentials: "omit",
     signal: options.signal,
   });

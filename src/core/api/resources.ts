@@ -1,13 +1,11 @@
-import type { MatchGameType } from "@/core/models";
+import type { Sport } from "@/config/sports";
 
 import {
-  getGames,
-  getGameSportTabs,
   getMatches,
-  getMatchSportTabs,
+  getMatchSportsTypes,
   getMatchStats,
   getRaceStats,
-  getTrendingGames,
+  getSportsTypes,
   getTrendingMatches,
 } from "./public-api";
 
@@ -27,21 +25,16 @@ export const resources = {
     key: "trending/matches",
     load: () => getTrendingMatches(),
   }),
-  trendingGames: () => ({
-    key: "trending/games",
-    load: () => getTrendingGames(),
+  matchSportsTypes: () => ({
+    key: "sports/matchSportsTypes",
+    load: () => getMatchSportsTypes(),
   }),
-  games: () => ({ key: "games", load: () => getGames() }),
-  matchSportTabs: () => ({
-    key: "sports/matches",
-    load: () => getMatchSportTabs(),
-  }),
-  gameSportTabs: () => ({
-    key: "sports/games",
-    load: () => getGameSportTabs(),
+  sportsTypes: () => ({
+    key: "sports/sportsTypes",
+    load: () => getSportsTypes(),
   }),
   /** One sport's fixture list for a day (YYYY-MM-DD in India time). */
-  matches: <G extends MatchGameType>(gameType: G, istDate: string) => ({
+  matches: <G extends Sport>(gameType: G, istDate: string) => ({
     key: `${MATCHES_KEY_PREFIX}${gameType}/${istDate}`,
     load: () => getMatches(gameType, istDate),
   }),

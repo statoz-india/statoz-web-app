@@ -6,7 +6,6 @@ export const IMAGES = {
     appleIcon: "/assets/icons/apple-icon.png",
     appLogo: "/assets/icons/app_logo.png",
     coin: "/assets/icons/coin.svg",
-    game: "/assets/icons/game.svg",
     match: "/assets/icons/match.svg",
     ozCoins: "/assets/icons/oz_coins.svg",
     pick: "/assets/icons/pick.svg",
@@ -14,23 +13,6 @@ export const IMAGES = {
     streak: "/assets/icons/streak.svg",
   },
 
-  games: {
-    bingo: "/assets/games/bingo.svg",
-    finalOver: "/assets/games/final-over.svg",
-    footballChess: "/assets/games/football-chess.svg",
-    grandPrixDash: "/assets/games/grand-prix-dash.svg",
-    guessDriver: "/assets/games/guess-driver.svg",
-    guessPlayer: "/assets/games/guess-player.svg",
-    guessWinner: "/assets/games/guess-winner.svg",
-    homeStadium: "/assets/games/home-stadium.png",
-    hoopArena: "/assets/games/hoop-arena.jpg",
-    hoopDuel: "/assets/games/hoop-duel.svg",
-    matchStadium: "/assets/games/match-stadium.png",
-    penaltyShootout: "/assets/games/penalty-shootout.svg",
-    pitchDuel: "/assets/games/pitch-duel.svg",
-    quiz: "/assets/games/quiz.svg",
-    tennisRally: "/assets/games/tennis-rally.svg",
-  },
 
   backgrounds: {
     onboarding: {

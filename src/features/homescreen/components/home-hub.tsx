@@ -3,157 +3,82 @@
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
-import { isMatchSport, isSport, type MatchSport } from "@/config/sports";
-import { accentVar } from "@/styles";
-import { GameIcon, MatchIcon } from "@/lib/icons";
-import {
-  GlidingTabs,
-  type GlidingTab,
-} from "@/lib/ui/gliding-tabs";
+import { SignalOffIcon } from "@/lib/icons";
 
-import { useGameSports, useMatchSports } from "../queries";
-import { GamesTrendingFeed } from "./games/games-trending-feed";
-import { SportGameDeck } from "./games/sport-game-deck";
+import { isSportHubSelection } from "../adapters";
+import { useMatchSports } from "../queries";
+import type { SportHubSelection } from "../types";
+import { BentoSkeleton, FeedEmpty, FeedError } from "./feed-states";
 import { SportMatchFeed } from "./matches/sport-match-feed";
 import { TrendingFeed } from "./matches/trending-feed";
-import { SportHubTabs, type SportHubSelection } from "./sport-hub-tabs";
-
-const tabs: GlidingTab[] = [
-  {
-    id: "match",
-    label: "MATCH",
-    accent: accentVar("cyan"),
-    icon: <MatchIcon size={18} />,
-  },
-  {
-    id: "games",
-    label: "GAMES",
-    accent: accentVar("orange"),
-    icon: <GameIcon size={18} />,
-  },
-];
+import { SportHubTabs } from "./sport-hub-tabs";
 
 /**
- * The home surface: the MATCH / GAMES switch over the sport browse strip and
- * the feed. The hub owns the selection and nothing else; each panel and feed
- * loads what it shows from the public API when it is first opened.
- *
- * Each tab keeps its own sport selection, so switching between them does not
- * reset the other's browse position.
+ * The home surface: the sport browse strip over the feed. The strip holds only
+ * what the match sports-types list sends, and the hub owns the selection and
+ * nothing else; each feed loads what it shows from the API when it is first
+ * opened.
  */
 export function HomeHub() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const requestedSport = searchParams.get("sport");
-  const initialTab = searchParams.get("tab") === "games" ? 1 : 0;
-  const [tab, setTab] = useState(initialTab);
-  // Tennis has games but no fixtures, so a sport can be valid on one tab only.
-  const [matchSport, setMatchSport] = useState<MatchSport | null>(
-    initialTab === 0 && isMatchSport(requestedSport) ? requestedSport : null,
+  const requested = searchParams.get("sport");
+  // `null` until a tab is picked, here or in the URL.
+  const [picked, setPicked] = useState<SportHubSelection | null>(
+    isSportHubSelection(requested) ? requested : null,
   );
-  const [gamesSport, setGamesSport] = useState<SportHubSelection>(
-    initialTab === 1 && isSport(requestedSport) ? requestedSport : null,
-  );
+  const list = useMatchSports();
+
+  // With nothing picked, or a tab the list no longer sends, the first tab shows.
+  const selected =
+    picked !== null && list.tabs.includes(picked) ? picked : list.tabs[0];
 
   /** Mirrors the selection in the URL without asking the server for anything. */
-  function persistBrowseState(nextTab: number, sport: SportHubSelection) {
-    const params = new URLSearchParams();
-    params.set("tab", nextTab === 0 ? "match" : "games");
-    if (sport !== null) params.set("sport", sport);
-    window.history.replaceState(null, "", `${pathname}?${params.toString()}`);
+  function selectTab(tab: SportHubSelection) {
+    setPicked(tab);
+    window.history.replaceState(null, "", `${pathname}?sport=${tab}`);
   }
 
-  function selectTab(nextTab: number) {
-    setTab(nextTab);
-    persistBrowseState(nextTab, nextTab === 0 ? matchSport : gamesSport);
-  }
-
-  function selectMatchSport(selection: SportHubSelection) {
-    const sport = isMatchSport(selection) ? selection : null;
-    setMatchSport(sport);
-    persistBrowseState(0, sport);
-  }
-
-  function selectGamesSport(selection: SportHubSelection) {
-    setGamesSport(selection);
-    persistBrowseState(1, selection);
+  function feed() {
+    if (!list.data) {
+      return list.status === "error" ? (
+        <FeedError
+          subject="the sports list"
+          error={list.error}
+          onRetry={list.reload}
+        />
+      ) : (
+        <BentoSkeleton />
+      );
+    }
+    if (selected === undefined) {
+      return (
+        <FeedEmpty
+          icon={<SignalOffIcon size={34} className="text-cyan" />}
+          title="NO SPORTS RIGHT NOW"
+          note="Check back soon."
+        />
+      );
+    }
+    return selected === "trending" ? (
+      <TrendingFeed />
+    ) : (
+      <SportMatchFeed key={selected} sport={selected} />
+    );
   }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <GlidingTabs
-        label="Match or games"
-        tabs={tabs}
-        activeIndex={tab}
-        onChange={selectTab}
-      />
-
-      {tab === 0 ? (
-        <MatchPanel sport={matchSport} onSelect={selectMatchSport} />
-      ) : (
-        <GamesPanel sport={gamesSport} onSelect={selectGamesSport} />
+      {selected !== undefined && (
+        <SportHubTabs
+          destinations={list.tabs}
+          selected={selected}
+          onSelect={selectTab}
+        />
       )}
-
-    </div>
-  );
-}
-
-function MatchPanel({
-  sport,
-  onSelect,
-}: {
-  sport: MatchSport | null;
-  onSelect: (selection: SportHubSelection) => void;
-}) {
-  const { sports, trending } = useMatchSports();
-  return (
-    <div
-      role="tabpanel"
-      aria-label="Match"
-      className="flex min-h-0 flex-1 flex-col"
-    >
-      <SportHubTabs
-        sports={sports}
-        trending={trending}
-        selected={sport}
-        onSelect={onSelect}
-      />
       <div className="flex-1 overflow-y-auto px-4 py-3">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
-          {sport === null ? (
-            <TrendingFeed />
-          ) : (
-            <SportMatchFeed key={sport} sport={sport} />
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function GamesPanel({
-  sport,
-  onSelect,
-}: {
-  sport: SportHubSelection;
-  onSelect: (selection: SportHubSelection) => void;
-}) {
-  const { sports, trending } = useGameSports();
-  return (
-    <div
-      role="tabpanel"
-      aria-label="Games"
-      className="flex min-h-0 flex-1 flex-col"
-    >
-      <SportHubTabs
-        sports={sports}
-        trending={trending}
-        selected={sport}
-        onSelect={onSelect}
-      />
-      <div className="flex-1 overflow-y-auto px-4 py-3">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
-          {sport === null ? <GamesTrendingFeed /> : <SportGameDeck sport={sport} />}
+          {feed()}
         </div>
       </div>
     </div>
