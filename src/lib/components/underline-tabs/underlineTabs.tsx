@@ -32,8 +32,8 @@ export type UnderlineTabsProps = {
 
 /**
  * Flat tab strip whose only live element is a glowing underline that slides
- * between tabs. Low-key by design, for dense browse surfaces that already
- * carry a focal element.
+ * between tabs. Lower-key than {@link GlidingTabs} — reach for it on dense
+ * browse surfaces that already carry a focal element.
  */
 export function UnderlineTabs({
   tabs,

@@ -10,7 +10,6 @@ import {
   StyleIcon,
   SwapHorizIcon,
 } from "@/lib/icons";
-import { FilterChips } from "@/lib/ui/filter-chips";
 import { NoDataState } from "@/lib/ui/no-data-state";
 import type {
   MatchDetailLineup,
@@ -24,6 +23,7 @@ import type {
 import { MatchPlayerSheet } from "./match-player-sheet";
 import { TeamBadge } from "./team-badge";
 import styles from "./match-pitch.module.css";
+import { FilterChips } from "@/lib/components/filter-chips";
 
 /**
  * The team sheet as a board rather than a list: one side at a time, its shape

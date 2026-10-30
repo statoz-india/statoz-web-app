@@ -10,11 +10,11 @@ import {
   TrendingUpIcon,
 } from "@/lib/icons";
 import { NoDataState } from "@/lib/ui/no-data-state";
-import { UnderlineTabs } from "@/lib/ui/underline-tabs";
 
 import type { MatchDetailScoreboard, SportMatch } from "../types";
 import { MatchScoreboard } from "./match-scoreboard";
 import styles from "./match-detail.module.css";
+import { UnderlineTabs } from "@/lib/components/underline-tabs";
 
 /**
  * The match surfaces: the quizzes, the markets on the same fixture, and the

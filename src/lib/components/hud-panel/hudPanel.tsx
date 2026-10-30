@@ -92,24 +92,11 @@ export function HudPanel({
           {children}
         </div>
 
-        {/* The hit area below is clipped, which crops the browser's focus
-            outline away, so keyboard focus is shown by this inner ring. */}
-        {interactive ? (
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 z-20 hidden group-has-focus-visible:block"
-            style={{
-              ...clip,
-              boxShadow: "inset 0 0 0 3px var(--hud-accent)",
-            }}
-          />
-        ) : null}
-
         {href ? (
           <Link
             href={href}
             aria-label={label}
-            className="absolute inset-0 z-20 outline-none"
+            className="absolute inset-0 z-20"
             style={clip}
           />
         ) : onClick ? (
@@ -117,7 +104,7 @@ export function HudPanel({
             type="button"
             onClick={onClick}
             aria-label={label}
-            className="absolute inset-0 z-20 outline-none"
+            className="absolute inset-0 z-20"
             style={clip}
           />
         ) : null}

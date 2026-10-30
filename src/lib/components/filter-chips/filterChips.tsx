@@ -2,7 +2,7 @@
 
 import type { CSSProperties, KeyboardEvent } from "react";
 
-import styles from "./filter-chips.module.css";
+import styles from "./filterChips.module.css";
 
 export type FilterChipsProps = {
   options: string[];

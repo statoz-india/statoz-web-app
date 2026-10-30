@@ -1,3 +1,4 @@
+import { typography } from "@/styles";
 import type { CSSProperties } from "react";
 
 export type GoalMouthPlacement = { x: number; y: number; label: string } | null;
@@ -99,7 +100,7 @@ export function GoalMouthDiagram({
             : "var(--ds-color-text-muted)",
           fontFamily: "var(--ds-font-display)",
           fontSize: "var(--ds-text-2xs)",
-          fontWeight: 900,
+          fontWeight: typography.weight.black,
           textAlign: "center",
           letterSpacing: "var(--ds-tracking-wide)",
         }}

@@ -5,8 +5,6 @@ import { useState } from "react";
 
 import { accentVar } from "@/styles";
 import { GridOnIcon, InsightsIcon, MicIcon, ShowChartIcon } from "@/lib/icons";
-import { FilterChips } from "@/lib/ui/filter-chips";
-import { InteractiveLineChart } from "@/lib/ui/interactive-line-chart";
 import type { MatchDetailScoreboard, SportMatch } from "@/features/match/types";
 
 import {
@@ -19,6 +17,8 @@ import {
 } from "./match-stats-shell";
 import { MatchTraceChart } from "./match-trace-chart";
 import styles from "./match-stats.module.css";
+import { FilterChips } from "@/lib/components/filter-chips";
+import { InteractiveLineChart } from "@/lib/components/interactive-line-chart";
 
 /**
  * The cricket report: the chase, the two worms side by side, the required rate

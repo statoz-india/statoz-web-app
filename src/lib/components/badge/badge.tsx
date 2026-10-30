@@ -51,7 +51,7 @@ export function Badge({
           "0 0 8px -4px color-mix(in srgb, var(--badge-accent) 20%, transparent)",
       }}
       className={[
-        "inline-flex items-center gap-[5px] border px-[7px] py-1 font-display text-2xs font-extrabold tracking-label",
+        "inline-flex items-center gap-1.25 border px-1.75 py-1 font-display text-2xs font-extrabold tracking-label",
         pulse ? "animate-pulse" : "",
         className ?? "",
       ]
@@ -60,7 +60,7 @@ export function Badge({
     >
       <span
         aria-hidden
-        className="size-[5px] rounded-pill"
+        className="size-1.25 rounded-pill"
         style={{ background: accent }}
       />
       {children}

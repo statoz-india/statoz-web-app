@@ -1,5 +1,5 @@
 import type { Sport } from "@/config/sports";
-import type { BentoSpan } from "@/lib/ui/bento-grid";
+import { BentoSpan } from "@/lib/components/bento-grid";
 
 /**
  * What the sports hub draws. The API's responses are turned into these in

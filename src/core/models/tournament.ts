@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { listOf } from "./list-of";
-import type { Matches, MotorSportMatches } from "./match";
+import type { Matches, MotorSportMatches } from "./match.model";
 
 /** The tournament fields a trending item carries. */
 export const tournamentSummarySchema = z.object({

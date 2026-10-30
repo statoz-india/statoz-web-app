@@ -1,12 +1,12 @@
 import { accentVar } from "@/styles";
 import { formatPercent } from "@/utils";
-import { Badge } from "@/lib/ui/badge";
-import { Progress } from "@/lib/ui/progress";
-import { SignalPanel } from "@/lib/ui/signal-panel";
 
 import type { MarketOutcome, PickMarket } from "../../types";
 import { TileFooter } from "./tile-footer";
 import { TileMetaRow } from "./tile-meta-row";
+import { SignalPanel } from "@/lib/components/signal-panel";
+import { Badge } from "@/lib/components/badge";
+import { Progress } from "@/lib/components/progress";
 
 export type TrendingMarketCardProps = {
   market: PickMarket;

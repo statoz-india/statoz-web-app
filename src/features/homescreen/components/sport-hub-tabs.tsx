@@ -3,10 +3,10 @@
 import { sportModuleFor } from "@/config/sports";
 import { accentVar } from "@/styles";
 import { FlameIcon } from "@/lib/icons";
-import { UnderlineTabs, type UnderlineTab } from "@/lib/ui/underline-tabs";
 
 import type { SportHubSelection } from "../types";
 import { SportIcon } from "./sport-icon";
+import { UnderlineTab, UnderlineTabs } from "@/lib/components/underline-tabs";
 
 export type SportHubTabsProps = {
   /** The tabs, in the API's order. */

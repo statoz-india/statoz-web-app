@@ -1,11 +1,11 @@
 import { z } from "zod";
 
-import { eventSchema } from "./event";
-import { futureSchema } from "./future";
+import { eventSchema } from "./event.model";
+import { futureSchema } from "./future.model";
 import { listOf } from "./list-of";
-import { matchesSchema } from "./match";
+import { matchesSchema } from "./match.model";
 import { predictionSchema } from "./prediction.model";
-import { quizSchema } from "./quiz";
+import { quizSchema } from "./quiz.model";
 
 /** A fixture as the trending list sends it, without the volume fields. */
 export const trendingMatchSchema = matchesSchema.omit({

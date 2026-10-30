@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 
 import { accentVar } from "@/styles";
 import { BoltIcon, ShowChartIcon } from "@/lib/icons";
-import { FilterChips } from "@/lib/ui/filter-chips";
 import type { MatchDetailScoreboard, SportMatch } from "@/features/match/types";
 
 import { CommentaryView, TimelineList } from "./match-report-parts";
@@ -20,6 +19,7 @@ import {
 import { MatchTraceChart } from "./match-trace-chart";
 import { FootballShotMap } from "./football-shot-map";
 import styles from "./match-stats.module.css";
+import { FilterChips } from "@/lib/components/filter-chips";
 
 /**
  * The football report — the app's five sections, in its order.

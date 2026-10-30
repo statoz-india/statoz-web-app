@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { matchEventSchema } from "./match";
+import { matchEventSchema } from "./match.model";
 import { teamSchema } from "./team";
 import { tournamentSummarySchema } from "./tournament";
 

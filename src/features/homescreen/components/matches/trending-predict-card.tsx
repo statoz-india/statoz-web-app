@@ -1,11 +1,11 @@
 import { accentVar } from "@/styles";
-import { Badge } from "@/lib/ui/badge";
-import { SignalPanel } from "@/lib/ui/signal-panel";
 
 import type { PredictMission } from "../../types";
 import { TeamBadge } from "./team-badge";
 import { TileFooter } from "./tile-footer";
 import { TileMetaRow } from "./tile-meta-row";
+import { SignalPanel } from "@/lib/components/signal-panel";
+import { Badge } from "@/lib/components/badge";
 
 export type TrendingPredictCardProps = {
   mission: PredictMission;

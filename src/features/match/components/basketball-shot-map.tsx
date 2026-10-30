@@ -3,7 +3,6 @@
 
 import { useMemo, useState, type CSSProperties } from "react";
 
-import { FilterChips } from "@/lib/ui/filter-chips";
 import type {
   BasketballScoringEvent,
   SportMatch,
@@ -11,6 +10,7 @@ import type {
 
 import { EmptyPanel, SectionHeading } from "./match-stats-shell";
 import styles from "./basketball-shot-map.module.css";
+import { FilterChips } from "@/lib/components/filter-chips";
 
 const filters = ["ALL", "HOME", "AWAY", "3PT"];
 

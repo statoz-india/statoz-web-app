@@ -2,8 +2,6 @@
 
 import { useMemo, useState, type CSSProperties } from "react";
 
-import { FilterChips } from "@/lib/ui/filter-chips";
-import { GoalMouthDiagram } from "@/lib/ui/goal-mouth-diagram";
 import type {
   MatchShot,
   ShotOutcome,
@@ -12,6 +10,8 @@ import type {
 
 import { EmptyPanel, StatsRow, TeamLegendRow } from "./match-stats-shell";
 import styles from "./football-shot-map.module.css";
+import { FilterChips } from "@/lib/components/filter-chips";
+import { GoalMouthDiagram } from "@/lib/components/goal-mouth-diagram";
 
 const filters = ["ALL", "1ST", "2ND", "GOALS"];
 

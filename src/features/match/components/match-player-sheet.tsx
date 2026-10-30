@@ -10,7 +10,6 @@ import {
 } from "react";
 
 import { ChevronLeftIcon, ChevronRightIcon, CloseIcon } from "@/lib/icons";
-import { FilterChips } from "@/lib/ui/filter-chips";
 import type {
   MatchDetailLineup,
   MatchDetailPlayer,
@@ -20,6 +19,7 @@ import type {
 
 import { TeamBadge } from "./team-badge";
 import styles from "./match-player-sheet.module.css";
+import { FilterChips } from "@/lib/components/filter-chips";
 
 type SquadPlayer = {
   roster: MatchDetailPlayer;

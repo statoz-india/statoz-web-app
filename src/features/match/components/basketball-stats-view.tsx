@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { accentVar } from "@/styles";
 import { GridOnIcon, ShowChartIcon } from "@/lib/icons";
-import { FilterChips } from "@/lib/ui/filter-chips";
+
 import type { MatchDetailScoreboard, SportMatch } from "@/features/match/types";
 
 import {
@@ -23,6 +23,7 @@ import {
 import { MatchTraceChart } from "./match-trace-chart";
 import { BasketballShotMap } from "./basketball-shot-map";
 import styles from "./match-stats.module.css";
+import { FilterChips } from "@/lib/components/filter-chips";
 
 /**
  * The basketball report: the model's read, the flow that produced it, the

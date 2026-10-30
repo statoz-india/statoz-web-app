@@ -9,11 +9,11 @@ import {
 } from "react";
 
 import { FullscreenExitIcon, FullscreenIcon } from "@/lib/icons";
-import { FilterChips } from "@/lib/ui/filter-chips";
 
 import type { MatchTrace, SportMatch } from "@/features/match/types";
 
 import styles from "./match-stats.module.css";
+import { FilterChips } from "@/lib/components/filter-chips";
 
 /**
  * A two-sided trace: both teams on one axis, scrubbable, with the events that

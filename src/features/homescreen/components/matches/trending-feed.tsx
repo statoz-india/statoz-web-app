@@ -2,15 +2,15 @@
 
 import { useTodayInIST } from "@/hooks/useTodayInIST";
 import { FlameIcon } from "@/lib/icons";
-import { BentoGrid, BentoTile } from "@/lib/ui/bento-grid";
 
 import { toTrendingTiles } from "../../adapters";
-import { useTrendingMatches } from "../../data/trending.data";
+import { useTrendingMatches } from "../../data/getTrendingData";
 import type { TrendingTile } from "../../types";
 import { BentoSkeleton, FeedEmpty, FeedError } from "../feed-states";
 import { SportFixtureCard } from "./sport-fixture-card";
 import { TrendingMarketCard } from "./trending-market-card";
 import { TrendingPredictCard } from "./trending-predict-card";
+import { BentoGrid, BentoTile } from "@/lib/components/bento-grid";
 
 /** The curated trending bento — the home screen's main surface. */
 export function TrendingFeed() {

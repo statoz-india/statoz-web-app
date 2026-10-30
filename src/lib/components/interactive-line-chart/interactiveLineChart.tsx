@@ -7,7 +7,7 @@ import {
   type PointerEvent,
 } from "react";
 
-import styles from "./interactive-line-chart.module.css";
+import styles from "./interactiveLineChart.module.css";
 
 /** One plotted line. Several may share a chart when they share a scale. */
 export type LineChartSeries = {

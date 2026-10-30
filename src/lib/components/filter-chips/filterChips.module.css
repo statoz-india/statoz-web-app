@@ -28,7 +28,7 @@
   cursor: pointer;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xs);
-  font-weight: 900;
+  font-weight: var(--ds-weight-black);
   letter-spacing: var(--ds-tracking-wide);
   line-height: var(--ds-leading-compact);
   white-space: nowrap;
