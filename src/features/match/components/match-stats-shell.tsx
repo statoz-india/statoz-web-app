@@ -5,7 +5,11 @@ import type { ComponentType, CSSProperties, ReactNode } from "react";
 import { accentVar } from "@/styles";
 import { SignalOffIcon, type IconProps } from "@/lib/icons";
 import { NoDataState } from "@/lib/ui/no-data-state";
-import type { MatchDetailStat, MatchIntel, SportMatch } from "@/features/match/types";
+import type {
+  MatchDetailStat,
+  MatchIntel,
+  SportMatch,
+} from "@/features/match/types";
 
 import styles from "./match-stats.module.css";
 

@@ -4,7 +4,10 @@
 import { useMemo, useState, type CSSProperties } from "react";
 
 import { FilterChips } from "@/lib/ui/filter-chips";
-import type { BasketballScoringEvent, SportMatch } from "@/features/match/types";
+import type {
+  BasketballScoringEvent,
+  SportMatch,
+} from "@/features/match/types";
 
 import { EmptyPanel, SectionHeading } from "./match-stats-shell";
 import styles from "./basketball-shot-map.module.css";

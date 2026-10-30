@@ -53,7 +53,10 @@ type MatchDetails = {
     winner: string;
     winnerId: string;
   };
-} & Record<"title" | "date" | "time" | "end" | "seriesNote" | "officials", unknown>;
+} & Record<
+  "title" | "date" | "time" | "end" | "seriesNote" | "officials",
+  unknown
+>;
 
 type TeamStat = {
   /** The stat's key, for example "runs". */

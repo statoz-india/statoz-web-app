@@ -9,11 +9,7 @@ import {
   type CSSProperties,
 } from "react";
 
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  CloseIcon,
-} from "@/lib/icons";
+import { ChevronLeftIcon, ChevronRightIcon, CloseIcon } from "@/lib/icons";
 import { FilterChips } from "@/lib/ui/filter-chips";
 import type {
   MatchDetailLineup,
@@ -189,7 +185,9 @@ function PlayerCard({
           </p>
           <span className={styles.statuses}>
             <b>{lineupRole(roster)}</b>
-            <b data-muted>{played ? "MATCH DATA" : tracked ? "UNUSED" : "NO PLAYER DATA"}</b>
+            <b data-muted>
+              {played ? "MATCH DATA" : tracked ? "UNUSED" : "NO PLAYER DATA"}
+            </b>
           </span>
         </span>
       </section>

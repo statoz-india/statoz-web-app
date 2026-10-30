@@ -4,7 +4,11 @@ import { useMemo, useState, type CSSProperties } from "react";
 
 import { FilterChips } from "@/lib/ui/filter-chips";
 import { GoalMouthDiagram } from "@/lib/ui/goal-mouth-diagram";
-import type { MatchShot, ShotOutcome, SportMatch } from "@/features/match/types";
+import type {
+  MatchShot,
+  ShotOutcome,
+  SportMatch,
+} from "@/features/match/types";
 
 import { EmptyPanel, StatsRow, TeamLegendRow } from "./match-stats-shell";
 import styles from "./football-shot-map.module.css";

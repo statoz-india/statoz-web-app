@@ -33,12 +33,7 @@ import { useFixtureDays, useMatchStats } from "../queries";
 const POLL_MS = 30_000;
 
 /** The sports whose day lists a match or a race can be found in. */
-const FIXTURE_SPORTS: Sport[] = [
-  "football",
-  "cricket",
-  "basketball",
-  "racing",
-];
+const FIXTURE_SPORTS: Sport[] = ["football", "cricket", "basketball", "racing"];
 
 /**
  * The days searched for a match nothing here knows the day of: a link opened

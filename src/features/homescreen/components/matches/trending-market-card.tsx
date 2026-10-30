@@ -41,7 +41,9 @@ export function TrendingMarketCard({
     <SignalPanel
       accent={borderAccent}
       appearance="balanced"
-      tag={<Badge accent={accent}>{kind === "future" ? "FUTURE" : "PICK"}</Badge>}
+      tag={
+        <Badge accent={accent}>{kind === "future" ? "FUTURE" : "PICK"}</Badge>
+      }
       href={market.href}
       label={market.question}
       footer={

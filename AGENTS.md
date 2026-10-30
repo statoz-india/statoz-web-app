@@ -56,6 +56,7 @@ Use the `@/` alias for imports across folders, and relative imports inside a fea
 - Always give the best suggestions whenever I ask something, don't just agree to me blindly.
 - Never edit this file `.claude/CLAUDE.md` & `AGENTS.md` without asking first.
 - Don't touch any file unnecessarily for making any changes that is not related to the given instructions
+- Never run a formatter (`npm run format`, `npx prettier --write` or any other) unless asked.
 
 ## Before finishing a change
 

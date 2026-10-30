@@ -13,13 +13,16 @@ const eslintConfig = defineConfig([
       "no-restricted-syntax": [
         "error",
         {
-          selector: "Literal[value=/\\/assets\\/.*\\.(svg|png|jpe?g|webp|gif|avif|ico)$/i]",
-          message: "Use IMAGES from @/config/images instead of hardcoding image paths.",
+          selector:
+            "Literal[value=/\\/assets\\/.*\\.(svg|png|jpe?g|webp|gif|avif|ico)$/i]",
+          message:
+            "Use IMAGES from @/config/images instead of hardcoding image paths.",
         },
         {
           selector:
             "TemplateLiteral:has(TemplateElement[value.raw=/\\/assets\\//]):has(TemplateElement[value.raw=/\\.(svg|png|jpe?g|webp|gif|avif|ico)$/i])",
-          message: "Use IMAGES from @/config/images instead of hardcoding image paths.",
+          message:
+            "Use IMAGES from @/config/images instead of hardcoding image paths.",
         },
       ],
     },

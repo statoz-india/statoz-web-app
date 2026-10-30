@@ -113,29 +113,29 @@ src/
 
 ## What each folder is for
 
-| Folder | Holds | Never holds |
-|---|---|---|
-| `app/` | Routes, layouts, metadata, global CSS. Each `page.tsx` is a few lines that render a screen from `features/` or `lib/screens/` | Business logic, data fetching, components |
-| `features/<name>/` | One feature's screens, components, data hooks (`queries.ts`), adapters and view-model types | Code another feature imports from inside it |
-| `lib/` | Shared UI: primitives (`ui/`), the app shell (`layout/`), shared full screens (`screens/`), icons | Non-UI code; components only one feature uses |
-| `core/api/` | Everything that talks to the backend: HTTP, paths, calls, cache keys | UI; feature-specific shaping of data |
-| `core/models/` | What the API sends: a zod schema per entity, with its type inferred from the schema, plus its status enums | View models; anything the UI invents |
-| `hooks/` | React hooks shared across features | Hooks only one feature uses |
-| `config/` | Static app data that every layer may read | Logic; values that come from the API |
-| `styles/` | Design tokens as TypeScript values and as CSS variables (`tokens.css`) | Components |
-| `utils/` | Pure functions with no React and no styling: formatters, date helpers | Anything visual, anything with state |
+| Folder             | Holds                                                                                                                         | Never holds                                   |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `app/`             | Routes, layouts, metadata, global CSS. Each `page.tsx` is a few lines that render a screen from `features/` or `lib/screens/` | Business logic, data fetching, components     |
+| `features/<name>/` | One feature's screens, components, data hooks (`queries.ts`), adapters and view-model types                                   | Code another feature imports from inside it   |
+| `lib/`             | Shared UI: primitives (`ui/`), the app shell (`layout/`), shared full screens (`screens/`), icons                             | Non-UI code; components only one feature uses |
+| `core/api/`        | Everything that talks to the backend: HTTP, paths, calls, cache keys                                                          | UI; feature-specific shaping of data          |
+| `core/models/`     | What the API sends: a zod schema per entity, with its type inferred from the schema, plus its status enums                    | View models; anything the UI invents          |
+| `hooks/`           | React hooks shared across features                                                                                            | Hooks only one feature uses                   |
+| `config/`          | Static app data that every layer may read                                                                                     | Logic; values that come from the API          |
+| `styles/`          | Design tokens as TypeScript values and as CSS variables (`tokens.css`)                                                        | Components                                    |
+| `utils/`           | Pure functions with no React and no styling: formatters, date helpers                                                         | Anything visual, anything with state          |
 
 ### Inside a feature
 
 Every feature follows the same layout:
 
-| File or folder | Role |
-|---|---|
-| `screens/` | What a route renders. The entry point for `app/` |
-| `components/` | UI used only by this feature |
-| `queries.ts` | Hooks that ask `core/api` for data, e.g. `useTrendingMatches()` |
-| `adapters` | Pure functions that turn API models (`core/models`) into this feature's view models |
-| `types` | The feature's view models, the shapes its components render |
+| File or folder | Role                                                                                |
+| -------------- | ----------------------------------------------------------------------------------- |
+| `screens/`     | What a route renders. The entry point for `app/`                                    |
+| `components/`  | UI used only by this feature                                                        |
+| `queries.ts`   | Hooks that ask `core/api` for data, e.g. `useTrendingMatches()`                     |
+| `adapters`     | Pure functions that turn API models (`core/models`) into this feature's view models |
+| `types`        | The feature's view models, the shapes its components render                         |
 
 A small feature uses single files (`adapters.ts`, `types.ts`). A larger one uses
 folders (`adapters/`, `types/`). The `match` feature splits its adapters by
@@ -204,12 +204,12 @@ flowchart LR
     resources --> queries
 ```
 
-| File | Knows | Doesn't know |
-|---|---|---|
-| `client.ts` | HTTP, the `{ statusCode, data, message, success }` envelope, 404 and 429 handling, error classes | Any path |
-| `endpoints.ts` | Every path, as strings or functions | How to call them |
-| `public-api.ts` | Which path returns which model, checked by which schema | Caching |
-| `resources.ts` | The cache key each call is stored under | Screens |
+| File            | Knows                                                                                            | Doesn't know     |
+| --------------- | ------------------------------------------------------------------------------------------------ | ---------------- |
+| `client.ts`     | HTTP, the `{ statusCode, data, message, success }` envelope, 404 and 429 handling, error classes | Any path         |
+| `endpoints.ts`  | Every path, as strings or functions                                                              | How to call them |
+| `public-api.ts` | Which path returns which model, checked by which schema                                          | Caching          |
+| `resources.ts`  | The cache key each call is stored under                                                          | Screens          |
 
 ## How data reaches a screen
 
@@ -346,15 +346,15 @@ Two rules of thumb:
 
 ## Conventions
 
-| Topic | Convention |
-|---|---|
-| File names | kebab-case: `sport-fixture-card.tsx`, `ist-date.ts` |
-| Hooks | `useSomething` |
-| Styles | A CSS module next to its component (`badge.module.css`); global tokens in `styles/tokens.css` |
-| Image paths | Only through `IMAGES` in `config/images.ts`. ESLint rejects a hardcoded `/assets/...` path anywhere else |
-| Barrels | One `index.ts` per shared folder (`@/core`, `@/core/models`, `@/core/api`, `@/styles`, `@/utils`, `@/lib/icons`). Inside a folder, import from the specific file to avoid cycles |
-| Models | One file per entity in `core/models/`: the schema, the type inferred from it, and its status enums |
-| Statuses | Compare against the exact string. Casing differs by entity: `upcoming` for a match, `Upcoming` for a race, `UPCOMING` for a quiz |
+| Topic       | Convention                                                                                                                                                                       |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| File names  | kebab-case: `sport-fixture-card.tsx`, `ist-date.ts`                                                                                                                              |
+| Hooks       | `useSomething`                                                                                                                                                                   |
+| Styles      | A CSS module next to its component (`badge.module.css`); global tokens in `styles/tokens.css`                                                                                    |
+| Image paths | Only through `IMAGES` in `config/images.ts`. ESLint rejects a hardcoded `/assets/...` path anywhere else                                                                         |
+| Barrels     | One `index.ts` per shared folder (`@/core`, `@/core/models`, `@/core/api`, `@/styles`, `@/utils`, `@/lib/icons`). Inside a folder, import from the specific file to avoid cycles |
+| Models      | One file per entity in `core/models/`: the schema, the type inferred from it, and its status enums                                                                               |
+| Statuses    | Compare against the exact string. Casing differs by entity: `upcoming` for a match, `Upcoming` for a race, `UPCOMING` for a quiz                                                 |
 
 ## Suggestions
 
@@ -385,10 +385,10 @@ flowchart LR
 
 **1. Fix the two boundary breaks**
 
-| Today | Change to |
-|---|---|
+| Today                                                                                         | Change to                                                                                                      |
+| --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `features/match/screens/MatchScreen.tsx` imports `features/homescreen/components/feed-states` | Move `feed-states` to `lib/ui/feed-states.tsx`. Loading, empty and error states aren't specific to one feature |
-| `lib/layout/app-nav.tsx` imports `@/features/auth` | Move auth to `core/auth/`. The session is cross-cutting: shared UI and several features all read it |
+| `lib/layout/app-nav.tsx` imports `@/features/auth`                                            | Move auth to `core/auth/`. The session is cross-cutting: shared UI and several features all read it            |
 
 **2. Remove the duplicated team badge**
 
@@ -468,15 +468,15 @@ because the server and the browser both use it.
 
 ### Summary
 
-| # | Change | Effort | Risk |
-|---|---|---|---|
-| 1 | Move `feed-states` to `lib/ui`, auth to `core/auth` | Small | Low |
-| 2 | One shared `TeamBadge` and `SportTeam` | Small | Low |
-| 3 | ESLint boundary rules + a feature `index.ts` each | Small | None |
-| 4 | Split `homescreen` into `home`, `fixtures`, `games` | Large | Medium |
-| 5 | kebab-case screen files | Small | None |
-| 6 | Vitest + adapter and schema tests | Medium | None |
-| 7 | Shared `request()` for authenticated APIs | Medium | Low |
+| #   | Change                                              | Effort | Risk   |
+| --- | --------------------------------------------------- | ------ | ------ |
+| 1   | Move `feed-states` to `lib/ui`, auth to `core/auth` | Small  | Low    |
+| 2   | One shared `TeamBadge` and `SportTeam`              | Small  | Low    |
+| 3   | ESLint boundary rules + a feature `index.ts` each   | Small  | None   |
+| 4   | Split `homescreen` into `home`, `fixtures`, `games` | Large  | Medium |
+| 5   | kebab-case screen files                             | Small  | None   |
+| 6   | Vitest + adapter and schema tests                   | Medium | None   |
+| 7   | Shared `request()` for authenticated APIs           | Medium | Low    |
 
 Do 1–3 and 5 together; they're mechanical and remove every boundary problem
 above. Do 4 when the next feature starts, 7 when login work starts, and 6

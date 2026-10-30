@@ -395,6 +395,8 @@ export function toSportTabs(items: MatchSportsType[]): SportHubSelection[] {
     .filter(isSportHubSelection);
 }
 
-export function isSportHubSelection(value: unknown): value is SportHubSelection {
+export function isSportHubSelection(
+  value: unknown,
+): value is SportHubSelection {
   return value === "trending" || isSport(value);
 }
