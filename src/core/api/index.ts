@@ -1,8 +1,9 @@
-// The cache layer and the calls. `publicGet` and `ENDPOINTS` stay internal, so
-// screens cannot reach the backend without going through `resources`.
+// The cache layer and the calls. The fetch functions and `ENDPOINTS` stay
+// internal, so screens cannot reach the backend without going through the
+// calls in `public-api`.
 export {
+  dataOrThrow,
   InvalidResponseError,
-  PublicApiError,
   RateLimitedError,
   type RequestOptions,
 } from "./client";

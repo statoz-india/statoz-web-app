@@ -8,6 +8,7 @@ import {
   raceStatsSchema,
   sportsTypesResponseSchema,
   tournamentSectionSchema,
+  type ApiResult,
   trendingMatchesSchema,
   type MatchFor,
   type MatchSportsType,
@@ -19,28 +20,28 @@ import {
   type TrendingMatches,
 } from "@/core/models";
 
-import { publicGet, type RequestOptions } from "./client";
+import { unauthenticatedFetch, type RequestOptions } from "./client";
 import { ENDPOINTS } from "./endpoints";
 
 /**
  * Every call to the public API, each with the schema its data is checked
- * against. Nothing else in the app calls `publicGet`; screens ask for data
- * through `resources.ts`.
+ * against. Each resolves to the API's response as it was sent; screens ask
+ * for data through `resources.ts`, which unwraps it.
  */
 
 /**
  * One sport's fixtures for a day, grouped by tournament and already in display
- * order. A day with nothing on it resolves to `[]`.
+ * order. A day with nothing on it is a 404.
  */
 export function getMatches<G extends Sport>(
   gameType: G,
   istDate: string,
   options?: RequestOptions,
-): Promise<TournamentSection<MatchFor<G>>[]> {
-  return publicGet(
+): Promise<ApiResult<TournamentSection<MatchFor<G>>[]>> {
+  return unauthenticatedFetch(
     ENDPOINTS.matches(gameType, istDate),
     listOf(tournamentSectionSchema(matchForSchema(gameType))),
-    { ...options, emptyOn404: [] },
+    options,
   );
 }
 
@@ -51,26 +52,30 @@ export function getMatches<G extends Sport>(
 export function getRaces(
   istDate: string,
   options?: RequestOptions,
-): Promise<MotorSportMatches[]> {
-  return publicGet(
+): Promise<ApiResult<MotorSportMatches[]>> {
+  return unauthenticatedFetch(
     ENDPOINTS.races(istDate),
     listOf(motorSportMatchesSchema),
-    { ...options, emptyOn404: [] },
+    options,
   );
 }
 
 /** The curated trending list, plus counts. `items` is `[]` when nothing is trending. */
 export function getTrendingMatches(
   options?: RequestOptions,
-): Promise<TrendingMatches> {
-  return publicGet(ENDPOINTS.trendingMatches, trendingMatchesSchema, options);
+): Promise<ApiResult<TrendingMatches>> {
+  return unauthenticatedFetch(
+    ENDPOINTS.trendingMatches,
+    trendingMatchesSchema,
+    options,
+  );
 }
 
 /** The sports that have fixtures, in the order the home screen shows them. */
 export function getMatchSportsTypes(
   options?: RequestOptions,
-): Promise<MatchSportsType[]> {
-  return publicGet(
+): Promise<ApiResult<MatchSportsType[]>> {
+  return unauthenticatedFetch(
     ENDPOINTS.matchSportsType,
     matchSportsTypesResponseSchema.shape.data,
     options,
@@ -80,8 +85,8 @@ export function getMatchSportsTypes(
 /** Every sport the API covers. */
 export function getSportsTypes(
   options?: RequestOptions,
-): Promise<SportsType[]> {
-  return publicGet(
+): Promise<ApiResult<SportsType[]>> {
+  return unauthenticatedFetch(
     ENDPOINTS.sportsType,
     sportsTypesResponseSchema.shape.data,
     options,
@@ -89,8 +94,8 @@ export function getSportsTypes(
 }
 
 /**
- * The stats for a football, cricket or basketball match, or `null` while the
- * server has none, which is usual before a match starts.
+ * The stats for a football, cricket or basketball match. While the server has
+ * none, which is usual before a match starts, it answers 404.
  *
  * `matchObjectId` is the match's 24-character `_id`. Its readable `matchId`,
  * such as "IPL-M12", is rejected with a 400.
@@ -103,17 +108,17 @@ export function getSportsTypes(
 export function getMatchStats(
   matchObjectId: string,
   options?: RequestOptions,
-): Promise<MatchStats | null> {
-  return publicGet(
+): Promise<ApiResult<MatchStats | null>> {
+  return unauthenticatedFetch(
     ENDPOINTS.matchStats(matchObjectId),
     matchStatsSchema.nullable(),
-    { ...options, emptyOn404: null },
+    options,
   );
 }
 
 /**
- * The stats for an F1 race, or `null` when the server has none yet or does not
- * know the race. `raceId` is the race's `_id` or its readable `matchId`, such
+ * The stats for an F1 race. It answers 404 when the server has none yet or
+ * does not know the race. `raceId` is the race's `_id` or its readable `matchId`, such
  * as "F1-R18"; the readable one is not case-sensitive.
  *
  * The same advice on size and polling applies as for a match. A race is over
@@ -122,10 +127,10 @@ export function getMatchStats(
 export function getRaceStats(
   raceId: string,
   options?: RequestOptions,
-): Promise<RaceStats | null> {
-  return publicGet(
+): Promise<ApiResult<RaceStats | null>> {
+  return unauthenticatedFetch(
     ENDPOINTS.raceStats(raceId),
     raceStatsSchema.nullable(),
-    { ...options, emptyOn404: null },
+    options,
   );
 }

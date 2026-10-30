@@ -1,41 +1,31 @@
 /**
- * Client for the login-free, read-only endpoints
- * (docs/sportsSectionBackend.md and docs/stats.md). It runs in the browser and
- * on the server.
- * Each path in `ENDPOINTS` is absolute, so only the origin of `API_BASE_URL`
- * is used and any path it ends in is ignored.
+ * The only place that calls `fetch` against the API. Endpoint paths are
+ * absolute (`/api/v1/...`), so only the origin of `API_BASE_URL` is used.
  *
- * Every caller behind one IP shares a budget of 60 requests a minute across
- * all of these endpoints, and each response is cached for 15 seconds. So load
- * an endpoint once when its screen opens, and never poll faster than every 30
- * seconds.
+ * - `unauthenticatedFetch` sends the request exactly as the caller built it.
+ * - `authenticatedFetch` adds the `Cookie: accessToken=...` header the
+ *   backend reads to know who is calling.
+ *
+ * Both resolve to the body the API sent: `ApiSuccess`, `ApiError` or
+ * `ApiErrorResponse`. Check `success` before reading `data`.
  */
 
 import { z } from "zod";
 
 import { API_BASE_URL } from "@/core/env";
+import {
+  apiErrorResponseSchema,
+  apiErrorSchema,
+  apiSuccessSchema,
+  type ApiResult,
+} from "@/core/models";
 
-/** The rate limit's window, used when the server's Retry-After is unreadable. */
 const RATE_LIMIT_WINDOW_SECONDS = 60;
 
-/** The wrapper every JSON response from the API uses. */
-type Envelope = {
-  statusCode: number;
-  data: unknown;
-  message: string;
-  success: boolean;
-};
+const DEFAULT_ERROR_MESSAGE = "Something went wrong";
 
 export type RequestOptions = {
   signal?: AbortSignal;
-};
-
-type PublicGetOptions<T> = RequestOptions & {
-  /**
-   * Returned when the server answers 404, which the day endpoints do for an
-   * empty day and the stats endpoints do while there are no stats yet.
-   */
-  emptyOn404?: T;
 };
 
 /**
@@ -45,102 +35,130 @@ type PublicGetOptions<T> = RequestOptions & {
 export class RateLimitedError extends Error {
   readonly retryAfterSeconds: number;
 
-  constructor(retryAfterSeconds: number) {
-    super("Too many requests, please try again later.");
+  constructor(message: string, retryAfterSeconds = RATE_LIMIT_WINDOW_SECONDS) {
+    super(message);
     this.name = "RateLimitedError";
     this.retryAfterSeconds = retryAfterSeconds;
   }
 }
 
-/** Any other failed call: an error envelope, or a body that is not one. */
-export class PublicApiError extends Error {
-  readonly status: number;
-  /** The envelope's `data`, which holds the detail on a 400. */
-  readonly data: unknown;
-
-  constructor(message: string, status: number, data: unknown = null) {
-    super(message);
-    this.name = "PublicApiError";
-    this.status = status;
-    this.data = data;
-  }
-}
-
 /**
  * The call worked, but its data is not the shape the app expects. The backend
- * has changed, or the model in `@/core/models` is wrong; `issues` says which
- * field.
+ * has changed, or the model is wrong; `issues` says which field.
  */
-export class InvalidResponseError extends PublicApiError {
+export class InvalidResponseError extends Error {
   readonly issues: z.ZodError["issues"];
 
   constructor(path: string, status: number, error: z.ZodError) {
     super(
-      `Public API ${path} answered with data the app cannot read:\n${z.prettifyError(error)}`,
-      status,
+      `API ${path} answered ${status} with data the app cannot read:\n${z.prettifyError(error)}`,
     );
     this.name = "InvalidResponseError";
     this.issues = error.issues;
   }
 }
 
-function isEnvelope(body: unknown): body is Envelope {
-  return (
-    typeof body === "object" &&
-    body !== null &&
-    typeof (body as Envelope).success === "boolean"
-  );
+/*
+ * The access token from the last login. It lives in memory only, so a reload
+ * logs the visitor out. `auth.ts` sets it; nothing else should.
+ */
+let accessToken: string | null = null;
+
+export function setAccessToken(token: string | null) {
+  accessToken = token;
 }
 
-/**
- * Calls one endpoint and checks its data against `schema`, so a response the
- * app cannot read fails here, by name, instead of deep inside a screen.
- */
-export async function publicGet<T>(
-  path: string,
-  schema: z.ZodType<T>,
-  options: PublicGetOptions<T> = {},
-): Promise<T> {
+export function getAccessToken(): string | null {
+  return accessToken;
+}
+
+function urlFor(path: string): URL {
   if (!API_BASE_URL) {
     throw new Error("NEXT_PUBLIC_API_BASE_URL is not set");
   }
+  return new URL(path, API_BASE_URL);
+}
 
-  // A bare GET. The API ignores a token, and a custom header would add a CORS
-  // preflight to every call.
-  const res = await fetch(new URL(path, API_BASE_URL), {
-    credentials: "omit",
-    signal: options.signal,
-  });
-
-  // A 429 body is plain text, so it must not reach the JSON parse below.
-  // Retry-After is readable on the server but not from another origin.
-  if (res.status === 429) {
-    throw new RateLimitedError(
-      Number(res.headers.get("Retry-After")) || RATE_LIMIT_WINDOW_SECONDS,
-    );
+async function send<T>(
+  path: string,
+  schema: z.ZodType<T>,
+  init?: RequestInit,
+): Promise<ApiResult<T>> {
+  const res = await fetch(urlFor(path), init);
+  const text = await res.text();
+  let body: unknown;
+  try {
+    body = JSON.parse(text);
+  } catch {
+    // A 429 is plain text worth showing; an unknown route is an HTML page.
+    const isHtml = res.headers.get("Content-Type")?.includes("text/html");
+    return {
+      statusCode: res.status,
+      success: false,
+      message: !isHtml && text ? text : DEFAULT_ERROR_MESSAGE,
+    };
   }
 
-  const body: unknown = await res.json().catch(() => null);
-
-  // A 404 without the envelope is a route this environment does not have yet,
-  // not an empty day, so it falls through to the error here.
-  if (!isEnvelope(body)) {
-    throw new PublicApiError(
-      `Public API answered ${res.status} without its JSON envelope`,
-      res.status,
-    );
-  }
-
-  if (res.status === 404 && options.emptyOn404 !== undefined) {
-    return options.emptyOn404;
-  }
-  if (!body.success) {
-    throw new PublicApiError(body.message, res.status, body.data);
-  }
-
-  const parsed = schema.safeParse(body.data);
+  const parsed = res.ok
+    ? apiSuccessSchema(schema).safeParse(body)
+    : typeof body === "object" && body !== null && "data" in body
+      ? apiErrorResponseSchema.safeParse(body)
+      : apiErrorSchema.safeParse(body);
   if (!parsed.success) {
     throw new InvalidResponseError(path, res.status, parsed.error);
   }
-  return parsed.data;
+  return parsed.data as ApiResult<T>;
+}
+
+/** Calls the endpoint with exactly the request the caller built. */
+export function unauthenticatedFetch<T>(
+  path: string,
+  schema: z.ZodType<T>,
+  init?: RequestInit,
+): Promise<ApiResult<T>> {
+  return send(path, schema, init);
+}
+
+/**
+ * Calls the endpoint as the logged-in user, by sending the access token as a
+ * cookie. Browsers drop a hand-set `Cookie` header, so this only reaches the
+ * backend from server code (Server Components, route handlers).
+ *
+ * Before anyone has logged in it answers the way the backend does for a
+ * missing token, without making the call.
+ */
+export async function authenticatedFetch<T>(
+  path: string,
+  schema: z.ZodType<T>,
+  init: RequestInit = {},
+): Promise<ApiResult<T>> {
+  if (!accessToken) {
+    return { statusCode: 401, success: false, message: "Unauthorized request" };
+  }
+  const headers = new Headers(init.headers);
+  headers.set("Cookie", `accessToken=${accessToken}`);
+  return send(path, schema, { ...init, headers });
+}
+
+/**
+ * A result's `data`, or a thrown error, for the resource store: it shows a
+ * screen's error state when its load rejects.
+ *
+ * `emptyOn404` is returned instead when the backend answers 404, which the day
+ * endpoints do for an empty day and the stats endpoints do while there are no
+ * stats yet.
+ */
+export function dataOrThrow<T>(result: ApiResult<T>, emptyOn404?: T): T {
+  if (result.success) return result.data;
+
+  if (result.statusCode === 429) {
+    throw new RateLimitedError(result.message);
+  }
+  // The backend's own 404s carry `data` or `errors`. An unknown route is an
+  // HTML page with neither, and is a missing endpoint, not an empty day.
+  const fromBackend = "data" in result || "errors" in result;
+  if (result.statusCode === 404 && fromBackend && emptyOn404 !== undefined) {
+    return emptyOn404;
+  }
+  throw new Error(result.message);
 }

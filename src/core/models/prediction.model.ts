@@ -56,12 +56,7 @@ export type PredictionSide = z.infer<typeof predictionSideSchema>;
 
 /** Where a prediction submission's payout stands. It starts as `PENDING`. */
 export type PredictionPayoutStatus =
-  | "PENDING"
-  | "PROCESSING"
-  | "COMPLETED"
-  | "PAID"
-  | "FAILED"
-  | "LOST";
+  "PENDING" | "PROCESSING" | "COMPLETED" | "PAID" | "FAILED" | "LOST";
 
 /** A prediction's `pickType`. Set from the kind of record, and never changes. */
 export const predictionPickTypeSchema = z.literal("MATCH");

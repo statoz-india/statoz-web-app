@@ -1,6 +1,8 @@
 import type { Sport } from "@/config/sports";
 
 export const ENDPOINTS = {
+  sendOtp: "/api/v1/authorization/send-otp",
+  login: "/api/v1/authorization/login",
   trendingMatches: "/api/v2/trending/public/matches",
   matches: (gameType: Sport, istDate: string) =>
     `/api/v1/match/public/matches/${gameType}/${encodeURIComponent(istDate)}`,

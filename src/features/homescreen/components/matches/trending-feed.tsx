@@ -5,7 +5,7 @@ import { FlameIcon } from "@/lib/icons";
 import { BentoGrid, BentoTile } from "@/lib/ui/bento-grid";
 
 import { toTrendingTiles } from "../../adapters";
-import { useTrendingMatches } from "../../queries";
+import { useTrendingMatches } from "../../data/trending.data";
 import type { TrendingTile } from "../../types";
 import { BentoSkeleton, FeedEmpty, FeedError } from "../feed-states";
 import { SportFixtureCard } from "./sport-fixture-card";

@@ -1,3 +1,5 @@
+export * from "./api-response.model";
+export * from "./auth.model";
 export * from "./list-of";
 export * from "./team";
 export * from "./tournament";
@@ -5,7 +7,7 @@ export * from "./sports.model";
 export * from "./match";
 export * from "./event";
 export * from "./future";
-export * from "./prediction";
+export * from "./prediction.model";
 export * from "./quiz";
 export * from "./trending";
 export * from "./stats";

@@ -4,7 +4,7 @@ import { eventSchema } from "./event";
 import { futureSchema } from "./future";
 import { listOf } from "./list-of";
 import { matchesSchema } from "./match";
-import { predictionSchema } from "./prediction";
+import { predictionSchema } from "./prediction.model";
 import { quizSchema } from "./quiz";
 
 /** A fixture as the trending list sends it, without the volume fields. */

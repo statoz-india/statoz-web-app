@@ -1,23 +1,16 @@
 import { useSyncExternalStore } from "react";
 
-import {
-  dayOfMatchesKey,
-  MATCHES_KEY_PREFIX,
-  resources,
-  type TrendingMatches,
-} from "@/core";
+import { dayOfMatchesKey, MATCHES_KEY_PREFIX } from "@/core";
 import type { TournamentSection } from "@/core/models";
 import { loadedKeys, peekResource } from "@/hooks/useResource";
-import { toISTDate } from "@/utils";
 
 /**
  * Which day's fixture list a match is on.
  *
  * A match's address is its readable id alone, and the API can only list
  * matches a day at a time, so the page has to know the day from somewhere
- * else. It is read, in order, from the lists the visitor has already loaded,
- * from the trending list, and from what this browser remembers of matches it
- * has opened before.
+ * else. It is read from the lists the visitor has already loaded, or from what
+ * this browser remembers of matches it has opened before.
  */
 
 const STORAGE_KEY = "statoz:match-days";
@@ -55,12 +48,6 @@ export function rememberMatchDay(matchId: string, day: string) {
   }
 }
 
-/** The day of a start time in India, or nothing when the time is unusable. */
-function dayOf(time: string | undefined): string | undefined {
-  const date = time ? new Date(time) : null;
-  return date && !Number.isNaN(date.getTime()) ? toISTDate(date) : undefined;
-}
-
 /** The day a loaded fixture list has this match on, if any does. */
 export function loadedMatchDay(matchId: string): string | null {
   for (const key of loadedKeys(MATCHES_KEY_PREFIX)) {
@@ -74,21 +61,7 @@ export function loadedMatchDay(matchId: string): string | null {
 }
 
 function knownMatchDay(matchId: string): string | null {
-  const loaded = loadedMatchDay(matchId);
-  if (loaded) return loaded;
-
-  // A trending tile names its match and when it starts, and a match is listed
-  // on the day it starts.
-  const trending = peekResource<TrendingMatches>(
-    resources.trendingMatches().key,
-  );
-  for (const item of trending?.items ?? []) {
-    if (!("matchId" in item.data) || item.data.matchId !== matchId) continue;
-    const day = dayOf(item.data.matchStartTime);
-    if (day) return day;
-  }
-
-  return remembered()[matchId] ?? null;
+  return loadedMatchDay(matchId) ?? remembered()[matchId] ?? null;
 }
 
 const subscribe = () => () => {};

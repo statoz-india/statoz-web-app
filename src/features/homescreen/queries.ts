@@ -9,10 +9,6 @@ import { toSportTabs } from "./adapters";
  * that needs it opens, and is then shared by every component that asks for it.
  */
 
-export function useTrendingMatches() {
-  return useResource(resources.trendingMatches());
-}
-
 /** One resource per day, in the order of `days` (YYYY-MM-DD in India time). */
 export function useDayFixtures(sport: Sport, days: string[]) {
   return useResources(days.map((day) => resources.matches(sport, day)));
