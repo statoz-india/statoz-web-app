@@ -63,13 +63,23 @@ export class InvalidResponseError extends Error {
  * logs the visitor out. `auth.ts` sets it; nothing else should.
  */
 let accessToken: string | null = null;
+const tokenListeners = new Set<() => void>();
 
 export function setAccessToken(token: string | null) {
   accessToken = token;
+  for (const listener of tokenListeners) listener();
 }
 
 export function getAccessToken(): string | null {
   return accessToken;
+}
+
+/** Calls `listener` whenever the token is set or cleared. Returns the unsubscribe. */
+export function subscribeAccessToken(listener: () => void): () => void {
+  tokenListeners.add(listener);
+  return () => {
+    tokenListeners.delete(listener);
+  };
 }
 
 function urlFor(path: string): URL {

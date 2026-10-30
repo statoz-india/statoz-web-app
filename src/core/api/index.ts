@@ -3,7 +3,9 @@
 // calls in `public-api`.
 export {
   dataOrThrow,
+  getAccessToken,
   InvalidResponseError,
+  subscribeAccessToken,
   RateLimitedError,
   type RequestOptions,
 } from "./client";

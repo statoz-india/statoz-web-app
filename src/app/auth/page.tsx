@@ -1,5 +1,5 @@
-import ComingSoonScreen from "@/lib/screens/coming-soon";
+import { AuthScreen } from "@/features/auth/screens/AuthScreen";
 
 export default function AuthPage() {
-  return <ComingSoonScreen feature="Log in" />;
+  return <AuthScreen />;
 }

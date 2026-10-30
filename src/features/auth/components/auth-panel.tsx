@@ -10,35 +10,71 @@ import { InputField } from "@/lib/components/input-fields";
 import { Divider } from "@/lib/components/divider";
 
 export type AuthPanelProps = {
+  /** Sends the code. The code field appears once this resolves; a throw keeps it hidden. */
   onEmailSubmit: (email: string) => void | Promise<void>;
+  /** Checks the 6-digit code sent to `email`. */
+  onOtpSubmit: (email: string, otp: string) => void | Promise<void>;
   onGoogle: () => void | Promise<void>;
-  /** A server- or provider-side error to show under the field. */
+  /** A server- or provider-side error to show under the field in use. */
   error?: string;
   emailPending?: boolean;
+  otpPending?: boolean;
   googlePending?: boolean;
   className?: string;
 };
 
 /** Lenient on purpose: something@domain.tld, with a TLD of 2 or more. */
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const OTP_LENGTH = 6;
+const OTP = new RegExp(`^\\d{${OTP_LENGTH}}$`);
 
 /**
  * The sign-up / log-in form. UI only: the callbacks carry whatever the auth
- * provider needs.
+ * provider needs. The email goes first; once the code is sent, a 6-digit
+ * code field appears under it.
  *
  * Google sits above the terms line and the submit button last, under it, so
  * pressing SIGN UP / LOG IN reads as agreeing to the terms.
  */
 export function AuthPanel({
   onEmailSubmit,
+  onOtpSubmit,
   onGoogle,
   error,
   emailPending,
+  otpPending,
   googlePending,
   className,
 }: AuthPanelProps) {
   const [email, setEmail] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
+  const [codeSentTo, setCodeSentTo] = useState<string | null>(null);
+  const [otp, setOtp] = useState("");
+  const [otpError, setOtpError] = useState<string | null>(null);
+
+  async function submitEmail() {
+    const value = email.trim();
+    if (!EMAIL.test(value)) {
+      setLocalError("Enter a valid email address");
+      return;
+    }
+    setLocalError(null);
+    try {
+      await onEmailSubmit(value);
+      setCodeSentTo(value);
+    } catch {
+      // The caller shows why through `error`; the code field stays hidden.
+    }
+  }
+
+  function submitOtp(sentTo: string) {
+    if (!OTP.test(otp)) {
+      setOtpError(`Enter the ${OTP_LENGTH}-digit code`);
+      return;
+    }
+    setOtpError(null);
+    void onOtpSubmit(sentTo, otp);
+  }
 
   return (
     <div
@@ -56,13 +92,8 @@ export function AuthPanel({
         className="flex flex-col gap-5"
         onSubmit={(event) => {
           event.preventDefault();
-          const value = email.trim();
-          if (!EMAIL.test(value)) {
-            setLocalError("Enter a valid email address");
-            return;
-          }
-          setLocalError(null);
-          void onEmailSubmit(value);
+          if (codeSentTo) submitOtp(codeSentTo);
+          else void submitEmail();
         }}
       >
         <InputField
@@ -75,14 +106,41 @@ export function AuthPanel({
           spellCheck={false}
           placeholder="champion@arena.com"
           hint="Enter a valid email address"
-          error={localError ?? error}
+          error={localError ?? (codeSentTo ? undefined : error)}
           value={email}
           onChange={(event) => {
             setEmail(event.target.value);
             setLocalError(null);
+            // The code is tied to the address it was sent to.
+            setCodeSentTo(null);
+            setOtp("");
+            setOtpError(null);
           }}
           required
         />
+
+        {codeSentTo && (
+          <InputField
+            label="Enter the 6-digit code"
+            name="otp"
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            maxLength={OTP_LENGTH}
+            placeholder="000000"
+            hint={`Sent to ${codeSentTo}`}
+            error={otpError ?? error}
+            value={otp}
+            onChange={(event) => {
+              setOtp(
+                event.target.value.replace(/\D/g, "").slice(0, OTP_LENGTH),
+              );
+              setOtpError(null);
+            }}
+            autoFocus
+            required
+          />
+        )}
 
         <Divider label="OR" />
 
@@ -119,7 +177,7 @@ export function AuthPanel({
           variant="tonal"
           size="lg"
           fullWidth
-          pending={emailPending}
+          pending={codeSentTo ? otpPending : emailPending}
           trailingIcon={<ChevronRightIcon size={18} />}
         >
           SIGN UP / LOG IN
