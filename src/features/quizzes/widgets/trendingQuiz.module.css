@@ -1,0 +1,319 @@
+/* The plate. The whole card is one link. */
+.card {
+  --cut: 16px;
+  --sport-accent: var(--ds-color-accent-cyan);
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  height: 100%; /* fills its grid cell */
+  padding: 16px;
+  color: var(--ds-color-text-default);
+  text-decoration: none;
+  font-family: var(--ds-font-body);
+  transition: transform 120ms;
+  container-type: inline-size;
+}
+
+/* Edge and fill are two clipped layers: a CSS border would be cut off at the chamfers. */
+.card::before,
+.card::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  clip-path: polygon(
+    var(--cut) 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%,
+    0 var(--cut)
+  );
+}
+.card::before {
+  inset: 0;
+  background: var(--ds-color-border-default);
+}
+.card::after {
+  inset: 1px;
+  background: var(--ds-gradient-fixture-card);
+  box-shadow: inset 0 -3px var(--ds-color-fixture-shadow);
+}
+.card:hover::before,
+.card:focus-visible::before {
+  background: var(--ds-color-accent-cyan);
+}
+.card:focus-visible {
+  outline: none;
+}
+.card:focus-visible::after {
+  inset: 2px;
+}
+.card:active {
+  transform: scale(0.99);
+}
+
+/* 1px etched outline, 5px inside the edge. */
+.etch {
+  --e: calc(var(--cut) - 5px);
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+}
+.etch::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ds-color-border-strong);
+  opacity: 0.36;
+  /* The outer polygon, then the inner one walked back, leaves a 1px hollow outline. */
+  clip-path: polygon(
+    var(--e) 0,
+    100% 0,
+    100% calc(100% - var(--e)),
+    calc(100% - var(--e)) 100%,
+    0 100%,
+    0 var(--e),
+    var(--e) 0,
+    calc(var(--e) + 0.4px) 1px,
+    1px calc(var(--e) + 0.4px),
+    1px calc(100% - 1px),
+    calc(100% - var(--e) - 0.4px) calc(100% - 1px),
+    calc(100% - 1px) calc(100% - var(--e) - 0.4px),
+    calc(100% - 1px) 1px,
+    calc(var(--e) + 0.4px) 1px
+  );
+}
+.rail {
+  position: absolute;
+  top: -4px; /* 1px below the card's top edge */
+  left: calc(var(--cut) - 5px); /* starts where the corner cut ends */
+  width: 36px;
+  height: 2px;
+  background: var(--sport-accent);
+  opacity: 0.6;
+  transform-origin: left;
+}
+
+/* Status line */
+.status {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  min-width: 0;
+}
+.status::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 1px;
+  background: var(--ds-color-fixture-border);
+}
+.label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 80px;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--ds-color-text-muted);
+}
+.label svg {
+  color: var(--sport-accent);
+  flex-shrink: 0;
+}
+.signal {
+  width: 16px;
+  height: 2px;
+  background: var(--sport-accent);
+  flex-shrink: 0;
+}
+
+/* Docks into the card's top-right corner. */
+.tag {
+  --state: var(--ds-color-text-muted);
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3334;
+  white-space: nowrap;
+  color: var(--state);
+}
+.tag::before,
+.tag::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 4px));
+}
+.tag::before {
+  background: color-mix(in srgb, var(--state) 28%, var(--ds-color-fixture-strip));
+}
+.tag::after {
+  inset: 1px;
+  background: color-mix(in srgb, var(--state) 8%, var(--ds-color-fixture-strip));
+}
+.tag[data-status="live"] {
+  --state: var(--ds-color-danger);
+}
+.tag[data-status="open"] {
+  --state: var(--ds-color-accent-gold);
+}
+.tag[data-status="unresolved"] {
+  --state: var(--ds-color-accent-orange);
+}
+.tag[data-status="settled"] {
+  --state: var(--ds-color-success);
+}
+
+/* Invisible copy of the tag text: keeps the label from running under the tag. */
+.tagSpace {
+  visibility: hidden;
+  flex-shrink: 0;
+  height: 0;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Below 220px the label takes its own row and the tag drops into the flow. */
+@container (max-width: 220px) {
+  .status {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .label {
+    grid-column: 1 / -1;
+  }
+  .tag {
+    grid-column: 2;
+  }
+  .status:has(.tag) {
+    padding-top: 16px;
+  }
+  .tagSpace {
+    display: none;
+  }
+}
+
+/* Teams */
+.teams {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+}
+.versus {
+  flex: 1;
+  text-align: center;
+  font: 600 12px/1.4 var(--ds-font-display);
+  white-space: nowrap;
+}
+
+.badge {
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+}
+.badgeShadow,
+.badgeFace {
+  position: absolute;
+  inset: 0;
+  clip-path: var(--ds-clip-octagon);
+}
+.badgeShadow {
+  transform: translateY(var(--lift));
+  background: color-mix(in srgb, var(--primary) 42%, black);
+}
+.badgeFace {
+  bottom: var(--lift);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--primary);
+  color: var(--ink);
+  font: 700 var(--code-size)/1 var(--ds-font-display);
+}
+.badgeFace::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 11%;
+  background: var(--secondary);
+}
+
+/* Progress */
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.progressText {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ds-color-text-muted);
+}
+.steps {
+  display: flex;
+  gap: 4px;
+}
+.steps span {
+  flex: 1;
+  height: 4px;
+  background: var(--ds-color-border-default);
+}
+.steps span[data-complete] {
+  background: var(--ds-color-accent-cyan);
+}
+
+/* Reward chip */
+.reward {
+  align-self: flex-start;
+  margin: 0;
+  padding: 4px 8px;
+  border-left: 2px solid var(--ds-color-accent-gold);
+  background: color-mix(
+    in srgb,
+    var(--ds-color-accent-gold) 6%,
+    var(--ds-color-fixture-strip)
+  );
+  color: var(--ds-color-accent-gold);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+  .card:active {
+    transform: none;
+  }
+}

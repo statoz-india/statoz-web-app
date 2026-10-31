@@ -1,0 +1,253 @@
+.panel {
+  --cut: 16px;
+  --strip: var(--ds-color-fixture-strip);
+  --sport-accent: var(--ds-color-accent-cyan);
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 16px;
+  color: var(--ds-color-text-default);
+  font-family: var(--ds-font-body);
+  transition: transform 120ms;
+}
+
+/* Edge and fill are two clipped layers: a CSS border would be cut off at the chamfers. */
+.panel::before,
+.panel::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  clip-path: polygon(
+    var(--cut) 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%,
+    0 var(--cut)
+  );
+}
+.panel::before {
+  inset: 0;
+  background: var(--ds-color-border-default);
+}
+.panel::after {
+  inset: 1px;
+  background: var(--strip);
+  box-shadow: inset 0 -3px var(--ds-color-fixture-shadow);
+}
+.panel:hover::before,
+.panel:has(:focus-visible)::before {
+  background: var(--ds-color-accent-cyan);
+}
+.panel:active {
+  transform: scale(0.99);
+}
+
+/* 1px etched outline, 5px inside the edge. */
+.etch {
+  --e: calc(var(--cut) - 5px);
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+}
+.etch::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ds-color-border-strong);
+  opacity: 0.18;
+  /* The outer polygon, then the inner one walked back, leaves a 1px hollow outline. */
+  clip-path: polygon(
+    var(--e) 0,
+    100% 0,
+    100% calc(100% - var(--e)),
+    calc(100% - var(--e)) 100%,
+    0 100%,
+    0 var(--e),
+    var(--e) 0,
+    calc(var(--e) + 0.4px) 1px,
+    1px calc(var(--e) + 0.4px),
+    1px calc(100% - 1px),
+    calc(100% - var(--e) - 0.4px) calc(100% - 1px),
+    calc(100% - 1px) calc(100% - var(--e) - 0.4px),
+    calc(100% - 1px) 1px,
+    calc(var(--e) + 0.4px) 1px
+  );
+}
+.rail {
+  position: absolute;
+  top: -4px; /* 1px below the card's top edge */
+  left: calc(var(--cut) - 5px); /* starts where the corner cut ends */
+  width: 36px;
+  height: 2px;
+  background: var(--sport-accent);
+  opacity: 0.6;
+  transform-origin: left;
+}
+
+.title {
+  margin: 0;
+  font: 600 14px/1.4 var(--ds-font-display);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.row {
+  display: block;
+  padding: 16px 0;
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--ds-color-fixture-border);
+}
+.row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.row:focus-visible {
+  outline: 1px solid var(--ds-color-accent-cyan);
+  outline-offset: 4px;
+}
+.row:hover .question {
+  color: var(--ds-color-text-accent);
+}
+
+.status {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  min-width: 0;
+}
+.league {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 80px;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--ds-color-text-muted);
+}
+.league svg {
+  color: var(--sport-accent);
+  flex-shrink: 0;
+}
+.signal {
+  width: 16px;
+  height: 2px;
+  background: var(--sport-accent);
+  flex-shrink: 0;
+}
+
+/* The tag hangs from the top of the row, flush with the card's right edge. */
+.tag {
+  --state: var(--ds-color-text-muted);
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3334;
+  white-space: nowrap;
+  color: var(--state);
+}
+.tag::before,
+.tag::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 4px));
+}
+.tag::before {
+  background: color-mix(in srgb, var(--state) 28%, var(--strip));
+}
+.tag::after {
+  inset: 1px;
+  background: color-mix(in srgb, var(--state) 8%, var(--strip));
+}
+.tag[data-status="live"] {
+  --state: var(--ds-color-danger);
+}
+.tag[data-status="open"] {
+  --state: var(--ds-color-accent-gold);
+}
+.tag[data-status="unresolved"] {
+  --state: var(--ds-color-accent-orange);
+}
+.tag[data-status="settled"] {
+  --state: var(--ds-color-success);
+}
+
+/* Invisible copy of the tag text: keeps the league name from running under the tag. */
+.tagSpace {
+  visibility: hidden;
+  flex-shrink: 0;
+  height: 0;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.timing {
+  flex-basis: 100%;
+  padding-left: 24px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ds-color-text-muted);
+}
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 20px;
+}
+.question {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.answer {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ds-color-text-muted);
+  overflow-wrap: anywhere;
+}
+.numbers {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 48px;
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.price {
+  font-family: var(--ds-font-display);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    transition: none;
+  }
+  .panel:active {
+    transform: none;
+  }
+}

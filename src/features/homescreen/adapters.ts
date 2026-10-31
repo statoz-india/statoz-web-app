@@ -1,28 +1,18 @@
 import { isSport, type Sport } from "@/config/sports";
 import type {
-  Event as PickEvent,
-  Future,
   Matches,
   MatchEvent,
   MotorSportMatches,
-  Prediction,
-  Quiz,
   MatchSportsType,
   Team,
   Tournament,
-  TrendingItem,
-  TrendingMatch,
 } from "@/core";
 
 import type {
   LeagueGroup,
-  MarketOutcome,
-  PickMarket,
-  PredictMission,
   SportFixture,
   SportHubSelection,
   SportTeam,
-  TrendingTile,
 } from "./types";
 import type { TournamentSection } from "@/core/models";
 
@@ -145,7 +135,7 @@ function scores(
   return teamAIsAway ? [away, home] : [home, away];
 }
 
-export function toFixture(match: Matches | TrendingMatch): SportFixture | null {
+export function toFixture(match: Matches): SportFixture | null {
   if (!match.teamA || !match.teamB) return null;
   const state = stateOf(match.matchStatus, match.matchStartTime);
   // The live-score object exists before kick-off too, with both scores at 0.
@@ -231,157 +221,6 @@ export function countFixtures(groups: LeagueGroup[]): {
     total: fixtures.length,
     live: fixtures.filter((fixture) => fixture.status === "live").length,
   };
-}
-
-/* -------------------------------------------------------------------------
- * Trending
- * ---------------------------------------------------------------------- */
-
-/** A market that is taking entries says so; any other state names itself. */
-function marketStatus(status: string, settled: boolean): string {
-  if (settled) return "SETTLED";
-  return status.toUpperCase() === "ACTIVE" ? "MARKET OPEN" : statusText(status);
-}
-
-function toMission(quiz: Quiz): PredictMission | null {
-  if (!quiz.teamA || !quiz.teamB) return null;
-  return {
-    id: quiz._id,
-    href: matchHref(quiz.matchId),
-    sport: toSport(quiz.gameType),
-    leagueLabel: quiz.tournament,
-    home: toTeam(quiz.teamA),
-    away: toTeam(quiz.teamB),
-    statusLabel: statusText(quiz.quizStatus),
-  };
-}
-
-/** The result market on a fixture: either side, and the draw in football. */
-function predictionMarket(prediction: Prediction): PickMarket | null {
-  if (!prediction.teamA || !prediction.teamB) return null;
-  const home = toTeam(prediction.teamA);
-  const away = toTeam(prediction.teamB);
-  const outcomes: MarketOutcome[] = [
-    { id: "a", label: home.name, probabilityPercent: prediction.oddsTeamA },
-    { id: "b", label: away.name, probabilityPercent: prediction.oddsTeamB },
-  ];
-  if (prediction.oddsDraw != null) {
-    outcomes.splice(1, 0, {
-      id: "draw",
-      label: "Draw",
-      probabilityPercent: prediction.oddsDraw,
-    });
-  }
-  return {
-    id: prediction.predictionId,
-    href: `/picks/${encodeURIComponent(prediction.predictionId)}`,
-    sport: toSport(prediction.gameType),
-    leagueLabel: prediction.tournamentData?.tournament || prediction.tournament,
-    question: `${home.name} vs ${away.name}`,
-    outcomes,
-    volumeOz: prediction.totalCoins,
-    statusLabel: marketStatus(
-      prediction.predictionStatus,
-      prediction.winningTeam != null || prediction.winningTeamId != null,
-    ),
-  };
-}
-
-/** A yes/no market. The third option exists only when the event has three. */
-function eventMarket(event: PickEvent): PickMarket {
-  const outcomes: MarketOutcome[] = [
-    { id: "Y", label: event.yesPlaceholder, probabilityPercent: event.oddsYes },
-    { id: "N", label: event.noPlaceholder, probabilityPercent: event.oddsNo },
-  ];
-  if (event.haveThreeOptions && event.oddsMaybe != null) {
-    outcomes.push({
-      id: "M",
-      label: event.maybePlaceholder ?? "Maybe",
-      probabilityPercent: event.oddsMaybe,
-    });
-  }
-  return {
-    id: event.eventId,
-    href: `/picks/${encodeURIComponent(event.eventId)}`,
-    // An event carries no sport of its own, only whether it is a race's.
-    sport: event.isRacingMatchEvent ? "racing" : undefined,
-    leagueLabel: event.tournamentData?.tournament ?? "",
-    question: event.eventName,
-    outcomes,
-    volumeOz: event.totalCoins,
-    statusLabel: marketStatus(event.eventStatus, event.winningOption != null),
-  };
-}
-
-function futureMarket(future: Future): PickMarket {
-  return {
-    id: future.futureId,
-    href: `/picks/${encodeURIComponent(future.futureId)}`,
-    leagueLabel: future.tournamentData?.tournament ?? "",
-    question: future.eventName,
-    // Already sorted by odds, highest first. Hidden choices must not show.
-    outcomes: (future.choices ?? [])
-      .filter((choice) => choice.isVisible !== false)
-      .map((choice) => ({
-        id: choice._id,
-        label: choice.choiceName,
-        probabilityPercent: choice.odds,
-      })),
-    volumeOz: future.totalCoinsPlaced,
-    statusLabel: marketStatus(
-      future.futureStatus,
-      future.correctChoice != null,
-    ),
-  };
-}
-
-/** A future with a field of choices takes a tall tile and lists the leaders. */
-const OUTCOME_BOARD_MINIMUM = 3;
-
-function toTrendingTile(item: TrendingItem): TrendingTile | null {
-  switch (item.type) {
-    case "match": {
-      const fixture = toFixture(item.data);
-      return fixture && { id: item._id, kind: "match", span: "wide", fixture };
-    }
-    case "quiz": {
-      const mission = toMission(item.data);
-      return (
-        mission && { id: item._id, kind: "predict", span: "square", mission }
-      );
-    }
-    case "prediction": {
-      const market = predictionMarket(item.data);
-      return market && { id: item._id, kind: "pick", span: "square", market };
-    }
-    case "event":
-      return {
-        id: item._id,
-        kind: "pick",
-        span: "square",
-        market: eventMarket(item.data),
-      };
-    case "future": {
-      const market = futureMarket(item.data);
-      return {
-        id: item._id,
-        kind: "future",
-        span:
-          market.outcomes.length >= OUTCOME_BOARD_MINIMUM ? "tall" : "square",
-        market,
-      };
-    }
-    default:
-      // A type added to the API after this was written.
-      return null;
-  }
-}
-
-/** The trending list, in the order the API sent it. */
-export function toTrendingTiles(items: TrendingItem[]): TrendingTile[] {
-  return items
-    .map((item) => (item.data ? toTrendingTile(item) : null))
-    .filter((tile) => tile !== null);
 }
 
 /* -------------------------------------------------------------------------

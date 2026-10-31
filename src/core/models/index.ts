@@ -9,5 +9,5 @@ export * from "./event.model";
 export * from "./future.model";
 export * from "./prediction.model";
 export * from "./quiz.model";
-export * from "./trending";
+export * from "./trending.model";
 export * from "./stats";

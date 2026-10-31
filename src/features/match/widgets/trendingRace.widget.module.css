@@ -1,0 +1,241 @@
+/* The plate. The whole card is one link. */
+.plate {
+  --cut: 16px;
+  --rail: var(--ds-color-accent-racing);
+  --match-accent: var(--ds-color-border-default);
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px;
+  color: var(--ds-color-text-default);
+  text-decoration: none;
+  text-align: left;
+  font-family: var(--ds-font-body);
+  transition: transform 120ms;
+  container-type: inline-size;
+}
+
+/* Edge and fill are two clipped layers: a CSS border would be cut off at the chamfers. */
+.plate::before,
+.plate::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  clip-path: polygon(
+    var(--cut) 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%,
+    0 var(--cut)
+  );
+}
+.plate::before {
+  inset: 0;
+  background: var(--ds-color-border-default);
+}
+.plate::after {
+  inset: 1px;
+  /* A faint glow of the match accent in the top-right corner. */
+  background:
+    radial-gradient(
+      ellipse at 100% 0%,
+      color-mix(in srgb, var(--match-accent) 9%, transparent) 0%,
+      transparent 72%
+    ),
+    var(--ds-gradient-fixture-card);
+  box-shadow: inset 0 -3px var(--ds-color-fixture-shadow);
+}
+.plate:hover::before,
+.plate:focus-visible::before {
+  background: var(--ds-color-accent-cyan);
+}
+.plate:focus-visible {
+  outline: none;
+}
+.plate:focus-visible::after {
+  inset: 2px;
+}
+.plate:active {
+  transform: scale(0.99);
+}
+
+/* 1px etched outline, 5px inside the edge. */
+.chrome {
+  --e: calc(var(--cut) - 5px);
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+}
+.chrome::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ds-color-border-strong);
+  opacity: 0.36;
+  /* The outer polygon, then the inner one walked back, leaves a 1px hollow outline. */
+  clip-path: polygon(
+    var(--e) 0,
+    100% 0,
+    100% calc(100% - var(--e)),
+    calc(100% - var(--e)) 100%,
+    0 100%,
+    0 var(--e),
+    var(--e) 0,
+    calc(var(--e) + 0.4px) 1px,
+    1px calc(var(--e) + 0.4px),
+    1px calc(100% - 1px),
+    calc(100% - var(--e) - 0.4px) calc(100% - 1px),
+    calc(100% - 1px) calc(100% - var(--e) - 0.4px),
+    calc(100% - 1px) 1px,
+    calc(var(--e) + 0.4px) 1px
+  );
+}
+.rail {
+  position: absolute;
+  top: -4px; /* 1px below the card's top edge */
+  left: calc(var(--cut) - 5px); /* starts where the corner cut ends */
+  width: 36px;
+  height: 2px;
+  background: var(--rail);
+  opacity: 0.6;
+  transform-origin: left;
+}
+
+/* Status row */
+.status {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  min-width: 0;
+}
+.status::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 1px;
+  background: var(--ds-color-fixture-border);
+}
+.league {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 80px;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--ds-color-text-muted);
+}
+.league svg {
+  color: var(--rail);
+  flex-shrink: 0;
+}
+
+/* Docks into the card's top-right corner. */
+.tag {
+  --state: var(--ds-color-text-muted);
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3334;
+  white-space: nowrap;
+  color: var(--state);
+}
+.tag::before,
+.tag::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 4px));
+}
+.tag::before {
+  background: color-mix(in srgb, var(--state) 28%, var(--ds-color-fixture-strip));
+}
+.tag::after {
+  inset: 1px;
+  background: color-mix(in srgb, var(--state) 8%, var(--ds-color-fixture-strip));
+}
+.tag[data-status="live"] {
+  --state: var(--ds-color-danger);
+}
+.tag[data-status="open"] {
+  --state: var(--ds-color-accent-gold);
+}
+
+/* Invisible copy of the tag text: keeps the league from running under the tag. */
+.tagSlot {
+  visibility: hidden;
+  flex-shrink: 0;
+  height: 0;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Body */
+.title {
+  margin: 0;
+  font: 600 16px/1.4 var(--ds-font-display);
+  overflow-wrap: anywhere;
+}
+.kickoff {
+  font: 500 16px/1.35 var(--ds-font-body);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  white-space: nowrap;
+}
+.result {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ds-color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plate {
+    transition: none;
+  }
+  .plate:active {
+    transform: none;
+  }
+}
+
+/* Narrow plates: the league takes its own row and the tag drops into the flow. */
+@container (max-width: 220px) {
+  .status {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-top: 16px;
+  }
+  .league {
+    grid-column: 1 / -1;
+  }
+  .tag {
+    grid-column: 2;
+  }
+  .tagSlot {
+    display: none;
+  }
+}

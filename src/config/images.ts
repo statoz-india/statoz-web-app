@@ -14,6 +14,10 @@ export const IMAGES = {
   },
 
   backgrounds: {
+    hub: {
+      trendingPortrait: "/assets/backgrounds/hub/trending-wide.svg",
+    },
+
     onboarding: {
       desktopPoster: "/assets/backgrounds/onboarding/desktop-poster.webp",
       mobilePoster: "/assets/backgrounds/onboarding/mobile-poster.webp",

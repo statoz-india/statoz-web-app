@@ -9,7 +9,7 @@ import {
   sportsTypesResponseSchema,
   tournamentSectionSchema,
   type ApiResult,
-  trendingMatchesSchema,
+  trendingResponseSchema,
   type MatchFor,
   type MatchSportsType,
   type MatchStats,
@@ -17,7 +17,7 @@ import {
   type RaceStats,
   type SportsType,
   type TournamentSection,
-  type TrendingMatches,
+  type Trending,
 } from "@/core/models";
 
 import { unauthenticatedFetch, type RequestOptions } from "./client";
@@ -60,13 +60,13 @@ export function getRaces(
   );
 }
 
-/** The curated trending list, plus counts. `items` is `[]` when nothing is trending. */
+/** What is trending, one list per kind: picks, fixtures, races, futures, quizzes and events. */
 export function getTrendingMatches(
   options?: RequestOptions,
-): Promise<ApiResult<TrendingMatches>> {
+): Promise<ApiResult<Trending>> {
   return unauthenticatedFetch(
     ENDPOINTS.trendingMatches,
-    trendingMatchesSchema,
+    trendingResponseSchema.shape.data,
     options,
   );
 }
