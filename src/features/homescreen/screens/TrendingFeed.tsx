@@ -25,7 +25,7 @@ import { TrendingPredictionsWidget } from "@/features/predictions/widgets/trendi
 import { TrendingQuiz } from "@/features/quizzes/widgets/trendingQuiz";
 
 import { BentoSkeleton, FeedError } from "../components/feed-states";
-import { useSportsTypes, useTrendingMatches } from "../data/getTrendingData";
+import { useSportsTypes, useTrendingMatches } from "../data/getTrending.data";
 import { TrendingSportsQuizWidget } from "../widgets/trendingSportsQuiz.widget";
 
 /** How long scrolling must pause before the loop jumps back, where `scrollend` is missing. */

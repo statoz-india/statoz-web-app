@@ -61,14 +61,18 @@ export const matchesSchema = z.object({
   _id: z.string(),
   matchId: z.string(),
   matchStartTime: z.string(),
-  matchStatus: matchStatusSchema,
+  /** Missing on fixtures in a later day's list. */
+  matchStatus: matchStatusSchema.optional(),
   /** Null until the feed has data. */
   matchEvent: matchEventSchema.nullable(),
-  matchBanner: z.string().nullable(),
-  tag: z.string(),
+  /** Missing from a day's fixture list. */
+  matchBanner: z.string().nullable().optional(),
+  /** Missing on most fixtures in a day's list. */
+  tag: z.string().optional(),
   gameType: z.string(),
   tournament: z.string(),
-  espnLeagueName: z.string(),
+  /** Missing on some fixtures, such as IPL matches. */
+  espnLeagueName: z.string().optional(),
   teamA: teamSchema,
   teamB: teamSchema,
   /** Empty when the match has no quiz. Opening one needs a login. */

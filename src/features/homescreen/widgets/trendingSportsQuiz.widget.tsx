@@ -18,7 +18,7 @@ import {
   type GlyphName,
 } from "@/lib/icons";
 
-import styles from "./trendingSportsQuiz.widget.module.css";
+import styles from "../css/trendingSportsQuiz.widget.module.css";
 
 /** One pose of an art layer. `x` and `y` are in the scene's 220×160 units. */
 export type QuizArtFrame = {

@@ -1,5 +1,12 @@
 import type { Sport } from "@/config/sports";
-import { resources, type MatchStats } from "@/core";
+import {
+  dataOrThrow,
+  getMatches,
+  MATCHES_KEY_PREFIX,
+  resources,
+  type MatchStats,
+  type TournamentSection,
+} from "@/core";
 import { useResource, useResources } from "@/hooks/useResource";
 
 import { isRace, type Fixture } from "./adapters";
@@ -33,7 +40,12 @@ export function useMatchStats(fixture: Fixture | undefined) {
  * day the visitor has already browsed is not asked for again.
  */
 export function useFixtureDays(requests: { sport: Sport; day: string }[]) {
-  return useResources(
-    requests.map(({ sport, day }) => resources.matches(sport, day)),
+  // Named here: it cannot be inferred through `map`.
+  return useResources<TournamentSection[]>(
+    requests.map(({ sport, day }) => ({
+      key: `${MATCHES_KEY_PREFIX}${sport}/${day}`,
+      // A day with nothing on it is a 404, read as an empty list.
+      load: () => getMatches(sport, day).then((result) => dataOrThrow(result, [])),
+    })),
   );
 }

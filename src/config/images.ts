@@ -14,8 +14,29 @@ export const IMAGES = {
   },
 
   backgrounds: {
+    // The home hub's art: a portrait file for phones and a wide one from 768px.
     hub: {
-      trendingPortrait: "/assets/backgrounds/hub/trending-wide.svg",
+      cyberOverlay: "/assets/backgrounds/hub/cyber-overlay.svg",
+      trending: {
+        portrait: "/assets/backgrounds/hub/trending-portrait.svg",
+        wide: "/assets/backgrounds/hub/trending-wide.svg",
+      },
+      football: {
+        portrait: "/assets/backgrounds/hub/football-portrait.svg",
+        wide: "/assets/backgrounds/hub/football-wide.svg",
+      },
+      cricket: {
+        portrait: "/assets/backgrounds/hub/cricket-portrait.svg",
+        wide: "/assets/backgrounds/hub/cricket-wide.svg",
+      },
+      basketball: {
+        portrait: "/assets/backgrounds/hub/basketball-portrait.svg",
+        wide: "/assets/backgrounds/hub/basketball-wide.svg",
+      },
+      motorsport: {
+        portrait: "/assets/backgrounds/hub/motorsport-portrait.svg",
+        wide: "/assets/backgrounds/hub/motorsport-wide.svg",
+      },
     },
 
     onboarding: {

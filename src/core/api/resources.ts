@@ -1,8 +1,5 @@
-import type { Sport } from "@/config/sports";
-
 import { dataOrThrow } from "./client";
 import {
-  getMatches,
   getMatchSportsTypes,
   getMatchStats,
   getRaceStats,
@@ -28,15 +25,7 @@ export const resources = {
     key: "sports/matchSportsTypes",
     load: () => getMatchSportsTypes().then((r) => dataOrThrow(r)),
   }),
-  sportsTypes: () => ({
-    key: "sports/sportsTypes",
-    load: () => getSportsTypes().then((r) => dataOrThrow(r)),
-  }),
-  /** One sport's fixture list for a day (YYYY-MM-DD in India time). */
-  matches: <G extends Sport>(gameType: G, istDate: string) => ({
-    key: `${MATCHES_KEY_PREFIX}${gameType}/${istDate}`,
-    load: () => getMatches(gameType, istDate).then((r) => dataOrThrow(r, [])),
-  }),
+
   /**
    * A team match's stats. It is kept under the readable `matchId`, but the
    * endpoint accepts only the database `_id`.

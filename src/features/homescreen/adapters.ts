@@ -87,7 +87,7 @@ function isAhead(startTime: string | undefined): boolean {
 }
 
 function stateOf(
-  matchStatus: string,
+  matchStatus: string | undefined,
   startTime: string | undefined,
 ): FixtureState {
   // A match that has not started is upcoming, whatever status it carries.

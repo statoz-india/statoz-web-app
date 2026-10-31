@@ -6,7 +6,7 @@ import { useSyncExternalStore, type CSSProperties } from "react";
 import type { MotorSportMatches, RaceStatus } from "@/core";
 import { MotorsportIcon } from "@/lib/icons";
 
-import styles from "./trendingRace.widget.module.css";
+import styles from "../css/trendingRace.widget.module.css";
 
 type Lifecycle = "open" | "live" | "finished" | "voided";
 

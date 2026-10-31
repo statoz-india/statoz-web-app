@@ -12,7 +12,7 @@ import { BasketballIcon, CricketIcon, FootballIcon } from "@/lib/icons";
 
 import { TeamBadge } from "../components/team-badge";
 import type { SportTeam } from "../types";
-import styles from "./trendingMatch.widget.module.css";
+import styles from "../css/trendingMatch.widget.module.css";
 
 type Lifecycle = "scheduled" | "live" | "finished" | "unresolved" | "voided";
 
@@ -269,9 +269,7 @@ export function TrendingMatchWidget({
                       : styles.score
                   }
                 >
-                  {bracket >= 0
-                    ? score!.slice(0, bracket).trim()
-                    : show(score)}
+                  {bracket >= 0 ? score!.slice(0, bracket).trim() : show(score)}
                 </span>
                 {bracket >= 0 && (
                   <span className={styles.inningsContext}>
