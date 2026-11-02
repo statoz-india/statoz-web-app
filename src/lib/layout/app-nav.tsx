@@ -102,6 +102,20 @@ function NavItems({ activeId, orientation = "bar", className }: AppNavProps) {
       };
     }
 
+    // The shop needs a session too, but keeps its own label and icon.
+    if (destination.id === "shop" && session.status !== "authenticated") {
+      return {
+        ...base,
+        onSelect: () => {
+          requireAuth({
+            intent: "shop",
+            message: "Log in to visit the shop.",
+            returnTo: destination.href,
+          });
+        },
+      };
+    }
+
     return { ...base, href: destination.href };
   });
 

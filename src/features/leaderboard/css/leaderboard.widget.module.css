@@ -1,0 +1,252 @@
+.board {
+  width: 100%;
+}
+
+/*
+ * One shape for every surface: cut at the top-left and bottom-right only.
+ * The edge is a clipped layer behind an inset fill; a CSS border would be cut
+ * off at the chamfers. Fills are opaque, mixed into the page colour.
+ */
+.plate {
+  --cut: 12px;
+  --shape: polygon(
+    var(--cut) 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%,
+    0 var(--cut)
+  );
+  position: relative;
+  isolation: isolate;
+}
+.plate::before,
+.plate::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  clip-path: var(--shape);
+}
+.plate::before {
+  inset: 0;
+  background: var(--edge, transparent);
+}
+.plate::after {
+  inset: 1px;
+  background: color-mix(
+    in srgb,
+    var(--ds-color-background-elevated) var(--fill-mix),
+    var(--ds-color-background-primary)
+  );
+}
+
+.championPlate {
+  --cut: 18px;
+  --fill-mix: 84%;
+  --placing: var(--ds-color-accent-gold);
+  --edge: color-mix(in srgb, var(--placing) 42%, transparent);
+}
+.runnerPlate {
+  --cut: 13px;
+  --fill-mix: 58%;
+  --edge: color-mix(in srgb, var(--placing) 26%, transparent);
+}
+.runnerPlate[data-placing="second"] {
+  --placing: var(--ds-color-accent-cyan);
+}
+.runnerPlate[data-placing="third"] {
+  --placing: var(--ds-color-accent-orange);
+}
+/* Rank rows have no edge, so the fill runs to it. */
+.rowPlate {
+  --cut: 12px;
+  --fill-mix: 34%;
+}
+.rowPlate::after {
+  inset: 0;
+}
+
+/* Octagon portrait. The ring takes the placing colour; rows use the border colour. */
+.face {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  --ring: color-mix(in srgb, var(--placing, var(--ds-color-border-default)) 42%, transparent);
+}
+.faceRing,
+.facePhoto {
+  position: absolute;
+  clip-path: var(--ds-clip-octagon);
+}
+.faceRing {
+  inset: 0;
+  background: var(--ring);
+}
+.facePhoto {
+  inset: 1.2px;
+  overflow: hidden;
+  background: var(--ds-color-background-elevated);
+}
+/* Cropped to the top so the head stays in frame. */
+.faceImage {
+  object-fit: cover;
+  object-position: top;
+}
+
+/* Shared type */
+.championRank,
+.championValue,
+.championUnit,
+.runnerRank,
+.runnerScore,
+.rowRank,
+.rowValue,
+.rowUnit {
+  font-family: var(--ds-font-display);
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.rankLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Champion */
+.champion {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+}
+.championText {
+  flex: 1;
+  min-width: 0;
+  margin-left: 16px;
+}
+.championRank {
+  font-size: 17px;
+  color: var(--placing);
+}
+.medal {
+  flex-shrink: 0;
+  color: var(--placing);
+}
+.championName {
+  margin: 8px 0 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ds-color-text-default);
+  font: 700 20px/1 var(--ds-font-body);
+}
+.championScore {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+.championValue {
+  font-size: 24px;
+  color: var(--placing);
+}
+.championUnit {
+  margin-top: 4px;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  color: color-mix(in srgb, var(--placing) 72%, transparent);
+}
+
+/* Runners-up */
+.runners {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+.runner {
+  padding: 12px;
+}
+.runnerRank {
+  font-size: 15px;
+  color: var(--placing);
+}
+.runnerRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+.runnerName {
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ds-color-text-default);
+  font: 700 16px/1 var(--ds-font-body);
+}
+.runnerScore {
+  display: block;
+  margin-top: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  color: var(--placing);
+}
+
+/* Rank rows */
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 24px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  padding: 11px 12px;
+}
+.rowRank {
+  width: 34px;
+  flex-shrink: 0;
+  margin-right: 10px;
+  font-size: 14px;
+  color: var(--ds-color-text-muted);
+}
+.rowText {
+  flex: 1;
+  min-width: 0;
+  margin-left: 12px;
+}
+.rowName {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ds-color-text-default);
+  font: 600 16px/1 var(--ds-font-body);
+}
+.rowScore {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+.rowValue {
+  font-size: 16px;
+  color: var(--ds-color-accent-cyan);
+}
+.rowUnit {
+  margin-top: 4px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: color-mix(in srgb, var(--ds-color-text-muted) 82%, transparent);
+}

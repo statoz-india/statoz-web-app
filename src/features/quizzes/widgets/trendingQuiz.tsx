@@ -10,7 +10,7 @@ import {
   MotorsportIcon,
 } from "@/lib/icons";
 
-import styles from "./trendingQuiz.module.css";
+import styles from "../css/trendingQuiz.module.css";
 
 type Tag = "open" | "live" | "closed" | "unresolved" | "settled" | "void";
 
@@ -67,7 +67,9 @@ function TeamBadge({ team }: { team: Team }) {
     height: BADGE_SIZE,
     "--primary": team.primaryColor || "var(--ds-color-border-strong)",
     "--secondary":
-      team.secondaryColor || team.primaryColor || "var(--ds-color-border-strong)",
+      team.secondaryColor ||
+      team.primaryColor ||
+      "var(--ds-color-border-strong)",
     "--ink": team.textColor || "var(--ds-color-text-default)",
     "--lift": `${Math.max(3, Math.round(BADGE_SIZE * 0.11))}px`,
     // Longer codes get a smaller size so they still fit the face.
@@ -102,6 +104,8 @@ export type TrendingQuizProps = {
   progress?: QuizProgress;
   /** e.g. "Up to 230 XP", or "+150 XP" once settled. Hidden without it. */
   reward?: string;
+  /** Runs before the card opens; returning false keeps it from opening. */
+  guard?: () => boolean;
 };
 
 /** A match quiz as one linked card: both teams, the progress, and the XP on offer. */
@@ -110,6 +114,7 @@ export function TrendingQuiz({
   label = "XP prediction",
   progress,
   reward,
+  guard,
 }: TrendingQuizProps) {
   const tag = TAG_FOR_STATUS[quiz.quizStatus];
   if (tag === null || !quiz.isVisible) return null;
@@ -121,6 +126,9 @@ export function TrendingQuiz({
     // No aria-label: it would replace the status, progress and reward for screen readers.
     <Link
       href={`/match/${encodeURIComponent(quiz.matchId)}/predict/${encodeURIComponent(quiz.quizId)}`}
+      onClick={(e) => {
+        if (guard && !guard()) e.preventDefault();
+      }}
       className={styles.card}
       style={
         {
@@ -160,7 +168,10 @@ export function TrendingQuiz({
           <p className={styles.progressText}>{progress.text}</p>
           <div className={styles.steps} aria-hidden>
             {Array.from({ length: Math.max(0, progress.total) }, (_, i) => (
-              <span key={i} data-complete={i < progress.answered || undefined} />
+              <span
+                key={i}
+                data-complete={i < progress.answered || undefined}
+              />
             ))}
           </div>
         </div>

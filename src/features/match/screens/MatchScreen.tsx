@@ -18,8 +18,8 @@ import {
   toRaceMatch,
   toScoreboard,
 } from "../adapters";
-import styles from "../components/match-detail.module.css";
-import { MatchSummaryHeader } from "../components/match-summary-header";
+import styles from "../css/match-detail.module.css";
+import { MatchSummaryHeader } from "../components/match-stats/match-summary-header";
 import { MatchTabsView } from "../components/match-tabs-view";
 import {
   loadedMatchDay,

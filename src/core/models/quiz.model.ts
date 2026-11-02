@@ -59,7 +59,7 @@ export const quizSchema = z.object({
   matchStartTime: z.string(),
   matchEvent: matchEventSchema.nullable(),
   matchEventEspnId: z.string().nullable(),
-  matchBanner: z.string().nullable(),
+  matchBanner: z.string().nullable().optional(),
   tag: z.string(),
   gameType: z.string(),
   espnLeagueName: z.string(),

@@ -20,8 +20,8 @@ import type {
 } from "@/features/match/types";
 
 import { EmptyPanel, SectionHeading, StatsRow } from "./match-stats-shell";
-import detail from "./match-lineups.module.css";
-import styles from "./match-stats.module.css";
+import detail from "../../css/match-lineups.module.css";
+import styles from "../../css/match-stats.module.css";
 
 /**
  * The three sections every sport's report shares: the event log, the

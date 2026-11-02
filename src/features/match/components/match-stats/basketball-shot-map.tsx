@@ -9,7 +9,7 @@ import type {
 } from "@/features/match/types";
 
 import { EmptyPanel, SectionHeading } from "./match-stats-shell";
-import styles from "./basketball-shot-map.module.css";
+import styles from "../../css/basketball-shot-map.module.css";
 import { FilterChips } from "@/lib/components/filter-chips";
 
 const filters = ["ALL", "HOME", "AWAY", "3PT"];

@@ -20,9 +20,9 @@ import {
   StatsRow,
   TeamLegendRow,
 } from "./match-stats-shell";
-import { MatchTraceChart } from "./match-trace-chart";
+import { MatchTraceChart } from "../match-trace-chart";
 import { BasketballShotMap } from "./basketball-shot-map";
-import styles from "./match-stats.module.css";
+import styles from "../../css/match-stats.module.css";
 import { FilterChips } from "@/lib/components/filter-chips";
 
 /**

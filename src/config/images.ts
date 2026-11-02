@@ -91,6 +91,10 @@ export const IMAGES = {
     },
   },
 
+  profile: {
+    defaultMale: "/assets/profile/default_male.png",
+  },
+
   shop: {
     coins: {
       starter: "/assets/shop/coins/starter.png",

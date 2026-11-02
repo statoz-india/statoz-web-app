@@ -1,20 +1,28 @@
 import type { Sport } from "@/config/sports";
 import {
+  eventSchema,
   listOf,
   matchForSchema,
   matchSportsTypesResponseSchema,
   matchStatsSchema,
   motorSportMatchesSchema,
+  predictionSchema,
+  quizSchema,
   raceStatsSchema,
+  sportLeaderboardSchema,
   sportsTypesResponseSchema,
   tournamentSectionSchema,
   type ApiResult,
+  type Event,
   trendingResponseSchema,
   type MatchFor,
   type MatchSportsType,
   type MatchStats,
   type MotorSportMatches,
+  type Prediction,
+  type Quiz,
   type RaceStats,
+  type SportLeaderboard,
   type SportsType,
   type TournamentSection,
   type Trending,
@@ -78,6 +86,63 @@ export function getMatchSportsTypes(
   return unauthenticatedFetch(
     ENDPOINTS.matchSportsType,
     matchSportsTypesResponseSchema.shape.data,
+    options,
+  );
+}
+
+/**
+ * A match's quizzes, without their questions; those need a login. `matchId` is
+ * the readable one, such as "EPL-M23".
+ */
+export function getMatchQuizzes(
+  matchId: string,
+  options?: RequestOptions,
+): Promise<ApiResult<Quiz[]>> {
+  return unauthenticatedFetch(
+    ENDPOINTS.matchQuizzes(matchId),
+    listOf(quizSchema),
+    options,
+  );
+}
+
+/**
+ * A match's predictions (pick markets), with the coins and odds on each side.
+ * `matchId` is the readable one, such as "EPL-M23".
+ */
+export function getMatchPredictions(
+  matchId: string,
+  options?: RequestOptions,
+): Promise<ApiResult<Prediction[]>> {
+  return unauthenticatedFetch(
+    ENDPOINTS.matchPredictions(matchId),
+    listOf(predictionSchema),
+    options,
+  );
+}
+
+/**
+ * A match's events: yes/no (or yes/no/maybe) questions with the coins and
+ * odds on each option. `matchId` is the readable one, such as "EPL-M23".
+ */
+export function getMatchEvents(
+  matchId: string,
+  options?: RequestOptions,
+): Promise<ApiResult<Event[]>> {
+  return unauthenticatedFetch(
+    ENDPOINTS.matchEvents(matchId),
+    listOf(eventSchema),
+    options,
+  );
+}
+
+/** A sport's leaderboard, best first, by its `gameType` such as "football". */
+export function getSportsLeaderboard(
+  gameType: string,
+  options?: RequestOptions,
+): Promise<ApiResult<SportLeaderboard>> {
+  return unauthenticatedFetch(
+    ENDPOINTS.sportsLeaderboard(gameType),
+    sportLeaderboardSchema,
     options,
   );
 }

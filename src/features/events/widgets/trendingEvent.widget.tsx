@@ -124,6 +124,8 @@ export type TrendingEventWidgetProps = {
   events: TrendingEvent[];
   /** Lists every event that can be shown, not just the first three. */
   showAll?: boolean;
+  /** Runs before an event opens; returning false keeps it from opening. */
+  guard?: () => boolean;
 };
 
 /** The EVENTS panel: one chamfered card of up to three linked events. */
@@ -132,6 +134,7 @@ export function TrendingEventWidget({
   icon: Icon,
   events,
   showAll = false,
+  guard,
 }: TrendingEventWidgetProps) {
   const now = useNow();
   const listable = events.filter(
@@ -163,6 +166,9 @@ export function TrendingEventWidget({
           <Link
             key={event._id}
             href={`/picks/${encodeURIComponent(event.eventId)}`}
+            onClick={(e) => {
+              if (guard && !guard()) e.preventDefault();
+            }}
             className={styles.row}
           >
             <div className={styles.status}>

@@ -58,6 +58,8 @@ Use the `@/` alias for imports across folders, and relative imports inside a fea
 - Don't touch any file unnecessarily for making any changes that is not related to the given instructions
 - Never run a formatter (`npm run format`, `npx prettier --write` or any other) unless asked.
 - Whenever creating a css file add it in the css folder of that level.
+- When removing a wrapper element, check every style that relied on it.
+- Check layout changes at both phone and desktop width before calling them done.
 
 ## Before finishing a change
 

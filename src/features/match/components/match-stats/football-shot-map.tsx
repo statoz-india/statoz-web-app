@@ -9,7 +9,7 @@ import type {
 } from "@/features/match/types";
 
 import { EmptyPanel, StatsRow, TeamLegendRow } from "./match-stats-shell";
-import styles from "./football-shot-map.module.css";
+import styles from "../../css/football-shot-map.module.css";
 import { FilterChips } from "@/lib/components/filter-chips";
 import { GoalMouthDiagram } from "@/lib/components/goal-mouth-diagram";
 

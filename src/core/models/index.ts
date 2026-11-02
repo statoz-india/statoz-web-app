@@ -10,4 +10,5 @@ export * from "./future.model";
 export * from "./prediction.model";
 export * from "./quiz.model";
 export * from "./trending.model";
+export * from "./leaderboard.model";
 export * from "./stats";

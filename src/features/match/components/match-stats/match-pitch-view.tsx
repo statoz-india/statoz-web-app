@@ -21,8 +21,8 @@ import type {
 } from "@/features/match/types";
 
 import { MatchPlayerSheet } from "./match-player-sheet";
-import { TeamBadge } from "./team-badge";
-import styles from "./match-pitch.module.css";
+import { TeamBadge } from "../team-badge";
+import styles from "../../css/match-pitch.module.css";
 import { FilterChips } from "@/lib/components/filter-chips";
 
 /**

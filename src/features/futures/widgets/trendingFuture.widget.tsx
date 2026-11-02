@@ -111,6 +111,8 @@ export type TrendingFutureWidgetProps = {
   maxChoices?: number;
   /** Without it, or once the future stops taking entries, the rows are disabled. */
   onPick?: (choiceId: string) => void;
+  /** Runs before any click on the card; returning false stops the click. */
+  guard?: () => boolean;
 };
 
 /** A future card: the question, one row per visible choice, and the volume. */
@@ -120,6 +122,7 @@ export function TrendingFutureWidget({
   featured,
   maxChoices,
   onPick,
+  guard,
 }: TrendingFutureWidgetProps) {
   const now = useSyncExternalStore(subscribeToClock, currentMinute, noClock);
   const tag = TAG_FOR_STATUS[future.futureStatus];
@@ -136,6 +139,13 @@ export function TrendingFutureWidget({
 
   return (
     <article
+      // Capture phase, so a stopped click never reaches the links or buttons.
+      onClickCapture={(e) => {
+        if (guard && !guard()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
       className={styles.card}
       style={
         {

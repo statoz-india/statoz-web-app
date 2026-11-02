@@ -11,7 +11,7 @@ import type {
   SportMatch,
 } from "@/features/match/types";
 
-import styles from "./match-stats.module.css";
+import styles from "../../css/match-stats.module.css";
 
 export function SectionHeading({ label }: { label: string }) {
   return <h3 className={styles.sectionHeading}>{label}</h3>;

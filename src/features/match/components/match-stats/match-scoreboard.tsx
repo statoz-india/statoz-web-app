@@ -5,7 +5,7 @@ import type { MatchDetailScoreboard, SportMatch } from "@/features/match/types";
 import { BasketballStatsView } from "./basketball-stats-view";
 import { CricketStatsView } from "./cricket-stats-view";
 import { FootballStatsView } from "./football-stats-view";
-import { MotorsportStatsView } from "./motorsport-stats-view";
+import { MotorsportStatsView } from "../motorsport-stats-view";
 
 /**
  * The match report. Each sport has a view of its own; this picks one.

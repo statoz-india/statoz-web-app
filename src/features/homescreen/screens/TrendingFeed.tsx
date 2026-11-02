@@ -17,6 +17,7 @@ import type {
   TrendingQuiz as QuizItem,
   TrendingRace,
 } from "@/core";
+import { useRequireAuth } from "@/features/auth";
 import { TrendingEventWidget } from "@/features/events/widgets/trendingEvent.widget";
 import { TrendingFutureWidget } from "@/features/futures/widgets/trendingFuture.widget";
 import { TrendingMatchWidget } from "@/features/match/widgets/trendingMatch.widget";
@@ -175,11 +176,18 @@ function LoopCarousel<T>({
 
 /** The trending picks, without a heading. */
 function TrendingPicks({ picks }: { picks: Prediction[] }) {
+  const requireAuth = useRequireAuth();
   if (picks.length === 0) return null;
   return (
     <section aria-label="Trending picks">
       <LoopCarousel items={picks} keyOf={(pick) => pick._id} noun="pick">
-        {(pick) => <TrendingPredictionsWidget prediction={pick} />}
+        {(pick) => (
+          <TrendingPredictionsWidget
+            prediction={pick}
+            onPick={() => requireAuth({ intent: "lock a pick" })}
+            guard={() => requireAuth({ intent: "lock a pick" })}
+          />
+        )}
       </LoopCarousel>
     </section>
   );
@@ -236,6 +244,7 @@ function TrendingRaces({ races }: { races: TrendingRace[] }) {
 
 /** The trending quizzes under their heading, in the order the API sent them. */
 function TrendingQuizzes({ quizzes }: { quizzes: QuizItem[] }) {
+  const requireAuth = useRequireAuth();
   if (quizzes.length === 0) return null;
   return (
     <section aria-labelledby="trending-quizzes" className="flex flex-col gap-3">
@@ -247,7 +256,11 @@ function TrendingQuizzes({ quizzes }: { quizzes: QuizItem[] }) {
       </h2>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-2">
         {quizzes.map((quiz) => (
-          <TrendingQuiz key={quiz._id} quiz={quiz} />
+          <TrendingQuiz
+            key={quiz._id}
+            quiz={quiz}
+            guard={() => requireAuth({ intent: "play this quiz" })}
+          />
         ))}
       </div>
     </section>
@@ -256,6 +269,7 @@ function TrendingQuizzes({ quizzes }: { quizzes: QuizItem[] }) {
 
 /** Every trending event in one panel, in the order the API sent them. */
 function TrendingEvents({ events }: { events: TrendingEvent[] }) {
+  const requireAuth = useRequireAuth();
   if (events.length === 0) return null;
   return (
     <section aria-labelledby="trending-events" className="flex flex-col gap-3">
@@ -266,7 +280,12 @@ function TrendingEvents({ events }: { events: TrendingEvent[] }) {
         Trending Events
       </h2>
       {/* Events do not say which sport they are, so the panel keeps its default accent. */}
-      <TrendingEventWidget sport="trending" events={events} showAll />
+      <TrendingEventWidget
+        sport="trending"
+        events={events}
+        showAll
+        guard={() => requireAuth({ intent: "lock a pick" })}
+      />
     </section>
   );
 }
@@ -277,6 +296,7 @@ function TrendingPredictions({
 }: {
   predictions: TrendingPrediction[];
 }) {
+  const requireAuth = useRequireAuth();
   if (predictions.length === 0) return null;
   return (
     <section
@@ -294,7 +314,13 @@ function TrendingPredictions({
         keyOf={(prediction) => prediction._id}
         noun="prediction"
       >
-        {(prediction) => <TrendingPredictionsWidget prediction={prediction} />}
+        {(prediction) => (
+          <TrendingPredictionsWidget
+            prediction={prediction}
+            onPick={() => requireAuth({ intent: "lock a pick" })}
+            guard={() => requireAuth({ intent: "lock a pick" })}
+          />
+        )}
       </LoopCarousel>
     </section>
   );
@@ -302,6 +328,7 @@ function TrendingPredictions({
 
 /** The trending futures under their heading, in the order the API sent them. */
 function TrendingFutures({ futures }: { futures: Future[] }) {
+  const requireAuth = useRequireAuth();
   if (futures.length === 0) return null;
   return (
     <section aria-labelledby="trending-futures" className="flex flex-col gap-3">
@@ -319,7 +346,12 @@ function TrendingFutures({ futures }: { futures: Future[] }) {
         slideWidth="w-[calc((100%-2rem)/2.2)]"
       >
         {(future) => (
-          <TrendingFutureWidget future={future} maxChoices={FUTURE_CHOICES} />
+          <TrendingFutureWidget
+            future={future}
+            maxChoices={FUTURE_CHOICES}
+            onPick={() => requireAuth({ intent: "lock a pick" })}
+            guard={() => requireAuth({ intent: "lock a pick" })}
+          />
         )}
       </LoopCarousel>
     </section>

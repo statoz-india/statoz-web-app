@@ -10,11 +10,26 @@ import {
   TrendingUpIcon,
 } from "@/lib/icons";
 import { NoDataState } from "@/lib/ui/no-data-state";
+import type { Event, Prediction } from "@/core";
+import type { Sport } from "@/config/sports";
+import { useRequireAuth } from "@/features/auth";
+import { useMatchEvents } from "@/features/events/data/getMatchEvent";
+import { TrendingEventWidget } from "@/features/events/widgets/trendingEvent.widget";
+import { FeedError } from "@/features/homescreen/components/feed-states";
+import { useMatchPredictions } from "@/features/predictions/data/getMatchPrediction";
+import { TrendingPredictionsWidget } from "@/features/predictions/widgets/trendingPredictions.widget";
+import { useMatchQuizzes } from "@/features/quizzes/data/getMatchQuiz";
+import {
+  isShownQuiz,
+  MatchQuizCard,
+  QuizCardList,
+} from "@/features/quizzes/widgets/quizCard";
 
 import type { MatchDetailScoreboard, SportMatch } from "../types";
-import { MatchScoreboard } from "./match-scoreboard";
-import styles from "./match-detail.module.css";
+
+import styles from "../css/match-detail.module.css";
 import { UnderlineTabs } from "@/lib/components/underline-tabs";
+import { MatchScoreboard } from "./match-stats/match-scoreboard";
 
 /**
  * The match surfaces: the quizzes, the markets on the same fixture, and the
@@ -62,19 +77,9 @@ export function MatchTabsView({
       />
 
       <div className={styles.tabPanel}>
-        {activeTab === "predict" ? (
-          <ComingSoon
-            icon={QuizIcon}
-            title="Predictions are coming soon"
-            message="Call the score and the big moments of this match, and earn XP for every one you get right."
-          />
-        ) : null}
+        {activeTab === "predict" ? <PredictPanel matchId={match.id} /> : null}
         {activeTab === "picks" ? (
-          <ComingSoon
-            icon={TrendingUpIcon}
-            title="Picks are coming soon"
-            message="This match's markets will open here."
-          />
+          <PicksPanel matchId={match.id} sport={match.sport} />
         ) : null}
         {activeTab === "stats" ? (
           scoreboard ? (
@@ -107,6 +112,136 @@ export function MatchTabsView({
         ) : null}
       </div>
     </section>
+  );
+}
+
+/** The match's quizzes. Loaded the first time the tab opens. */
+function PredictPanel({ matchId }: { matchId: string }) {
+  const quizzes = useMatchQuizzes(matchId);
+
+  if (!quizzes.data) {
+    return quizzes.status === "error" ? (
+      <div className={`${styles.scrollPanel} p-4`}>
+        <FeedError
+          subject="this match's quizzes"
+          error={quizzes.error}
+          onRetry={quizzes.reload}
+        />
+      </div>
+    ) : (
+      <div className={styles.scrollPanel}>
+        <div
+          role="status"
+          aria-label="Loading quizzes"
+          className="m-4 h-40 animate-pulse bg-surface-elevated/50"
+        />
+      </div>
+    );
+  }
+
+  const shown = quizzes.data.filter(isShownQuiz);
+  if (shown.length === 0) {
+    return (
+      <ComingSoon
+        icon={QuizIcon}
+        title="No quizzes yet"
+        message="Call the score and the big moments of this match, and earn XP for every one you get right."
+      />
+    );
+  }
+  return (
+    <div className={styles.scrollPanel}>
+      <QuizCardList>
+        {shown.map((quiz, i) => (
+          <MatchQuizCard key={quiz._id} quiz={quiz} index={i + 1} />
+        ))}
+      </QuizCardList>
+    </div>
+  );
+}
+
+/** Whether players see a prediction at all. */
+function isShownPrediction(prediction: Prediction): boolean {
+  return (
+    prediction.isVisible &&
+    prediction.predictionStatus !== "NOT_VISIBLE" &&
+    prediction.predictionStatus !== "ADMIN_VISIBLE"
+  );
+}
+
+/** Whether the events panel lists an event at all. */
+function isShownEvent(event: Event): boolean {
+  return event.eventStatus !== "DELETED";
+}
+
+/**
+ * The match's pick markets, then its events. Both are loaded the first time
+ * the tab opens.
+ */
+function PicksPanel({ matchId, sport }: { matchId: string; sport: Sport }) {
+  const predictions = useMatchPredictions(matchId);
+  const events = useMatchEvents(matchId);
+  const requireAuth = useRequireAuth();
+
+  const failed = [
+    { subject: "this match's picks", resource: predictions },
+    { subject: "this match's events", resource: events },
+  ].find(({ resource }) => !resource.data && resource.status === "error");
+  if (failed) {
+    return (
+      <div className={`${styles.scrollPanel} p-4`}>
+        <FeedError
+          subject={failed.subject}
+          error={failed.resource.error}
+          onRetry={failed.resource.reload}
+        />
+      </div>
+    );
+  }
+
+  if (!predictions.data || !events.data) {
+    return (
+      <div className={styles.scrollPanel}>
+        <div
+          role="status"
+          aria-label="Loading picks"
+          className="m-4 h-40 animate-pulse bg-surface-elevated/50"
+        />
+      </div>
+    );
+  }
+
+  const shown = predictions.data.filter(isShownPrediction);
+  const shownEvents = events.data.filter(isShownEvent);
+  if (shown.length === 0 && shownEvents.length === 0) {
+    return (
+      <ComingSoon
+        icon={TrendingUpIcon}
+        title="No picks yet"
+        message="This match's markets will open here."
+      />
+    );
+  }
+  return (
+    <div className={styles.scrollPanel}>
+      <div className="grid grid-cols-1 gap-4">
+        {shown.map((prediction) => (
+          <TrendingPredictionsWidget
+            key={prediction._id}
+            prediction={prediction}
+            // There is no trade sheet yet, so a signed-in player's tap does nothing.
+            onPick={() => requireAuth({ intent: "lock a pick" })}
+            guard={() => requireAuth({ intent: "lock a pick" })}
+          />
+        ))}
+        <TrendingEventWidget
+          sport={sport}
+          events={shownEvents}
+          showAll
+          guard={() => requireAuth({ intent: "lock a pick" })}
+        />
+      </div>
+    </div>
   );
 }
 

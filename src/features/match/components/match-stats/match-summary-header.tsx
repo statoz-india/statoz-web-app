@@ -1,8 +1,8 @@
 import type { SportMatch, SportTeam } from "@/features/match/types";
 import { formatKickoffTime } from "@/utils";
 
-import styles from "./match-detail.module.css";
-import { TeamBadge } from "./team-badge";
+import styles from "../../css/match-detail.module.css";
+import { TeamBadge } from "../team-badge";
 
 /**
  * The fixture, above the tabs: the clock or the minute, the two badges either

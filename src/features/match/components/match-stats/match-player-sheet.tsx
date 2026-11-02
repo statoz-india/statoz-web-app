@@ -17,8 +17,8 @@ import type {
   SportTeam,
 } from "@/features/match/types";
 
-import { TeamBadge } from "./team-badge";
-import styles from "./match-player-sheet.module.css";
+import { TeamBadge } from "../team-badge";
+import styles from "../../css/match-player-sheet.module.css";
 import { FilterChips } from "@/lib/components/filter-chips";
 
 type SquadPlayer = {

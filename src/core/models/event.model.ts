@@ -71,9 +71,10 @@ export const eventSchema = z.object({
   _id: z.string(),
   eventId: z.string(),
   eventName: z.string(),
-  eventDescription: z.string(),
-  eventImage: z.string(),
-  eventDescriptionImage: z.string().nullable(),
+  /** The description and images are missing from a match's event list. */
+  eventDescription: z.string().optional(),
+  eventImage: z.string().optional(),
+  eventDescriptionImage: z.string().nullable().optional(),
   eventStatus: eventStatusSchema,
   pickType: eventPickTypeSchema,
   isRacingMatchEvent: z.boolean(),

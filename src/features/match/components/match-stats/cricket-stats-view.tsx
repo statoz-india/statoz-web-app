@@ -15,8 +15,8 @@ import {
   StatsRow,
   TeamLegendRow,
 } from "./match-stats-shell";
-import { MatchTraceChart } from "./match-trace-chart";
-import styles from "./match-stats.module.css";
+import { MatchTraceChart } from "../match-trace-chart";
+import styles from "../../css/match-stats.module.css";
 import { FilterChips } from "@/lib/components/filter-chips";
 import { InteractiveLineChart } from "@/lib/components/interactive-line-chart";
 

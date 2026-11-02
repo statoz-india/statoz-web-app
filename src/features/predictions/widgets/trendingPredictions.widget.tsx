@@ -15,7 +15,7 @@ import {
 } from "@/lib/icons";
 import { colors, liftForContrast } from "@/styles/colors";
 
-import styles from "./trendingPredictions.widget.module.css";
+import styles from "../css/trendingPredictions.widget.module.css";
 
 /** A featured card shows at most this many outcomes. */
 const FEATURED_OUTCOMES = 3;
@@ -83,7 +83,12 @@ function inkFor(fill: string): string {
   return lum > 0.179 ? colors.text.inverse : colors.text.default;
 }
 
-type Outcome = { side: PredictionSide; label: string; percent: number; fill: string };
+type Outcome = {
+  side: PredictionSide;
+  label: string;
+  percent: number;
+  fill: string;
+};
 
 function outcome(
   side: PredictionSide,
@@ -109,7 +114,11 @@ function outcomesOf(prediction: TrendingPrediction): Outcome[] {
     outcome("B", teamName(teamB), prediction.oddsTeamB, teamB.primaryColor),
   ];
   if (prediction.oddsDraw != null) {
-    outcomes.splice(1, 0, outcome("D", "Draw", prediction.oddsDraw, DRAW_COLOR));
+    outcomes.splice(
+      1,
+      0,
+      outcome("D", "Draw", prediction.oddsDraw, DRAW_COLOR),
+    );
   }
   return outcomes;
 }
@@ -121,6 +130,8 @@ export type TrendingPredictionsWidgetProps = {
   featured?: boolean;
   /** Without it, or once the market stops taking entries, the rows are disabled. */
   onPick?: (side: PredictionSide) => void;
+  /** Runs before any click on the card; returning false stops the click. */
+  guard?: () => boolean;
 };
 
 /** A match pick card: the question, one row per outcome, and the volume. */
@@ -128,6 +139,7 @@ export function TrendingPredictionsWidget({
   prediction,
   featured,
   onPick,
+  guard,
 }: TrendingPredictionsWidgetProps) {
   const tag = TAG_FOR_STATUS[prediction.predictionStatus];
   if (tag === null) return null;
@@ -142,6 +154,13 @@ export function TrendingPredictionsWidget({
 
   return (
     <article
+      // Capture phase, so a stopped click never reaches the links or buttons.
+      onClickCapture={(e) => {
+        if (guard && !guard()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
       className={styles.card}
       style={
         {
@@ -182,7 +201,10 @@ export function TrendingPredictionsWidget({
             type="button"
             className={styles.outcome}
             style={
-              { "--fill": option.fill, "--ink": inkFor(option.fill) } as CSSProperties
+              {
+                "--fill": option.fill,
+                "--ink": inkFor(option.fill),
+              } as CSSProperties
             }
             disabled={disabled}
             onClick={() => onPick?.(option.side)}
