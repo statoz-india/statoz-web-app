@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import { AuthGateDialog } from "@/features/auth/components/authGateDialog";
 
@@ -15,6 +16,10 @@ export function AuthGateHost() {
   const request = useAuthGate((state) => state.request);
   // The store's actions never change, so the dialog's focus effect runs once.
   const close = useAuthGate((state) => state.close);
+  const pathname = usePathname();
+
+  // The nav stays usable beside the gate; going somewhere else closes it.
+  useEffect(() => close(), [pathname, close]);
 
   if (!request) return null;
 

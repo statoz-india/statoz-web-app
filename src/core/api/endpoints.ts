@@ -2,7 +2,11 @@ import type { Sport } from "@/config/sports";
 
 export const ENDPOINTS = {
   sendOtp: "/api/v1/authorization/send-otp",
-  login: "/api/v1/authorization/login",
+  loginSignupUser: "/api/v1/authorization/loginSignupUser",
+  googleSignIn: "/api/v1/authorization/firebase/google",
+  logout: "/api/v1/authorization/logout",
+  refreshToken: "/api/v1/authorization/refresh-token",
+  currentUser: "/api/v1/user/current-user",
   trendingMatches: "/api/v2/trending/public/matches",
   matches: (gameType: Sport, istDate: string) =>
     `/api/v1/match/public/matches/${gameType}/${encodeURIComponent(istDate)}`,

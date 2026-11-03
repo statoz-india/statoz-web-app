@@ -1,13 +1,14 @@
 // The cache layer and the calls. The fetch functions and `ENDPOINTS` stay
 // internal, so screens cannot reach the backend without going through the
-// calls in `public-api`.
+// calls in `public-api` and `auth`.
 export {
   dataOrThrow,
-  getAccessToken,
+  getSignedIn,
   InvalidResponseError,
-  subscribeAccessToken,
+  subscribeSession,
   RateLimitedError,
   type RequestOptions,
 } from "./client";
+export * from "./auth";
 export * from "./public-api";
 export * from "./resources";

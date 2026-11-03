@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ChevronRightIcon, GoogleMark } from "@/lib/icons";
 
@@ -12,7 +12,7 @@ import { Divider } from "@/lib/components/divider";
 export type AuthPanelProps = {
   /** Sends the code. The code field appears once this resolves; a throw keeps it hidden. */
   onEmailSubmit: (email: string) => void | Promise<void>;
-  /** Checks the 6-digit code sent to `email`. */
+  /** Checks the 6-digit code sent to `email`. A throw clears the code field. */
   onOtpSubmit: (email: string, otp: string) => void | Promise<void>;
   onGoogle: () => void | Promise<void>;
   /** A server- or provider-side error to show under the field in use. */
@@ -27,6 +27,8 @@ export type AuthPanelProps = {
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const OTP_LENGTH = 6;
 const OTP = new RegExp(`^\\d{${OTP_LENGTH}}$`);
+/** Seconds before another code can be asked for. */
+const RESEND_COOLDOWN = 45;
 
 /**
  * The sign-up / log-in form. UI only: the callbacks carry whatever the auth
@@ -51,6 +53,14 @@ export function AuthPanel({
   const [codeSentTo, setCodeSentTo] = useState<string | null>(null);
   const [otp, setOtp] = useState("");
   const [otpError, setOtpError] = useState<string | null>(null);
+  const [resendIn, setResendIn] = useState(0);
+  const [resent, setResent] = useState(false);
+
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const timer = window.setTimeout(() => setResendIn(resendIn - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [resendIn]);
 
   async function submitEmail() {
     const value = email.trim();
@@ -62,18 +72,38 @@ export function AuthPanel({
     try {
       await onEmailSubmit(value);
       setCodeSentTo(value);
+      setResent(false);
+      setResendIn(RESEND_COOLDOWN);
     } catch {
       // The caller shows why through `error`; the code field stays hidden.
     }
   }
 
-  function submitOtp(sentTo: string) {
+  async function resend(sentTo: string) {
+    try {
+      await onEmailSubmit(sentTo);
+      // A new code replaces the old one.
+      setOtp("");
+      setOtpError(null);
+      setResent(true);
+      setResendIn(RESEND_COOLDOWN);
+    } catch {
+      // The caller shows why through `error`.
+    }
+  }
+
+  async function submitOtp(sentTo: string) {
     if (!OTP.test(otp)) {
       setOtpError(`Enter the ${OTP_LENGTH}-digit code`);
       return;
     }
     setOtpError(null);
-    void onOtpSubmit(sentTo, otp);
+    try {
+      await onOtpSubmit(sentTo, otp);
+    } catch {
+      // The caller shows why through `error`; the player types the code again.
+      setOtp("");
+    }
   }
 
   return (
@@ -92,7 +122,7 @@ export function AuthPanel({
         className="flex flex-col gap-5"
         onSubmit={(event) => {
           event.preventDefault();
-          if (codeSentTo) submitOtp(codeSentTo);
+          if (codeSentTo) void submitOtp(codeSentTo);
           else void submitEmail();
         }}
       >
@@ -128,7 +158,11 @@ export function AuthPanel({
             autoComplete="one-time-code"
             maxLength={OTP_LENGTH}
             placeholder="000000"
-            hint={`Sent to ${codeSentTo}`}
+            hint={
+              resent
+                ? `New code sent to ${codeSentTo}. Only the latest code works.`
+                : `Sent to ${codeSentTo}. Valid for 10 minutes.`
+            }
             error={otpError ?? error}
             value={otp}
             onChange={(event) => {
@@ -140,6 +174,19 @@ export function AuthPanel({
             autoFocus
             required
           />
+        )}
+
+        {codeSentTo && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="self-start"
+            disabled={resendIn > 0 || otpPending}
+            pending={emailPending}
+            onClick={() => void resend(codeSentTo)}
+          >
+            {resendIn > 0 ? `RESEND CODE IN ${resendIn}s` : "RESEND CODE"}
+          </Button>
         )}
 
         <Divider label="OR" />

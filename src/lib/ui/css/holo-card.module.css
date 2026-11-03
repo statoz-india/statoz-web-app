@@ -1,7 +1,7 @@
 /*
- * The coming-soon screen is one 3D scene: a chamfered card floating over a grid
- * floor. Everything that moves animates a transform or an opacity, and every
- * resting style is the still frame that reduced motion is left with.
+ * The holo card is one 3D scene: a chamfered card floating over a grid floor.
+ * Everything that moves animates a transform or an opacity, and every resting
+ * style is the still frame that reduced motion is left with.
  *
  * Depth only survives where nothing flattens it, so no element between the
  * stage and a raised layer may take a clip-path, a filter or an opacity. Those
@@ -67,7 +67,7 @@
   animation: floor 3.2s linear infinite;
 }
 
-/* Stands the card up off the floor, once, when the screen opens. */
+/* Stands the card up off the floor, once, when the scene opens. */
 .rise {
   position: relative;
   transform-style: preserve-3d;
@@ -199,19 +199,10 @@
   transform-style: preserve-3d;
 }
 
-.title {
-  transform: translateZ(36px);
-  animation: reveal 600ms cubic-bezier(0.22, 1, 0.36, 1) 220ms both;
-}
-
-.note {
-  transform: translateZ(18px);
-  animation: reveal 600ms cubic-bezier(0.22, 1, 0.36, 1) 300ms both;
-}
-
-.action {
-  transform: translateZ(30px);
-  animation: reveal 600ms cubic-bezier(0.22, 1, 0.36, 1) 380ms both;
+/* A content layer, raised by `--depth` and faded in after `--delay`. */
+.layer {
+  transform: translateZ(var(--depth));
+  animation: reveal 600ms cubic-bezier(0.22, 1, 0.36, 1) var(--delay) both;
 }
 
 /*

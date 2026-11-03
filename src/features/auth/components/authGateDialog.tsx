@@ -4,6 +4,7 @@ import { useEffect, useId, useRef } from "react";
 
 import { Button } from "@/lib/components/button";
 import { LockIcon } from "@/lib/icons";
+import { HoloCard, holoLayer } from "@/lib/ui/holo-card";
 import { accentVar } from "@/styles/colors";
 
 export type AuthGateRequest = {
@@ -44,7 +45,7 @@ export function AuthGateDialog({
     // Restored rather than cleared, so a nested overlay keeps its own lock.
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    // The first control is NOT NOW, so a stray Enter dismisses rather than navigates.
+    // The first control is the close cross, so a stray Enter dismisses rather than navigates.
     panelRef.current?.querySelector<HTMLElement>(FOCUSABLE)?.focus();
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -77,46 +78,55 @@ export function AuthGateDialog({
     };
   }, [onCancel]);
 
+  const title = holoLayer(36, 220);
+  const note = holoLayer(18, 300);
+  const actions = holoLayer(30, 380);
   return (
     <div
-      className="fixed inset-0 z-100 grid place-items-center bg-(--ds-color-overlay-scrim) p-4"
+      ref={panelRef}
+      // Opaque, so the gate looks the same over every page. It leaves the nav
+      // uncovered: the bottom bar (5.25rem, `--platform-nav-height` in the app
+      // layout) on phones, and the side rail of the centred shell from `lg`.
+      className="fixed inset-x-0 top-0 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-100 bg-background lg:bottom-0 lg:left-[calc(max(0px,(100vw-80rem)/2)+14rem)]"
       role="presentation"
-      // mousedown, so a text drag that starts in the panel and ends on the scrim does not close it.
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onCancel();
-      }}
     >
-      <div
-        ref={panelRef}
+      <HoloCard
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className="relative w-full max-w-sm border border-cyan bg-surface-elevated p-5 shadow-(--ds-shadow-panel) [clip-path:var(--ds-clip-panel)]"
+        icon={<LockIcon size={48} />}
+        onClose={onCancel}
+        className="flex size-full items-center justify-center px-4 py-12"
+        // mousedown, so a text drag that starts in the card and ends beside it does not close it.
+        onMouseDown={(event) => {
+          if (event.target === event.currentTarget) onCancel();
+        }}
       >
-        <span
-          aria-hidden
-          className="grid size-11 place-items-center border border-cyan bg-cyan/10 text-cyan"
-        >
-          <LockIcon size={22} />
-        </span>
-        <p className="mt-5 font-display text-2xs font-black tracking-ultra text-cyan">
-          {"// ACCOUNT REQUIRED"}
-        </p>
         <h2
           id={titleId}
-          className="mt-2 font-display text-xl font-black tracking-wide"
+          className={`${title.className} mt-4 font-display font-black leading-tight`}
+          style={title.style}
         >
-          LOG IN TO {request.intent.toUpperCase()}
+          <span className="mb-2 block text-2xs tracking-ultra text-cyan">
+            {"// ACCOUNT REQUIRED"}
+          </span>
+          <span className="block text-xl tracking-wide text-foreground">
+            LOG IN TO {request.intent.toUpperCase()}
+          </span>
         </h2>
         <p
           id={descriptionId}
-          className="mt-3 text-sm leading-relaxed text-muted"
+          className={`${note.className} mt-3 max-w-xs text-balance text-sm leading-relaxed text-muted`}
+          style={note.style}
         >
           {request.message ??
             "Log in to unlock this feature and keep your StatOz progress."}
         </p>
-        <div className="mt-6 grid grid-cols-2 gap-2">
+        <div
+          className={`${actions.className} mt-8 grid w-full grid-cols-2 gap-2`}
+          style={actions.style}
+        >
           <Button variant="surface" size="lg" onClick={onCancel}>
             NOT NOW
           </Button>
@@ -129,7 +139,7 @@ export function AuthGateDialog({
             LOG IN
           </Button>
         </div>
-      </div>
+      </HoloCard>
     </div>
   );
 }

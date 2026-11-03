@@ -3,7 +3,7 @@
  * absolute (`/api/v1/...`), so only the origin of `API_BASE_URL` is used.
  *
  * - `unauthenticatedFetch` sends the request exactly as the caller built it.
- * - `authenticatedFetch` adds the `Cookie: accessToken=...` header the
+ * - `authenticatedFetch` adds the `Authorization: Bearer ...` header the
  *   backend reads to know who is calling.
  *
  * Both resolve to the body the API sent: `ApiSuccess`, `ApiError` or
@@ -17,8 +17,11 @@ import {
   apiErrorResponseSchema,
   apiErrorSchema,
   apiSuccessSchema,
+  refreshTokenResponseSchema,
   type ApiResult,
 } from "@/core/models";
+
+import { ENDPOINTS } from "./endpoints";
 
 const RATE_LIMIT_WINDOW_SECONDS = 60;
 
@@ -59,26 +62,27 @@ export class InvalidResponseError extends Error {
 }
 
 /*
- * The access token from the last login. It lives in memory only, so a reload
- * logs the visitor out. `auth.ts` sets it; nothing else should.
+ * The tokens live in the API's httpOnly cookies, which JavaScript can't read,
+ * so this only follows what the API says: `null` until it has answered.
+ * `auth.ts` and the calls below set it; nothing else should.
  */
-let accessToken: string | null = null;
-const tokenListeners = new Set<() => void>();
+let signedIn: boolean | null = null;
+const sessionListeners = new Set<() => void>();
 
-export function setAccessToken(token: string | null) {
-  accessToken = token;
-  for (const listener of tokenListeners) listener();
+export function setSignedIn(value: boolean) {
+  signedIn = value;
+  for (const listener of sessionListeners) listener();
 }
 
-export function getAccessToken(): string | null {
-  return accessToken;
+export function getSignedIn(): boolean | null {
+  return signedIn;
 }
 
-/** Calls `listener` whenever the token is set or cleared. Returns the unsubscribe. */
-export function subscribeAccessToken(listener: () => void): () => void {
-  tokenListeners.add(listener);
+/** Calls `listener` whenever the session starts or ends. Returns the unsubscribe. */
+export function subscribeSession(listener: () => void): () => void {
+  sessionListeners.add(listener);
   return () => {
-    tokenListeners.delete(listener);
+    sessionListeners.delete(listener);
   };
 }
 
@@ -120,34 +124,76 @@ async function send<T>(
   return parsed.data as ApiResult<T>;
 }
 
-/** Calls the endpoint with exactly the request the caller built. */
+/**
+ * Calls the endpoint without the session cookies, so it also works with an API
+ * that answers `*` for CORS.
+ */
 export function unauthenticatedFetch<T>(
   path: string,
   schema: z.ZodType<T>,
   init?: RequestInit,
 ): Promise<ApiResult<T>> {
-  return send(path, schema, init);
+  return send(path, schema, { ...init, credentials: "omit" });
 }
 
+/** Only a 401 means the login is over; anything else keeps the tokens. */
+type RefreshOutcome = "refreshed" | "signedOut" | "temporaryFailure";
+
+const REFRESH_TIMEOUT_MS = 10_000;
+
+let refreshing: Promise<RefreshOutcome> | null = null;
+
+/** One refresh at a time; calls that need one while it runs share its outcome. */
+function refreshTokens(): Promise<RefreshOutcome> {
+  refreshing ??= runRefresh().finally(() => {
+    refreshing = null;
+  });
+  return refreshing;
+}
+
+async function runRefresh(): Promise<RefreshOutcome> {
+  try {
+    // No body: the API reads the refresh token from its cookie and sets both again.
+    const result = await authenticatedFetch(
+      ENDPOINTS.refreshToken,
+      refreshTokenResponseSchema.shape.data,
+      { method: "POST", signal: AbortSignal.timeout(REFRESH_TIMEOUT_MS) },
+    );
+    if (result.success) return "refreshed";
+    // A 401 has already ended the session; there is nothing to log out of.
+    return result.statusCode === 401 ? "signedOut" : "temporaryFailure";
+  } catch {
+    // Offline or timed out: the player stays signed in.
+    return "temporaryFailure";
+  }
+}
+
+/** The status the backend reserves for an expired access token. */
+const TOKEN_EXPIRED = 498;
+
 /**
- * Calls the endpoint as the logged-in user, by sending the access token as a
- * cookie. Browsers drop a hand-set `Cookie` header, so this only reaches the
- * backend from server code (Server Components, route handlers).
- *
- * Before anyone has logged in it answers the way the backend does for a
- * missing token, without making the call.
+ * Calls the endpoint with the session cookies, which say who is calling, and
+ * lets the response set them (login, refresh). An expired token is refreshed
+ * and the call retried once.
  */
 export async function authenticatedFetch<T>(
   path: string,
   schema: z.ZodType<T>,
   init: RequestInit = {},
 ): Promise<ApiResult<T>> {
-  if (!accessToken) {
-    return { statusCode: 401, success: false, message: "Unauthorized request" };
+  const withCookies: RequestInit = { ...init, credentials: "include" };
+  let result = await send(path, schema, withCookies);
+  if (
+    result.statusCode === TOKEN_EXPIRED &&
+    // The refresh call itself never refreshes, so it can't wait on itself.
+    path !== ENDPOINTS.refreshToken &&
+    (await refreshTokens()) === "refreshed"
+  ) {
+    result = await send(path, schema, withCookies);
   }
-  const headers = new Headers(init.headers);
-  headers.set("Cookie", `accessToken=${accessToken}`);
-  return send(path, schema, { ...init, headers });
+  // No cookie, or one the API no longer accepts.
+  if (result.statusCode === 401) setSignedIn(false);
+  return result;
 }
 
 /**

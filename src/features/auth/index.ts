@@ -1,27 +1,35 @@
 import { useSyncExternalStore } from "react";
 import { create } from "zustand";
 
-import { getAccessToken, subscribeAccessToken } from "@/core";
+import { getSignedIn, subscribeSession } from "@/core";
 import type { AuthGateRequest } from "@/features/auth/components/authGateDialog";
 
+import { useCurrentUser } from "./data/authData";
+
 export type { AuthGateRequest };
+export { useCurrentUser };
 
 /**
  * Auth adapter. The primary nav reads these hooks, and anything that needs an
- * account asks through `useRequireAuth`. A player is signed in while there is
- * an access token from `login()`.
+ * account asks through `useRequireAuth`. A player is signed in while the API
+ * accepts the session cookies from `loginSignupUser()`.
  */
 export type AuthStatus = "hydrating" | "guest" | "authenticated";
 
-const statusSnapshot = (): AuthStatus =>
-  getAccessToken() ? "authenticated" : "guest";
-// The server never has a token, so it cannot tell a guest from a player.
+const statusSnapshot = (): AuthStatus => {
+  const signedIn = getSignedIn();
+  if (signedIn === null) return "hydrating";
+  return signedIn ? "authenticated" : "guest";
+};
+// The server can't see the API's cookies, so it cannot tell a guest from a player.
 const serverStatus = (): AuthStatus => "hydrating";
 
-/** The current session. `hydrating` means it is not known yet. */
+/** The current session. `hydrating` means the API has not answered yet. */
 export function useAuthSession(): { status: AuthStatus } {
+  // Asks the API on page load; until it answers, the status stays `hydrating`.
+  useCurrentUser();
   const status = useSyncExternalStore(
-    subscribeAccessToken,
+    subscribeSession,
     statusSnapshot,
     serverStatus,
   );

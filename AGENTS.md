@@ -51,7 +51,7 @@ Use the `@/` alias for imports across folders, and relative imports inside a fea
 - No `any`. Use `unknown` and narrow it.
 - Keep comments short and explain why, not what.
 - Don't read or print `.env` files.
-- Never edit docs/technical/folder-structure.md. Read it, but leave changes to it to the user.
+- Never edit docs/technical/ folder. Read it, but leave changes to it to the user.
 - Whatever is asked to do, just do that, never take decisions on your own and always ask whenever you are in a confusion.
 - Always give the best suggestions whenever I ask something, don't just agree to me blindly.
 - Never edit this file `.claude/CLAUDE.md` & `AGENTS.md` without asking first.
@@ -60,6 +60,8 @@ Use the `@/` alias for imports across folders, and relative imports inside a fea
 - Whenever creating a css file add it in the css folder of that level.
 - When removing a wrapper element, check every style that relied on it.
 - Check layout changes at both phone and desktop width before calling them done.
+- Write whatever is asked in minimum amount if code as possible.
+- If by any chance, the user misses selecting the options of the wuestions you asked, ask them again, never take any decisions on your own in any condition.
 
 ## Before finishing a change
 
