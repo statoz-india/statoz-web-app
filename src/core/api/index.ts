@@ -14,5 +14,6 @@ export * from "./contact";
 export * from "./public-api";
 export * from "./resources";
 export * from "./tournament";
+export * from "./shop";
 export * from "./tracker";
 export * from "./user";

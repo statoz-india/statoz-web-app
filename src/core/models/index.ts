@@ -18,3 +18,4 @@ export * from "./user.model";
 export * from "./xpTracker.model";
 export * from "./coinTracker.model";
 export * from "./userHistory.model";
+export * from "./shop.model";

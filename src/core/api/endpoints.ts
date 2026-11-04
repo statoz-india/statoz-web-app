@@ -1,5 +1,8 @@
 import type { Sport } from "@/config/sports";
 
+/** The three shop catalogues, as their path segment. */
+export type ShopCatalog = "profile-pics" | "profile-banners" | "player-cards";
+
 export const ENDPOINTS = {
   sendOtp: "/api/v1/authorization/send-otp",
   loginSignupUser: "/api/v1/authorization/loginSignupUser",
@@ -11,6 +14,11 @@ export const ENDPOINTS = {
   userStats: "/api/v1/user/userStats",
   userQuizzes: "/api/v1/quiz/userQuizzes",
   userPredictions: "/api/v1/prediction/userPredictions",
+  shopTeams: (catalog: ShopCatalog) => `/api/v1/${catalog}/team-abbreviations`,
+  shopItems: (catalog: ShopCatalog, team: string) =>
+    `/api/v1/${catalog}/by-team/${encodeURIComponent(team)}`,
+  paidProfileBanners: (page: number, limit: number) =>
+    `/api/v1/profile-banners/paid?page=${page}&limit=${limit}`,
   signupTournaments: "/api/v1/tournament/trending",
   xpTracker: (query: string) =>
     `/api/v1/tracker/xp${query ? `?${query}` : ""}`,
