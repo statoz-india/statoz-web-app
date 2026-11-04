@@ -45,7 +45,7 @@ Use the `@/` alias for imports across folders, and relative imports inside a fea
 
 ## Code style
 
-- Files and folders are kebab-case. Components are PascalCase named exports. No default exports, except where Next.js requires them (`page`, `layout` and similar).
+- Files are camelCase and folders are kebab-case. Components are PascalCase named exports. No default exports, except where Next.js requires them (`page`, `layout` and similar).
 - Use Tailwind classes. Use a CSS module only when Tailwind can't express it. Take colours, spacing and type from `src/styles` tokens, never hard-coded values.
 - Image paths come from `@/config/images`, never as string literals. ESLint enforces this.
 - No `any`. Use `unknown` and narrow it.
@@ -60,8 +60,9 @@ Use the `@/` alias for imports across folders, and relative imports inside a fea
 - Whenever creating a css file add it in the css folder of that level.
 - When removing a wrapper element, check every style that relied on it.
 - Check layout changes at both phone and desktop width before calling them done.
-- Write whatever is asked in minimum amount if code as possible.
+- Write minimal, clean, and efficient code without unnecessary complexity.
 - If by any chance, the user misses selecting the options of the wuestions you asked, ask them again, never take any decisions on your own in any condition.
+- Whenever creating a sample data always create a sampleData.ts file and add in those.
 
 ## Before finishing a change
 

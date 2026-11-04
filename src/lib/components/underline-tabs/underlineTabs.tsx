@@ -79,7 +79,7 @@ export function UnderlineTabs({
         borderColor: `color-mix(in srgb, ${accent} 22%, transparent)`,
       }}
     >
-      <div className="h-full min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="h-full min-w-0 flex-1 overflow-x-auto scrollbar-none [&::-webkit-scrollbar]:hidden">
         <div
           role="tablist"
           aria-label={label}

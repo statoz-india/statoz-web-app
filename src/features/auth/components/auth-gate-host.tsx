@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 
 import { AuthGateDialog } from "@/features/auth/components/authGateDialog";
 
@@ -16,22 +16,31 @@ export function AuthGateHost() {
   const request = useAuthGate((state) => state.request);
   // The store's actions never change, so the dialog's focus effect runs once.
   const close = useAuthGate((state) => state.close);
-  const pathname = usePathname();
-
-  // The nav stays usable beside the gate; going somewhere else closes it.
-  useEffect(() => close(), [pathname, close]);
-
-  if (!request) return null;
 
   return (
-    <AuthGateDialog
-      request={request}
-      onCancel={close}
-      onContinue={() => {
-        const returnTo = request.returnTo ?? window.location.pathname;
-        close();
-        router.push(`/auth?returnTo=${encodeURIComponent(returnTo)}`);
-      }}
-    />
+    <>
+      {/* The path is only known at request time, so it waits on its own. */}
+      <Suspense fallback={null}>
+        <CloseOnNavigate close={close} />
+      </Suspense>
+      {request ? (
+        <AuthGateDialog
+          request={request}
+          onCancel={close}
+          onContinue={() => {
+            const returnTo = request.returnTo ?? window.location.pathname;
+            close();
+            router.push(`/auth?returnTo=${encodeURIComponent(returnTo)}`);
+          }}
+        />
+      ) : null}
+    </>
   );
+}
+
+/** The nav stays usable beside the gate; going somewhere else closes it. */
+function CloseOnNavigate({ close }: { close: () => void }) {
+  const pathname = usePathname();
+  useEffect(() => close(), [pathname, close]);
+  return null;
 }

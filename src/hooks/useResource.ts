@@ -132,6 +132,17 @@ export function peekResource<T>(key: string): T | undefined {
   return entries.get(key)?.data as T | undefined;
 }
 
+/** Stores a value the app already has, such as the answer to a save. */
+export function setResource<T>(key: string, data: T) {
+  write(key, {
+    status: "ready",
+    data,
+    loadedAt: Date.now(),
+    retryAt: 0,
+    pending: false,
+  });
+}
+
 /** The keys that hold a value and start with `prefix`. */
 export function loadedKeys(prefix: string): string[] {
   return [...entries.keys()].filter(

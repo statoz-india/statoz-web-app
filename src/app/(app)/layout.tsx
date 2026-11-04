@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 
 import { AppNav } from "@/lib/layout/app-nav";
 import { AppTopBar } from "@/lib/layout/app-top-bar";
+import { PlatformNavigation } from "@/lib/widgets/platformNavigation";
 
 /**
  * The app shell: navigation sits at the bottom on phones and moves to a side
@@ -33,6 +34,7 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <AppTopBar />
+        <PlatformNavigation />
         <main className="flex min-h-0 flex-1 flex-col pb-[env(safe-area-inset-bottom)]">
           {children}
         </main>

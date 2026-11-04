@@ -7,6 +7,20 @@ export const ENDPOINTS = {
   logout: "/api/v1/authorization/logout",
   refreshToken: "/api/v1/authorization/refresh-token",
   currentUser: "/api/v1/user/current-user",
+  updateUser: "/api/v1/user/update-user",
+  userStats: "/api/v1/user/userStats",
+  userQuizzes: "/api/v1/quiz/userQuizzes",
+  userPredictions: "/api/v1/prediction/userPredictions",
+  signupTournaments: "/api/v1/tournament/trending",
+  xpTracker: (query: string) =>
+    `/api/v1/tracker/xp${query ? `?${query}` : ""}`,
+  xpTrackerMap: (query: string) =>
+    `/api/v1/tracker/xp/map${query ? `?${query}` : ""}`,
+  coinTracker: (query: string) =>
+    `/api/v1/tracker/coins${query ? `?${query}` : ""}`,
+  coinTrackerMap: (query: string) =>
+    `/api/v1/tracker/coins/map${query ? `?${query}` : ""}`,
+  contactUs: "/api/v1/contact-us",
   trendingMatches: "/api/v2/trending/public/matches",
   matches: (gameType: Sport, istDate: string) =>
     `/api/v1/match/public/matches/${gameType}/${encodeURIComponent(istDate)}`,

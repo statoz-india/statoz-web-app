@@ -10,5 +10,9 @@ export {
   type RequestOptions,
 } from "./client";
 export * from "./auth";
+export * from "./contact";
 export * from "./public-api";
 export * from "./resources";
+export * from "./tournament";
+export * from "./tracker";
+export * from "./user";

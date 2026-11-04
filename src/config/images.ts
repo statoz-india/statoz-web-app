@@ -91,8 +91,19 @@ export const IMAGES = {
     },
   },
 
+  // Single-colour marks with no fill of their own; draw them as masks.
+  social: {
+    instagram: "/assets/social/instagram.svg",
+    whatsapp: "/assets/social/whatsapp.svg",
+    youtube: "/assets/social/youtube.svg",
+    linkedin: "/assets/social/linkedin.svg",
+    x: "/assets/social/x.svg",
+    reddit: "/assets/social/reddit.svg",
+  },
+
   profile: {
     defaultMale: "/assets/profile/default_male.png",
+    defaultBanner: "/assets/profile/default_banner.png",
   },
 
   shop: {
