@@ -1,6 +1,7 @@
 /**
  * The only place that calls `fetch` against the API. Endpoint paths are
- * absolute (`/api/v1/...`), so only the origin of `API_BASE_URL` is used.
+ * absolute (`/api/v1/...`) and called on this site's own origin; the server
+ * forwards them to the backend (the rewrite in `next.config.ts`).
  *
  * - `unauthenticatedFetch` sends the request exactly as the caller built it.
  * - `authenticatedFetch` adds the `Authorization: Bearer ...` header the
@@ -12,7 +13,6 @@
 
 import { z } from "zod";
 
-import { API_BASE_URL } from "@/core/env";
 import {
   apiErrorResponseSchema,
   apiErrorSchema,
@@ -86,19 +86,12 @@ export function subscribeSession(listener: () => void): () => void {
   };
 }
 
-function urlFor(path: string): URL {
-  if (!API_BASE_URL) {
-    throw new Error("NEXT_PUBLIC_API_BASE_URL is not set");
-  }
-  return new URL(path, API_BASE_URL);
-}
-
 async function send<T>(
   path: string,
   schema: z.ZodType<T>,
   init?: RequestInit,
 ): Promise<ApiResult<T>> {
-  const res = await fetch(urlFor(path), init);
+  const res = await fetch(path, init);
   const text = await res.text();
   let body: unknown;
   try {
