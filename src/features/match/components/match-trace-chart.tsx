@@ -8,12 +8,12 @@ import {
   type PointerEvent,
 } from "react";
 
-import { FullscreenExitIcon, FullscreenIcon } from "@/utils";
-import { FilterChips } from "@/widgets/ui/components/filter-chips";
+import { FullscreenExitIcon, FullscreenIcon } from "@/lib/icons";
 
 import type { MatchTrace, SportMatch } from "@/features/match/types";
 
-import styles from "./match-stats.module.css";
+import styles from "../css/match-stats.module.css";
+import { FilterChips } from "@/lib/components/filter-chips";
 
 /**
  * A two-sided trace: both teams on one axis, scrubbable, with the events that

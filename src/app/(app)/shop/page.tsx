@@ -1,5 +1,5 @@
-import ComingSoonScreen from "@/widgets/ui/screen/comingSoon";
+import { ShopScreen } from "@/features/shop/screens/shopScreen";
 
-export default function HomeScreen() {
-  return <ComingSoonScreen />;
+export default function ShopPage() {
+  return <ShopScreen />;
 }

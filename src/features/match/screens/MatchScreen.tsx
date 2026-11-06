@@ -1,51 +1,23 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useEffectEvent, useMemo } from "react";
 
-import type { MatchSport } from "@/config/sports";
+import { isSport } from "@/config/sports";
 import {
   FeedEmpty,
   FeedError,
 } from "@/features/homescreen/components/feed-states";
-import { useTodayInIST } from "@/hooks/useTodayInIST";
-import { ArrowLeftIcon, SignalOffIcon } from "@/utils";
+import { ArrowLeftIcon, SignalOffIcon } from "@/lib/icons";
 
-import {
-  findFixture,
-  isRace,
-  toMatch,
-  toRaceMatch,
-  toScoreboard,
-} from "../adapters";
-import styles from "../components/match-detail.module.css";
-import { MatchSummaryHeader } from "../components/match-summary-header";
+import { isRace, toMatch, toRaceMatch, toScoreboard } from "../adapters";
+import styles from "../css/match-detail.module.css";
+import { MatchSummaryHeader } from "../components/match-stats/match-summary-header";
 import { MatchTabsView } from "../components/match-tabs-view";
-import {
-  loadedMatchDay,
-  rememberMatchDay,
-  shiftDay,
-  useKnownMatchDay,
-} from "../match-day";
-import { useFixtureDays, useMatchStats } from "../queries";
+import { useFixture, useMatchStats } from "../data/match.data";
 
 /** The public API asks not to be polled faster than this. */
 const POLL_MS = 30_000;
-
-/** The sports whose day lists a match or a race can be found in. */
-const FIXTURE_SPORTS: MatchSport[] = [
-  "football",
-  "cricket",
-  "basketball",
-  "racing",
-];
-
-/**
- * The days searched for a match nothing here knows the day of: a link opened
- * in a browser that has never seen the match. Each day costs a request per
- * sport, and the API allows 60 a minute, so it is yesterday and tomorrow only.
- */
-const NEARBY_DAYS = [-1, 1];
 
 /**
  * One match: its header and its tabs, across the full width of the page.
@@ -56,53 +28,10 @@ const NEARBY_DAYS = [-1, 1];
 export default function MatchScreen() {
   const params = useParams<{ id: string }>();
   const matchId = readableId(params.id);
-  const knownDay = useKnownMatchDay(matchId);
-  const today = useTodayInIST();
-
-  // The address is the match's id alone, and matches are listed by day. The
-  // day is the one already known for this match, and failing that today.
-  const day = knownDay ?? today;
-  const days = useMemo(
-    () => (day ? FIXTURE_SPORTS.map((sport) => ({ sport, day })) : []),
-    [day],
-  );
-  const listed = useFixtureDays(days);
-  const listedLoading =
-    day === null ||
-    listed.resources.some((resource) => resource.status === "loading");
-  const onDay = findFixture(
-    listed.resources.map((resource) => resource.data),
-    matchId,
-  );
-
-  // Not there: look a day either side of today before giving up.
-  const widen = !onDay && !listedLoading && today !== null;
-  const nearbyDays = useMemo(
-    () =>
-      widen && today
-        ? NEARBY_DAYS.map((offset) => shiftDay(today, offset))
-            .filter((nearby) => nearby !== day)
-            .flatMap((nearby) =>
-              FIXTURE_SPORTS.map((sport) => ({ sport, day: nearby })),
-            )
-        : [],
-    [widen, today, day],
-  );
-  const nearby = useFixtureDays(nearbyDays);
-  const fixture =
-    onDay ??
-    findFixture(
-      nearby.resources.map((resource) => resource.data),
-      matchId,
-    );
-
-  // Once found, the day is kept, so a reload goes straight to it.
-  const found = fixture !== undefined;
-  useEffect(() => {
-    if (!found) return;
-    const foundOn = loadedMatchDay(matchId);
-    if (foundOn) rememberMatchDay(matchId, foundOn);
-  }, [found, matchId]);
+  // An unknown sport counts as none, which tries a match and then a race.
+  const sportParam = useSearchParams().get("sport")?.toLowerCase();
+  const lookup = useFixture(matchId, isSport(sportParam) ? sportParam : null);
+  const fixture = lookup.data ?? undefined;
 
   const stats = useMatchStats(fixture);
   const record = stats.data;
@@ -128,12 +57,7 @@ export default function MatchScreen() {
     return () => window.clearInterval(timer);
   }, [live]);
 
-  const lookups = [...listed.resources, ...nearby.resources];
-  const lookingUp =
-    !fixture &&
-    (listedLoading ||
-      nearby.resources.some((resource) => resource.status === "loading"));
-  const lookupFailure = lookups.find((resource) => resource.status === "error");
+  const lookingUp = !fixture && lookup.status === "loading";
 
   return (
     <div className={styles.page}>
@@ -166,20 +90,17 @@ export default function MatchScreen() {
                 aria-label="Loading match"
                 className="h-40 animate-pulse bg-surface-elevated/50"
               />
-            ) : lookupFailure ? (
+            ) : lookup.status === "error" ? (
               <FeedError
                 subject="this match"
-                error={lookupFailure.error}
-                onRetry={() => {
-                  listed.reload();
-                  nearby.reload();
-                }}
+                error={lookup.error}
+                onRetry={lookup.reload}
               />
             ) : (
               <FeedEmpty
                 icon={<SignalOffIcon size={34} className="text-cyan" />}
                 title="MATCH NOT AVAILABLE"
-                note={`No match called ${matchId} is on the fixture lists for yesterday, today or tomorrow.`}
+                note={`There's no match called ${matchId}.`}
               />
             )}
           </div>

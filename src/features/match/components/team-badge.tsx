@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 
 import type { SportTeam } from "@/features/match/types";
 
-import styles from "./team-badge.module.css";
+import styles from "../css/team-badge.module.css";
 
 export type TeamBadgeProps = {
   team: SportTeam;

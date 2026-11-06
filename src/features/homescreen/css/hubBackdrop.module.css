@@ -1,0 +1,69 @@
+/* One screen tall and pinned, so the feed scrolls over it. */
+.backdrop {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  background: var(--ds-gradient-app-background);
+}
+.artwork,
+.veil {
+  position: absolute;
+  inset: 0;
+}
+
+/* Every theme stays mounted; only the active one shows, so a switch is a fade. */
+.artwork {
+  background-image: var(--hub-portrait);
+  background-position: top right;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 240ms ease-out;
+}
+.artwork[data-active="true"] {
+  opacity: 1;
+}
+@media (min-width: 768px) {
+  .artwork {
+    background-image: var(--hub-wide);
+  }
+}
+
+/*
+ * Pushes the art back so the cards stay readable: the cyan pattern over three
+ * washes of the page colour, darkest at the top and bottom edges.
+ */
+.veil {
+  --page: var(--ds-color-background-primary);
+  background:
+    var(--hub-overlay) 0 0 / 100% 100% no-repeat,
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--page) 94%, transparent) 0%,
+      color-mix(in srgb, var(--page) 68%, transparent) 22%,
+      color-mix(in srgb, var(--page) 64%, transparent) 48%,
+      color-mix(in srgb, var(--page) 76%, transparent) 76%,
+      color-mix(in srgb, var(--page) 91%, transparent) 100%
+    ),
+    linear-gradient(
+      to bottom right,
+      color-mix(in srgb, var(--page) 90%, transparent) 0%,
+      color-mix(in srgb, var(--page) 38%, transparent) 44%,
+      color-mix(in srgb, var(--page) 82%, transparent) 100%
+    ),
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--page) 72%, transparent) 0%,
+      color-mix(in srgb, var(--page) 24%, transparent) 62%,
+      color-mix(in srgb, var(--page) 62%, transparent) 100%
+    );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .artwork {
+    transition: none;
+  }
+}

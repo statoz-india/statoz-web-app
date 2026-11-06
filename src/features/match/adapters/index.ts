@@ -5,7 +5,8 @@ import type {
   MatchStats,
   MotorSportMatches,
   Team,
-} from "@/lib";
+} from "@/core";
+import { formatStatus } from "@/utils";
 
 import type {
   MatchDetailScoreboard,
@@ -24,13 +25,12 @@ import {
   side,
   type Side,
 } from "./shared";
-import { TournamentSection } from "@/lib/types/game-types";
 
 /**
  * Turns what the public API sends into what the match page draws.
  *
  * Two responses feed one page. The match stats carry the score, the events and
- * the line-ups, but no colours; the day's fixture list carries each team's
+ * the line-ups, but no colours; the match itself carries each team's
  * colours and the competition's short name. Either can be missing, and every
  * field of the stats can be null, so nothing here assumes a value is present.
  */
@@ -47,22 +47,6 @@ export type Fixture = Matches | MotorSportMatches;
 
 export function isRace(fixture: Fixture): fixture is MotorSportMatches {
   return !("teamA" in fixture);
-}
-
-/** The fixture with this readable id, from whichever loaded list holds it. */
-export function findFixture(
-  days: (TournamentSection[] | undefined)[],
-  matchId: string,
-): Fixture | undefined {
-  for (const sections of days) {
-    for (const section of sections ?? []) {
-      const found = (section.matches ?? []).find(
-        (match) => match.matchId === matchId,
-      );
-      if (found) return found;
-    }
-  }
-  return undefined;
 }
 
 const fixtureStatuses: Record<string, MatchStatus> = {
@@ -252,12 +236,17 @@ export function toMatch(
   const sportName = (stats?.gameType ?? fixture?.gameType)?.toLowerCase();
   const sport: Sport = isSport(sportName) ? sportName : "football";
   const kickoff = fixture?.matchStartTime ?? facts?.kickoff ?? "";
-  // A match that has not started is upcoming, whatever status it carries.
-  const status: MatchStatus = isAhead(kickoff)
-    ? "scheduled"
-    : (facts?.status ??
-      fixtureStatuses[String(fixture?.matchStatus).toLowerCase()] ??
-      "finished");
+  // Postponed overrides everything; otherwise a match that has not started
+  // is upcoming, whatever status it carries.
+  const status: MatchStatus =
+    String(fixture?.matchStatus).toLowerCase() === "postponed"
+      ? "postponed"
+      : isAhead(kickoff)
+        ? "scheduled"
+        : (facts?.status ??
+          fixtureStatuses[String(fixture?.matchStatus).toLowerCase()] ??
+          "finished");
+  const noScore = status === "scheduled" || status === "postponed";
 
   return {
     id,
@@ -266,10 +255,11 @@ export function toMatch(
     home,
     away,
     status,
+    statusLabel: fixture?.matchStatus ? formatStatus(fixture.matchStatus) : undefined,
     kickoff,
     // Before the start the feed already reports 0 - 0; that is not a score yet.
-    homeScore: status === "scheduled" ? undefined : facts?.home.score,
-    awayScore: status === "scheduled" ? undefined : facts?.away.score,
+    homeScore: noScore ? undefined : facts?.home.score,
+    awayScore: noScore ? undefined : facts?.away.score,
     liveMinute: status === "live" ? facts?.liveMinute : undefined,
     volumeOz: fixture?.totalVolume,
   };
@@ -308,6 +298,7 @@ export function toRaceMatch(
     home: name,
     away: name,
     status: isAhead(kickoff) ? "scheduled" : reported,
+    statusLabel: formatStatus(race.matchStatus),
     kickoff,
   };
 }

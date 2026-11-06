@@ -1,5 +1,5 @@
-import ComingSoonScreen from "@/widgets/ui/screen/comingSoon";
+import { LeaderboardScreen } from "@/features/leaderboard/screen/Leaderboard.screen";
 
-export default function HomeScreen() {
-  return <ComingSoonScreen />;
+export default function LeaderboardPage() {
+  return <LeaderboardScreen />;
 }

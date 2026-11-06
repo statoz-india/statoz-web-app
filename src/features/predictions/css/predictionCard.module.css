@@ -1,0 +1,334 @@
+/* The fixture panel: a square top with a notch cut out of the middle, and chamfered bottom corners. */
+.shell {
+  position: relative;
+  min-width: 0;
+  isolation: isolate;
+  color: var(--ds-color-text-default);
+  font-family: var(--ds-font-body);
+  animation: enter 0.35s both;
+}
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* Hard lift, edge plate, fill. A CSS border would be cut off at the chamfers. */
+.lift {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  transform: translateY(6px);
+  clip-path: var(--ds-clip-fixture);
+  background: var(--ds-color-fixture-shadow);
+}
+.frame {
+  position: relative;
+  height: 100%;
+  padding: 1.5px;
+  clip-path: var(--ds-clip-fixture);
+  background: var(--ds-color-fixture-border);
+}
+.inner {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  overflow: hidden;
+  clip-path: var(--ds-clip-fixture);
+  background: var(--ds-color-fixture-base);
+}
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 16px 16px 12px;
+  background: var(--ds-gradient-fixture-card);
+}
+
+/* Notch tag: sits in the cut-out, so it reads against the page */
+.tag {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 108px;
+  height: 22px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.closes {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--ds-color-fixture-kickoff);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  font-variant-numeric: tabular-nums;
+}
+.closes[data-long] {
+  font-size: 10px;
+  letter-spacing: 0.03em;
+}
+.status {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ds-color-danger);
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  font-variant-numeric: tabular-nums;
+}
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ds-color-danger);
+  box-shadow: 0 0 7px color-mix(in srgb, var(--ds-color-danger) 65%, transparent);
+  animation: pulse 1.1s ease-in-out infinite;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* Top row */
+.top {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.league {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 11px;
+  clip-path: polygon(
+    6px 0,
+    100% 0,
+    100% calc(100% - 6px),
+    calc(100% - 6px) 100%,
+    0 100%,
+    0 6px
+  );
+  background: var(--league);
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--league) 42%, black);
+  color: var(--ds-color-text-inverse);
+  font: 900 12px/1 var(--ds-font-display);
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 6px rgb(0 0 0 / 22%);
+}
+.type {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  margin-left: auto;
+  padding: 0 9px;
+  border: 1px solid
+    color-mix(in srgb, var(--ds-color-border-default) 78%, transparent);
+  background: var(--ds-color-fixture-strip);
+  color: color-mix(in srgb, var(--ds-color-text-muted) 90%, transparent);
+  font: 900 8.5px var(--ds-font-display);
+  letter-spacing: 0.13em;
+}
+
+/* Question + context */
+.question {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin-top: 8px;
+  color: var(--ds-color-text-default);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.12;
+  text-decoration: none;
+}
+@media (hover: hover) {
+  .question:hover {
+    color: var(--ds-color-accent-cyan);
+  }
+}
+.question:focus-visible {
+  outline: 2px solid var(--ds-color-accent-cyan);
+  outline-offset: 2px;
+}
+.context {
+  margin: 4px 0 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ds-color-fixture-score);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Outcome plates: a face over a darker lip, like the team badges */
+.outcomes {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+.outcome {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 72px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  clip-path: var(--ds-clip-octagon-plate);
+  container-type: inline-size;
+}
+.outcome:disabled {
+  cursor: default;
+}
+.base,
+.face {
+  position: absolute;
+  inset: 0 0 5px 0;
+  clip-path: var(--ds-clip-octagon-plate);
+}
+.base {
+  transform: translateY(5px);
+  background: color-mix(in srgb, var(--fill) 42%, black);
+}
+.face {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 4px;
+  background: var(--fill);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 16%);
+  color: var(--ink);
+}
+.outcome[data-held] .face {
+  box-shadow: inset 0 0 0 2px rgb(255 255 255 / 45%);
+}
+.outcome:hover:not(:disabled) .face {
+  filter: brightness(1.08);
+}
+.outcome:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.outcome:focus-visible {
+  outline: 2px solid var(--ds-color-text-default);
+  outline-offset: 2px;
+}
+.code {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 900 18px/1 var(--ds-font-display);
+  letter-spacing: 0.03em;
+}
+.price {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: 900 18px/1 var(--ds-font-display);
+  font-variant-numeric: tabular-nums;
+}
+.delta {
+  font-size: 8px;
+  font-style: normal;
+  opacity: 0.9;
+}
+@container (width < 72px) {
+  .face {
+    gap: 2px;
+  }
+  .code {
+    font-size: 14px;
+  }
+  .price {
+    font-size: 16px;
+  }
+  .delta {
+    font-size: 7px;
+  }
+}
+
+/* Foot: share bar + strip */
+.share {
+  display: flex;
+  flex: none;
+  gap: 7px;
+  height: 3px;
+}
+.share i {
+  display: block;
+}
+.strip {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 0;
+  background: var(--ds-color-fixture-strip);
+  color: inherit;
+  text-align: left;
+}
+.focal {
+  background: var(--ds-color-fixture-strip-focal);
+  box-shadow: inset 0 1px 0
+    color-mix(in srgb, var(--ds-color-accent-cyan) 45%, transparent);
+  cursor: pointer;
+}
+.focal:hover {
+  filter: brightness(1.12);
+}
+.focal:focus-visible {
+  outline: 2px solid var(--ds-color-accent-gold);
+  outline-offset: -3px;
+}
+.held {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ds-color-accent-cyan);
+  font: 900 8.5px var(--ds-font-display);
+  letter-spacing: 0.09em;
+  font-variant-numeric: tabular-nums;
+}
+.volume {
+  margin-left: auto;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--ds-color-text-muted) 70%, transparent);
+  font: 900 8px var(--ds-font-display);
+  letter-spacing: 0.09em;
+  font-variant-numeric: tabular-nums;
+}
+.claim {
+  color: var(--ds-color-accent-gold);
+  font: 900 9px var(--ds-font-display);
+  letter-spacing: 0.11em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell,
+  .dot {
+    animation: none;
+  }
+  .outcome:active:not(:disabled) {
+    transform: none;
+  }
+}

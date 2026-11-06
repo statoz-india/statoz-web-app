@@ -1,5 +1,5 @@
 import { sportModuleFor, type Sport } from "@/config/sports";
-import { accentVar } from "@/utils";
+import { accentVar } from "@/styles";
 
 import { SportIcon } from "../sport-icon";
 

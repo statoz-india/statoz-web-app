@@ -1,8 +1,12 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 
-import { toISTDate } from "@/lib";
-import { formatKickoffDate, formatKickoffTime, formatOzCompact } from "@/utils";
+import {
+  formatKickoffDate,
+  formatKickoffTime,
+  formatOzCompact,
+  toISTDate,
+} from "@/utils";
 
 import type { SportFixture, SportTeam } from "../../types";
 import styles from "./sport-fixture-card.module.css";
@@ -93,23 +97,23 @@ function StatusTag({
     return (
       <span className="flex items-center gap-1.5 text-xs font-extrabold tracking-label text-danger">
         <span aria-hidden className={styles.liveDot} />
-        LIVE
+        {match.statusLabel ?? "LIVE"}
       </span>
     );
   }
   if (match.status === "finished") {
     return (
       <span className="truncate text-xs font-semibold tracking-tight text-muted">
-        {match.statusNote ?? "Finished"}
+        {match.statusLabel ?? match.statusNote ?? "Finished"}
       </span>
     );
   }
   return (
     <time
       dateTime={match.kickoff}
-      className="ds-tabular text-sm font-bold tracking-label text-[var(--ds-color-fixture-kickoff)]"
+      className="ds-tabular text-sm font-bold tracking-label text-(--ds-color-fixture-kickoff)"
     >
-      {kickoff}
+      {match.statusLabel ?? kickoff}
     </time>
   );
 }
@@ -271,11 +275,12 @@ function StatusStrip({ match }: { match: SportFixture }) {
       {match.status === "live" ? (
         <span className="flex items-center gap-1.5 font-display text-2xs font-extrabold tracking-ultra text-danger">
           <span aria-hidden className={styles.liveDot} />
-          IN PLAY
+          {match.statusLabel ?? "IN PLAY"}
         </span>
       ) : match.status === "finished" ? (
         <span className="min-w-0 truncate font-display text-2xs font-extrabold tracking-wide text-muted">
-          {match.statusNote?.toUpperCase() ??
+          {match.statusLabel ??
+            match.statusNote?.toUpperCase() ??
             (match.away ? "FULL TIME" : "FINISHED")}
         </span>
       ) : (
@@ -293,6 +298,7 @@ function StatusStrip({ match }: { match: SportFixture }) {
 }
 
 function statusLabel(match: SportFixture, kickoff: string): string {
+  if (match.statusLabel) return match.statusLabel.toLowerCase();
   if (match.status === "live") return "live";
   if (match.status === "finished") {
     return (match.statusNote ?? "finished").toLowerCase();

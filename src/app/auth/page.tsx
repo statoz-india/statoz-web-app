@@ -1,5 +1,5 @@
-import ComingSoonScreen from "@/widgets/ui/screen/comingSoon";
+import { AuthScreen } from "@/features/auth/screens/AuthScreen";
 
 export default function AuthPage() {
-  return <ComingSoonScreen feature="Log in" />;
+  return <AuthScreen />;
 }

@@ -1,0 +1,80 @@
+/* Each card rises into place after its own `--delay`. */
+.enter {
+  animation: enter 380ms cubic-bezier(0.16, 1, 0.3, 1) var(--delay, 0ms) both;
+}
+
+/* A meter fills from empty to its inline width. */
+.grow {
+  animation: grow 500ms ease-out both;
+}
+
+.copied {
+  animation: copied 1.6s ease-out both;
+}
+
+/* Overlays: docked to the bottom on phones, centred from 640px. */
+.overlay {
+  animation: rise 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.overlay::backdrop {
+  background: var(--ds-color-overlay-scrim);
+  animation: fade 160ms ease-out both;
+}
+
+@media (width >= 640px) {
+  .overlay {
+    animation-name: scale;
+  }
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+}
+
+@keyframes grow {
+  from {
+    width: 0;
+  }
+}
+
+@keyframes copied {
+  0%,
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+
+@keyframes scale {
+  from {
+    opacity: 0;
+    scale: 0.97;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter,
+  .overlay {
+    animation: none;
+  }
+}

@@ -1,12 +1,8 @@
 import type { ReactNode } from "react";
 
-import { RateLimitedError } from "@/lib";
-import { SignalOffIcon } from "@/utils";
-import {
-  BentoGrid,
-  BentoTile,
-  type BentoSpan,
-} from "@/widgets/ui/components/bento-grid";
+import { RateLimitedError } from "@/core";
+import { SignalOffIcon } from "@/lib/icons";
+import { BentoGrid, BentoSpan, BentoTile } from "@/lib/components/bento-grid";
 
 /* -------------------------------------------------------------------------
  * What a feed shows in place of its content: while it loads, when the load
@@ -48,7 +44,7 @@ export function BentoSkeleton() {
   );
 }
 
-/** Stands in for a list of fixture cards or game banners. */
+/** Stands in for a list of fixture cards. */
 export function CardGridSkeleton({ count = 3 }: { count?: number }) {
   return (
     <div

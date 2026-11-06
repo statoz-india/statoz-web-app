@@ -1,4 +1,4 @@
-import type { CricketSummary } from "@/lib";
+import type { CricketSummary } from "@/core";
 
 import type {
   FeedEvent,

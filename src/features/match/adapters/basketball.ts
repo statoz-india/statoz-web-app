@@ -1,4 +1,4 @@
-import type { BasketballSummary } from "@/lib";
+import type { BasketballSummary } from "@/core";
 
 import type {
   BasketballScoringEvent,

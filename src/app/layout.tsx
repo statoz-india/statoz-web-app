@@ -1,9 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
-import type { CSSProperties } from "react";
 
-import { AppNav } from "@/widgets/nav/app-nav";
-import { AppTopBar } from "@/widgets/nav/app-top-bar";
+import { AuthGateHost } from "@/features/auth/components/auth-gate-host";
+import { IMAGES } from "@/config/images";
 
 import "./globals.css";
 
@@ -23,9 +22,24 @@ const orbitron = localFont({
   display: "swap",
 });
 
+const spaceGrotesk = localFont({
+  src: "./fonts/space-grotesk-variable.ttf",
+  weight: "300 700",
+  style: "normal",
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "StatOz",
   description: "Sports predictions, picks, and games.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "48x48" },
+      { url: IMAGES.icons.siteIcon, type: "image/png", sizes: "192x192" },
+    ],
+    apple: { url: IMAGES.icons.appleIcon, type: "image/png", sizes: "180x180" },
+  },
 };
 
 /**
@@ -38,45 +52,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${onest.variable} ${orbitron.variable} h-full antialiased`}
+      className={`${onest.variable} ${orbitron.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {/* Navigation sits at the bottom on phones and moves to a side rail
-            once there is room for it. */}
+        {/* The nav shell lives in (app)/layout.tsx, so routes outside that
+            group, such as /auth, get the whole screen. */}
         <div
           className="min-h-dvh"
-          style={
-            {
-              background: "var(--ds-gradient-app-background)",
-              /**
-               * The bar's height, published because the bar is sticky and
-               * floats over the page: anything docked above it has to offset
-               * by exactly this. The bar below is sized from the same value,
-               * so the two cannot drift.
-               */
-              "--platform-nav-height": "5.25rem",
-            } as CSSProperties
-          }
+          style={{ background: "var(--ds-gradient-app-background)" }}
         >
-          <div className="mx-auto flex min-h-dvh w-full max-w-7xl min-w-0 flex-col lg:flex-row">
-            {/* Side rail: lg and up */}
-            <div className="hidden shrink-0 lg:block lg:w-56">
-              <div className="sticky top-0 h-dvh">
-                <AppNav orientation="rail" />
-              </div>
-            </div>
-
-            <div className="flex min-w-0 flex-1 flex-col">
-              <AppTopBar />
-              <main className="flex min-h-0 flex-1 flex-col pb-[env(safe-area-inset-bottom)]">
-                {children}
-              </main>
-            </div>
-
-            {/* Bottom bar: below lg */}
-            <AppNav className="sticky bottom-0 z-20 h-[calc(var(--platform-nav-height)+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] lg:hidden" />
-          </div>
+          {children}
         </div>
+        <AuthGateHost />
       </body>
     </html>
   );

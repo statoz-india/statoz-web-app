@@ -1,0 +1,347 @@
+.card {
+  --cut: 16px;
+  --strip: var(--ds-color-fixture-strip);
+  --sport-accent: var(--ds-color-accent-cyan);
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  /* Fills a stretched parent, such as a carousel slide, so cards in a row match. */
+  height: 100%;
+  padding: 16px;
+  color: var(--ds-color-text-default);
+  font-family: var(--ds-font-body);
+  transition: transform 120ms;
+  container-type: inline-size;
+}
+
+/* Edge and fill are two clipped layers: a CSS border would be cut off at the chamfers. */
+.card::before,
+.card::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  clip-path: polygon(
+    var(--cut) 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%,
+    0 var(--cut)
+  );
+}
+.card::before {
+  inset: 0;
+  background: var(--ds-color-border-default);
+}
+.card::after {
+  inset: 1px;
+  background: var(--ds-gradient-fixture-card);
+  box-shadow: inset 0 -3px var(--ds-color-fixture-shadow);
+}
+.card:hover::before,
+.card:has(:focus-visible)::before {
+  background: var(--ds-color-accent-cyan);
+}
+.card:active {
+  transform: scale(0.99);
+}
+
+/* 1px etched outline, 5px inside the edge. */
+.etch {
+  --e: calc(var(--cut) - 5px);
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+}
+.etch::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ds-color-border-strong);
+  opacity: 0.36;
+  /* The outer polygon, then the inner one walked back, leaves a 1px hollow outline. */
+  clip-path: polygon(
+    var(--e) 0,
+    100% 0,
+    100% calc(100% - var(--e)),
+    calc(100% - var(--e)) 100%,
+    0 100%,
+    0 var(--e),
+    var(--e) 0,
+    calc(var(--e) + 0.4px) 1px,
+    1px calc(var(--e) + 0.4px),
+    1px calc(100% - 1px),
+    calc(100% - var(--e) - 0.4px) calc(100% - 1px),
+    calc(100% - 1px) calc(100% - var(--e) - 0.4px),
+    calc(100% - 1px) 1px,
+    calc(var(--e) + 0.4px) 1px
+  );
+}
+.rail {
+  position: absolute;
+  top: -4px; /* 1px below the card's top edge */
+  left: calc(var(--cut) - 5px); /* starts where the corner cut ends */
+  width: 36px;
+  height: 2px;
+  background: var(--sport-accent);
+  opacity: 0.6;
+  transform-origin: left;
+}
+
+/* Status line */
+.status {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  min-width: 0;
+}
+.status::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 1px;
+  background: var(--ds-color-fixture-border);
+}
+.league {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 80px;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--ds-color-text-muted);
+}
+.league svg {
+  color: var(--sport-accent);
+  flex-shrink: 0;
+}
+
+/* Docks into the card's top-right corner. */
+.tag {
+  --state: var(--ds-color-text-muted);
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3334;
+  white-space: nowrap;
+  color: var(--state);
+}
+.tag::before,
+.tag::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 4px));
+}
+.tag::before {
+  background: color-mix(in srgb, var(--state) 28%, var(--strip));
+}
+.tag::after {
+  inset: 1px;
+  background: color-mix(in srgb, var(--state) 8%, var(--strip));
+}
+.tag[data-status="live"] {
+  --state: var(--ds-color-danger);
+}
+.tag[data-status="open"] {
+  --state: var(--ds-color-accent-gold);
+}
+.tag[data-status="unresolved"] {
+  --state: var(--ds-color-accent-orange);
+}
+.tag[data-status="settled"] {
+  --state: var(--ds-color-success);
+}
+
+/* Invisible copy of the tag text: keeps the league name from running under the tag. */
+.tagSpace {
+  visibility: hidden;
+  flex-shrink: 0;
+  height: 0;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Below 220px the league line takes its own row and the tag drops into the flow. */
+@container (max-width: 220px) {
+  .status {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .league {
+    grid-column: 1 / -1;
+  }
+  .tag {
+    grid-column: 2;
+  }
+  .status:has(.tag) {
+    padding-top: 16px;
+  }
+  .tagSpace {
+    display: none;
+  }
+}
+
+/* Title and context */
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: inherit;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.context {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ds-color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+/* Outcome rows: every colour in a row comes from its --fill. */
+.outcomes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.outcome {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0;
+  color: inherit;
+  background: none;
+  border: 0;
+  font: 600 14px/1.4 var(--ds-font-body);
+  text-align: left;
+  cursor: pointer;
+}
+.outcome::before,
+.outcome::after,
+.badge::before,
+.badge::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  clip-path: polygon(
+    6px 0,
+    100% 0,
+    100% calc(100% - 6px),
+    calc(100% - 6px) 100%,
+    0 100%,
+    0 6px
+  );
+}
+.outcome::before {
+  background: color-mix(in srgb, var(--fill) 30%, var(--ds-color-fixture-border));
+}
+.outcome::after {
+  inset: 1px;
+  background:
+    linear-gradient(90deg, var(--fill) 0 2px, transparent 2px),
+    color-mix(in srgb, var(--fill) 4%, var(--strip));
+}
+.outcome:not(:disabled):hover::before,
+.outcome:focus-visible::before {
+  background: var(--fill);
+}
+.outcome:focus-visible {
+  outline: none;
+}
+.outcome:focus-visible::after {
+  inset: 2px;
+}
+.outcome:disabled {
+  cursor: default;
+  opacity: 0.65;
+}
+.outcomeLabel {
+  min-width: 0;
+  padding: 8px 0 8px 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.badge {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  flex-shrink: 0;
+  min-width: 64px;
+  min-height: 44px;
+  padding: 4px 10px;
+  color: var(--ink);
+  font: 600 14px/1.4 var(--ds-font-display);
+  font-variant-numeric: tabular-nums;
+}
+.badge::before {
+  background: color-mix(in srgb, var(--fill) 70%, var(--ds-color-text-default));
+}
+.badge::after {
+  inset: 1px;
+  background: var(--fill);
+  box-shadow: inset 0 -2px color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
+/* Footer, pinned to the card's bottom edge when cards are stretched to one height. */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--ds-color-fixture-border);
+  font-size: 12px;
+  color: var(--ds-color-text-muted);
+}
+.action {
+  padding: 4px 0;
+  color: var(--ds-color-accent-cyan);
+  font: 600 12px/1.4 var(--ds-font-body);
+  text-decoration: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+  .card:active {
+    transform: none;
+  }
+}

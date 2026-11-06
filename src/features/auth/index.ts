@@ -1,29 +1,73 @@
+import { useSyncExternalStore } from "react";
+import { create } from "zustand";
+
+import { getSignedIn, subscribeSession } from "@/core";
+import type { AuthGateRequest } from "@/features/auth/components/authGateDialog";
+
+import {
+  spendCoins,
+  updateCurrentUser,
+  useCurrentUser,
+} from "./data/authData";
+
+export type { AuthGateRequest };
+export { spendCoins, updateCurrentUser, useCurrentUser };
+
 /**
- * Auth adapter. The game tiles and the primary nav read these two hooks, and
- * they are the seam to wire to the real session once login exists. Until then
- * everyone is treated as signed in, so every tile is a plain link to its game
- * and PROFILE is a plain link to the profile page.
+ * Auth adapter. The primary nav reads these hooks, and anything that needs an
+ * account asks through `useRequireAuth`. A player is signed in while the API
+ * accepts the session cookies from `loginSignupUser()`.
  */
 export type AuthStatus = "hydrating" | "guest" | "authenticated";
 
-export type AuthGateRequest = {
-  /** What the player was trying to do, for example "play". */
-  intent: string;
-  message?: string;
-  /** Where to send the player once they have logged in. */
-  returnTo?: string;
+const statusSnapshot = (): AuthStatus => {
+  const signedIn = getSignedIn();
+  if (signedIn === null) return "hydrating";
+  return signedIn ? "authenticated" : "guest";
 };
+// The server can't see the API's cookies, so it cannot tell a guest from a player.
+const serverStatus = (): AuthStatus => "hydrating";
 
-/** The current session. `hydrating` means it is not known yet. */
+/** The current session. `hydrating` means the API has not answered yet. */
 export function useAuthSession(): { status: AuthStatus } {
-  return { status: "authenticated" };
+  // Asks the API on page load; until it answers, the status stays `hydrating`.
+  useCurrentUser();
+  const status = useSyncExternalStore(
+    subscribeSession,
+    statusSnapshot,
+    serverStatus,
+  );
+  return { status };
 }
 
+type AuthGateState = {
+  /** The request on screen, or `null` when the gate is closed. */
+  request: AuthGateRequest | null;
+  open: (request: AuthGateRequest) => void;
+  close: () => void;
+};
+
+/** One gate for the whole app, rendered by `AuthGateHost`. */
+export const useAuthGate = create<AuthGateState>((set) => ({
+  request: null,
+  open: (request) => set({ request }),
+  close: () => set({ request: null }),
+}));
+
 /**
- * Returns the function a tile calls when a signed-out player taps it. It
- * should open the login prompt and return false, or return true when the
- * player is already signed in.
+ * Returns the function a tile calls when a player taps something that needs
+ * an account. It returns true for a signed-in player. Otherwise it opens the
+ * login prompt and returns false; while the session is still hydrating it
+ * returns false without one, so a tap in the first frames does nothing.
  */
 export function useRequireAuth(): (request: AuthGateRequest) => boolean {
-  return () => true;
+  const { status } = useAuthSession();
+  return (request) => {
+    if (status === "authenticated") return true;
+    if (status === "hydrating") return false;
+    const gate = useAuthGate.getState();
+    // A second request while one is open keeps the first on screen.
+    if (!gate.request) gate.open(request);
+    return false;
+  };
 }

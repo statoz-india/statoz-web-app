@@ -1,11 +1,13 @@
 import type { Sport } from "@/config/sports";
-import type { AccentName } from "@/utils";
-import type { BentoSpan } from "@/widgets/ui/components/bento-grid";
+import { BentoSpan } from "@/lib/components/bento-grid";
 
 /**
  * What the sports hub draws. The API's responses are turned into these in
  * `adapters.ts`, so a component never reads a response shape directly.
  */
+
+/** A tab in the sport strip: the Trending feed, or one sport's fixtures. */
+export type SportHubSelection = Sport | "trending";
 
 /** A crest is drawn from these alone. The colours are the team's own data. */
 export type SportTeam = {
@@ -30,6 +32,8 @@ export type SportFixture = {
   status: FixtureStatus;
   /** How a fixture ended when it was not played out, for example "Postponed". */
   statusNote?: string;
+  /** The API's own match status as shown, such as "POSTPONED"; shown in place of the state's own text. */
+  statusLabel?: string;
   /** ISO timestamp. A race without a session time yet has none. */
   kickoff?: string;
   /** On a race, the race itself. */
@@ -101,49 +105,3 @@ export type TrendingTile =
       span: BentoSpan;
       market: PickMarket;
     };
-
-/**
- * Which illustration a game shows. Formats that repeat across sports share one
- * drawing rather than carrying five near-identical files.
- */
-export type GameSceneId =
-  | "pitch-duel"
-  | "penalty-shootout"
-  | "football-chess"
-  | "final-over"
-  | "hoop-duel"
-  | "grand-prix-dash"
-  | "tennis-rally"
-  | "quiz"
-  | "bingo"
-  | "guess-player"
-  | "guess-driver"
-  | "guess-winner";
-
-/**
- * How a game presents itself. `hero` tiles carry a painted scene and a call to
- * action; `quick` tiles are the compact icon plates.
- */
-export type GameTileKind = "hero" | "quick";
-
-export type GameTile = {
-  id: string;
-  kind: GameTileKind;
-  title: string;
-  subtitle: string;
-  sport?: Sport;
-  accent: AccentName;
-  /** Missing for a game this app has no artwork for. */
-  scene?: GameSceneId;
-  /** Hero tiles only: the corner tag above the title. */
-  badgeLabel?: string;
-  /** Hero tiles only: the verb pinned to the bottom edge. */
-  ctaLabel: string;
-  /** Casts the accent bloom. Only the featured game sets it. */
-  glow?: boolean;
-  href: string;
-  /** False when the game is switched off; the tile is then not a link. */
-  playable: boolean;
-  /** Shown in place of the call to action on a game that is switched off. */
-  offlineLabel: string;
-};

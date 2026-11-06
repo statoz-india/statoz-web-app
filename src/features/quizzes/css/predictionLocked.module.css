@@ -1,0 +1,193 @@
+/*
+ * PREDICTION LOCKED: plays over the quiz after it's submitted. Every step is
+ * a CSS animation timed from the same 4.5s start.
+ */
+
+.overlay {
+  background: color-mix(in srgb, var(--ds-color-background-primary) 92%, transparent);
+  animation: overlay-out 4500ms both;
+}
+@keyframes overlay-out {
+  0%,
+  86% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---- Seal ---- */
+
+.seal {
+  animation: seal-pop 810ms cubic-bezier(0.18, 1.5, 0.4, 1) both;
+}
+@keyframes seal-pop {
+  from {
+    transform: scale(0);
+  }
+}
+
+.flash {
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--ds-color-accent-cyan) 70%, transparent),
+    transparent 70%
+  );
+  animation: flash 450ms ease-out both;
+}
+@keyframes flash {
+  from {
+    opacity: 0.65;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.pulse {
+  border: 2px solid color-mix(in srgb, var(--ds-color-accent-cyan) 60%, transparent);
+  border-radius: 50%;
+  animation: pulse 1080ms 270ms ease-out both;
+}
+@keyframes pulse {
+  from {
+    opacity: 0.7;
+    transform: scale(0.45);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+.fillTop {
+  stop-color: var(--ds-color-accent-cyan);
+  stop-opacity: 0.2;
+}
+.fillBottom {
+  stop-color: var(--ds-color-accent-cyan);
+  stop-opacity: 0.05;
+}
+
+.track {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ds-color-accent-cyan) 12%, transparent);
+  stroke-width: 1;
+}
+
+/* 452.4 = 2π × 72, the ring's length; it starts at 12 o'clock. */
+.sweep {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ds-color-accent-cyan) 90%, transparent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 452.4;
+  transform: rotate(-90deg);
+  transform-origin: 120px 120px;
+  filter: drop-shadow(
+    0 0 4px color-mix(in srgb, var(--ds-color-accent-cyan) 70%, transparent)
+  );
+  animation: sweep 1530ms 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes sweep {
+  from {
+    stroke-dashoffset: 452.4;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.plate {
+  stroke: color-mix(in srgb, var(--ds-color-accent-cyan) 85%, transparent);
+  stroke-width: 2;
+  filter: drop-shadow(
+    0 0 18px color-mix(in srgb, var(--ds-color-accent-cyan) 45%, transparent)
+  );
+}
+
+.bracket {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ds-color-accent-cyan) 55%, transparent);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* 65: the check's full length, so its tip draws too. */
+.check {
+  fill: none;
+  stroke: var(--ds-color-text-default);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 65;
+  filter: drop-shadow(
+    0 0 6px color-mix(in srgb, var(--ds-color-accent-cyan) 60%, transparent)
+  );
+  animation: check 810ms 810ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes check {
+  from {
+    stroke-dashoffset: 65;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---- Copy ---- */
+
+.headline {
+  text-shadow: 0 0 14px color-mix(in srgb, var(--ds-color-accent-cyan) 55%, transparent);
+}
+.letter {
+  animation: letter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes letter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.copyIn {
+  animation: copy-in 540ms 810ms ease-out both;
+}
+@keyframes copy-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.meter {
+  background: color-mix(in srgb, var(--ds-color-background-primary) 70%, transparent);
+  box-shadow: inset 0 0 0 1px var(--ds-color-border-default);
+}
+.charge {
+  background: var(--ds-color-accent-gold);
+  animation: charge 1350ms 1080ms cubic-bezier(0.3, 1, 0.5, 1) both;
+}
+@keyframes charge {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .seal,
+  .flash,
+  .pulse,
+  .sweep,
+  .check,
+  .letter,
+  .copyIn,
+  .charge {
+    animation: none;
+  }
+}

@@ -1,0 +1,277 @@
+/*
+ * The welcome bonus screen. The timeline writes the custom properties every
+ * frame, so there are no keyframes here.
+ */
+
+.scene {
+  position: relative;
+  min-height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--ds-color-background-primary);
+  color: var(--ds-color-text-default);
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100dvh;
+  padding: calc(var(--spacing) * 10 + env(safe-area-inset-top))
+    calc(var(--spacing) * 6) calc(var(--spacing) * 8 + env(safe-area-inset-bottom));
+}
+
+.spacer {
+  flex: 1 1 0;
+}
+
+.header {
+  flex: none;
+  text-align: center;
+  opacity: var(--intro-opacity);
+  transform: translateY(var(--intro-y));
+}
+
+.eyebrow,
+.systemLabel,
+.credited,
+.balanceLabel,
+.continueLabel {
+  font-family: var(--ds-font-display);
+  font-weight: 800;
+  line-height: var(--ds-leading-compact);
+}
+
+.eyebrow {
+  color: var(--ds-color-accent-cyan);
+  font-size: var(--ds-text-compact);
+  letter-spacing: var(--ds-tracking-max);
+}
+
+.systemLabel {
+  margin-top: calc(var(--spacing) * 2);
+  color: var(--ds-color-text-muted);
+  font-size: var(--ds-text-micro);
+  letter-spacing: var(--ds-tracking-mega);
+}
+
+.artMotion {
+  flex: none;
+  opacity: var(--art-opacity);
+  transform: translate(var(--art-x), var(--art-y)) scale(var(--art-scale));
+}
+
+.artFrame {
+  position: relative;
+  width: min(calc(var(--spacing) * 58), 58vw, 34vh);
+  aspect-ratio: 1;
+  overflow: hidden;
+  box-shadow: 0 0 34px 2px
+    color-mix(in srgb, var(--ds-color-accent-gold) 46%, transparent);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    12px 100%,
+    0 calc(100% - 12px)
+  );
+}
+
+.artImage {
+  object-fit: cover;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - 11px),
+    calc(100% - 11px) 100%,
+    11px 100%,
+    0 calc(100% - 11px)
+  );
+}
+
+.artBorder {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.artBorder path {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ds-color-accent-gold) 86%, transparent);
+  stroke-width: 1.8;
+  vector-effect: non-scaling-stroke;
+}
+
+.rewardBlock {
+  flex: none;
+  margin-top: calc(var(--spacing) * 6);
+  text-align: center;
+  opacity: var(--line-opacity);
+  transform: translateY(var(--line-y));
+}
+
+.rewardLine {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--spacing) * 3);
+}
+
+.rewardCoin {
+  width: calc(var(--spacing) * 10.5);
+  height: calc(var(--spacing) * 10.5);
+  flex: none;
+}
+
+.rewardAmount {
+  color: var(--ds-color-accent-gold);
+  font-family: var(--ds-font-display);
+  font-weight: 900;
+  font-size: var(--ds-text-reward);
+  line-height: var(--ds-leading-compact);
+  letter-spacing: var(--ds-tracking-tight);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.credited {
+  margin-top: calc(var(--spacing) * 3);
+  font-size: var(--ds-text-xs);
+  letter-spacing: var(--ds-tracking-max);
+  opacity: var(--settle-opacity);
+  transform: scale(var(--settle-scale));
+}
+
+.balanceOuter {
+  flex: none;
+  margin-top: calc(var(--spacing) * 6);
+  padding: 1px;
+  background: var(--ds-color-border-default);
+  opacity: var(--settle-opacity);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    12px 100%,
+    0 calc(100% - 12px)
+  );
+}
+
+.balancePlate {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 1.5);
+  padding: calc(var(--spacing) * 3) calc(var(--spacing) * 5);
+  background: var(--ds-color-background-elevated);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - 11px),
+    calc(100% - 11px) 100%,
+    11px 100%,
+    0 calc(100% - 11px)
+  );
+}
+
+.balanceLabel {
+  margin-right: calc(var(--spacing) * 2.5);
+  color: var(--ds-color-text-muted);
+  font-size: var(--ds-text-micro);
+  letter-spacing: var(--ds-tracking-mega);
+  white-space: nowrap;
+}
+
+.balanceCoin {
+  width: calc(var(--spacing) * 4.5);
+  height: calc(var(--spacing) * 4.5);
+  flex: none;
+}
+
+.balanceValue {
+  font-family: var(--ds-font-display);
+  font-weight: 900;
+  font-size: var(--ds-text-question);
+  line-height: var(--ds-leading-compact);
+  letter-spacing: var(--ds-tracking-label);
+  font-variant-numeric: tabular-nums;
+}
+
+.continueLabel {
+  flex: none;
+  color: var(--ds-color-text-muted);
+  font-size: var(--ds-text-2xs);
+  letter-spacing: var(--ds-tracking-mega);
+  opacity: var(--tap-opacity);
+}
+
+.flash {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: var(--ds-color-accent-gold);
+  opacity: var(--flash-opacity);
+  pointer-events: none;
+}
+
+.tapTarget {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  cursor: default;
+}
+
+.tapTarget:focus-visible {
+  outline-offset: -4px;
+}
+
+@media (max-height: 679px) {
+  .content {
+    padding-top: calc(var(--spacing) * 5 + env(safe-area-inset-top));
+    padding-bottom: calc(var(--spacing) * 5 + env(safe-area-inset-bottom));
+  }
+  .artFrame {
+    width: min(calc(var(--spacing) * 46), 58vw, 34vh);
+  }
+  .rewardBlock,
+  .balanceOuter {
+    margin-top: calc(var(--spacing) * 4);
+  }
+}
+
+@media (max-width: 419px), (max-height: 679px) {
+  .rewardCoin {
+    width: calc(var(--spacing) * 8.5);
+    height: calc(var(--spacing) * 8.5);
+  }
+  .rewardAmount {
+    font-size: var(--ds-text-reward-compact);
+  }
+}
+
+@media (max-width: 359px) {
+  .content {
+    padding-inline: calc(var(--spacing) * 4);
+  }
+  .balancePlate {
+    padding-inline: calc(var(--spacing) * 3.5);
+  }
+  .balanceLabel {
+    margin-right: var(--spacing);
+    letter-spacing: var(--ds-tracking-spread);
+  }
+}

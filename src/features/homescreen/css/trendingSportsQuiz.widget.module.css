@@ -1,0 +1,244 @@
+/* The plate. The whole card is one link or button. */
+.plate {
+  --cut: 16px;
+  --sport-accent: var(--ds-color-accent-cyan);
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px;
+  color: var(--ds-color-text-default);
+  background: none;
+  border: 0;
+  text-decoration: none;
+  text-align: left;
+  font-family: var(--ds-font-body);
+  transition: transform 120ms;
+  container-type: inline-size;
+  cursor: pointer;
+}
+
+/* Edge and fill are two clipped layers: a CSS border would be cut off at the chamfers. */
+.plate::before,
+.plate::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  clip-path: polygon(
+    var(--cut) 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%,
+    0 var(--cut)
+  );
+}
+.plate::before {
+  inset: 0;
+  background: var(--ds-color-border-default);
+}
+.plate::after {
+  inset: 1px;
+  background: var(--ds-gradient-fixture-card);
+  box-shadow: inset 0 -3px var(--ds-color-fixture-shadow);
+}
+.plate:hover::before,
+.plate:focus-visible::before {
+  background: var(--ds-color-accent-cyan);
+}
+.plate:focus-visible {
+  outline: none;
+}
+.plate:focus-visible::after {
+  inset: 2px;
+}
+.plate:active {
+  transform: scale(0.99);
+}
+
+/* 1px etched outline, 5px inside the edge. */
+.chrome {
+  --e: calc(var(--cut) - 5px);
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+}
+.chrome::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ds-color-border-strong);
+  opacity: 0.36;
+  /* The outer polygon, then the inner one walked back, leaves a 1px hollow outline. */
+  clip-path: polygon(
+    var(--e) 0,
+    100% 0,
+    100% calc(100% - var(--e)),
+    calc(100% - var(--e)) 100%,
+    0 100%,
+    0 var(--e),
+    var(--e) 0,
+    calc(var(--e) + 0.4px) 1px,
+    1px calc(var(--e) + 0.4px),
+    1px calc(100% - 1px),
+    calc(100% - var(--e) - 0.4px) calc(100% - 1px),
+    calc(100% - 1px) calc(100% - var(--e) - 0.4px),
+    calc(100% - 1px) 1px,
+    calc(var(--e) + 0.4px) 1px
+  );
+}
+.rail {
+  position: absolute;
+  top: -4px; /* 1px below the card's top edge */
+  left: calc(var(--cut) - 5px); /* starts where the corner cut ends */
+  width: 36px;
+  height: 2px;
+  background: var(--sport-accent);
+  opacity: 0.6;
+  transform-origin: left;
+}
+
+/* Sport label row */
+.status {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  min-width: 0;
+}
+.status::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 1px;
+  background: var(--ds-color-fixture-border);
+}
+.marker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 80px;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--ds-color-text-muted);
+}
+.marker svg {
+  color: var(--sport-accent);
+  flex-shrink: 0;
+}
+
+/* The art window crops the 220×160 scene to 104px, so the art is cut at the bottom. */
+.quizArt {
+  width: 100%;
+  max-width: 220px;
+  height: 104px;
+  margin: 0 auto;
+  background: var(--ds-color-fixture-strip);
+  clip-path: polygon(
+    6px 0,
+    100% 0,
+    100% calc(100% - 6px),
+    calc(100% - 6px) 100%,
+    0 100%,
+    0 6px
+  );
+}
+/* Stands in for the quiz art while a sport has none. */
+.artIcon {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  color: var(--sport-accent);
+}
+.scene {
+  position: relative;
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 11 / 8;
+  pointer-events: none;
+}
+.layer {
+  position: absolute;
+  inset: 0;
+}
+.layerImage {
+  object-fit: contain;
+}
+
+.title {
+  margin: 0;
+  font: 600 14px/1.4 var(--ds-font-display);
+  overflow-wrap: anywhere;
+}
+
+/* Action bar */
+.action {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--ds-color-accent-cyan);
+}
+.action::before,
+.action::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  clip-path: polygon(
+    6px 0,
+    100% 0,
+    100% calc(100% - 6px),
+    calc(100% - 6px) 100%,
+    0 100%,
+    0 6px
+  );
+}
+.action::before {
+  background: var(--ds-color-fixture-border);
+}
+.action::after {
+  inset: 1px;
+  background: var(--ds-color-fixture-strip);
+}
+.arrow {
+  padding-left: 8px;
+  border-left: 1px solid var(--ds-color-fixture-border);
+  font-size: 16px;
+}
+.plate:hover .action::before,
+.plate:focus-visible .action::before {
+  background: color-mix(
+    in srgb,
+    var(--ds-color-accent-cyan) 50%,
+    var(--ds-color-fixture-border)
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plate {
+    transition: none;
+  }
+  .plate:active {
+    transform: none;
+  }
+}

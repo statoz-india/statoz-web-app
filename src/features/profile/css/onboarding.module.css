@@ -1,0 +1,216 @@
+/* Profile setup (onboarding): the arena backdrop, the welcome splash and the setup frame. */
+
+/* ---- Arena backdrop: base, drifting photo, scrim, scanlines, vignette ---- */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--ds-gradient-arena-backdrop);
+}
+.backdrop > * {
+  position: absolute;
+  inset: 0;
+}
+.photo {
+  opacity: 0.34;
+  animation: arena-drift 20s linear infinite;
+}
+.scrim {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--ds-color-background-primary) 50%, transparent) 0%,
+    color-mix(in srgb, var(--ds-color-background-primary) 32%, transparent) 46%,
+    color-mix(in srgb, var(--ds-color-background-primary) 78%, transparent) 100%
+  );
+}
+.scanlines {
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--ds-color-scanline) 0 1px,
+    transparent 1px 3px
+  );
+}
+.vignette {
+  background: radial-gradient(
+    115% 115% at 50% 50%,
+    transparent 55%,
+    color-mix(in srgb, var(--ds-color-background-muted) 50%, transparent) 100%
+  );
+}
+
+/* A small circle every 20s, the scale breathing between 1.052 and 1.068. */
+@keyframes arena-drift {
+  0% {
+    transform: translate(0, 4px) scale(1.06);
+  }
+  12.5% {
+    transform: translate(4.24px, 2.83px) scale(1.068);
+  }
+  25% {
+    transform: translate(6px, 0) scale(1.06);
+  }
+  37.5% {
+    transform: translate(4.24px, -2.83px) scale(1.052);
+  }
+  50% {
+    transform: translate(0, -4px) scale(1.06);
+  }
+  62.5% {
+    transform: translate(-4.24px, -2.83px) scale(1.068);
+  }
+  75% {
+    transform: translate(-6px, 0) scale(1.06);
+  }
+  87.5% {
+    transform: translate(-4.24px, 2.83px) scale(1.052);
+  }
+  100% {
+    transform: translate(0, 4px) scale(1.06);
+  }
+}
+
+/* ---- Welcome splash ---- */
+
+/* The pop and the spin sit on nested elements so each keeps its own timing. */
+.logoPop {
+  animation: logo-pop 660ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.logoSpin {
+  animation: logo-spin 1650ms cubic-bezier(0, 0, 0.58, 1) both;
+}
+.bloom {
+  position: absolute;
+  inset: 8%;
+  border-radius: 22%;
+  box-shadow: 0 0 45px 0
+    color-mix(in srgb, var(--ds-color-accent-cyan) 50%, transparent);
+}
+.welcome {
+  animation: rise-12 480ms cubic-bezier(0, 0, 0.58, 1) 1560ms both;
+}
+.statoz {
+  text-shadow:
+    0 0 28px color-mix(in srgb, var(--ds-color-accent-cyan) 85%, transparent),
+    0 0 54px color-mix(in srgb, var(--ds-color-accent-cyan) 40%, transparent);
+  animation: rise-16 480ms cubic-bezier(0, 0, 0.58, 1) 1920ms both;
+}
+
+@keyframes logo-pop {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes logo-spin {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(1080deg);
+  }
+}
+@keyframes rise-12 {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+@keyframes rise-16 {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+/* ---- Setup frame ---- */
+
+/* Re-keyed on every step change, so each step rises in. */
+.enter {
+  animation: step-in 480ms cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+}
+
+.segment {
+  transition: background 200ms;
+}
+.current {
+  box-shadow: 0 0 8px
+    color-mix(in srgb, var(--ds-color-accent-orange) 35%, transparent);
+}
+
+/*
+ * The octagon cuts a border off at the corners, so the edge is the outer
+ * shape's fill showing round an inset inner shape.
+ */
+.field {
+  height: 3.25rem;
+  padding: 1px;
+  clip-path: var(--ds-clip-field);
+  background: var(--ds-color-border-muted);
+  transition:
+    padding 150ms,
+    background-color 150ms;
+}
+.field:focus-within {
+  padding: 2px;
+  background: var(--ds-color-accent-cyan);
+}
+.fieldFill {
+  height: 100%;
+  clip-path: var(--ds-clip-field);
+  background: var(--ds-color-background-muted);
+}
+
+.button {
+  height: 3.25rem;
+  clip-path: var(--ds-clip-field);
+  transition:
+    transform 150ms,
+    filter 150ms,
+    opacity 150ms;
+}
+.button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.previous {
+  padding: 1px;
+  background: color-mix(in srgb, var(--ds-color-accent-cyan) 50%, transparent);
+}
+.previousFill {
+  clip-path: var(--ds-clip-field);
+  background: color-mix(
+    in srgb,
+    var(--ds-color-accent-cyan) 15%,
+    var(--ds-color-background-secondary)
+  );
+}
+/* A drop-shadow on a wrapper, since the clip-path would cut a box-shadow. */
+.nextGlow {
+  filter: drop-shadow(
+    0 0 12px color-mix(in srgb, var(--ds-color-accent-cyan) 50%, transparent)
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo,
+  .logoPop,
+  .logoSpin,
+  .welcome,
+  .statoz,
+  .enter {
+    animation: none;
+  }
+}

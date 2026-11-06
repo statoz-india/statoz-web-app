@@ -2,14 +2,13 @@
 
 import Image from "next/image";
 import { useState } from "react";
-
-import { FilterChips } from "@/widgets/ui/components/filter-chips";
-import { HudPanel } from "@/widgets/ui/components/hud-panel";
-import { InteractiveLineChart } from "@/widgets/ui/components/interactive-line-chart";
 import type { F1RaceReport } from "@/features/match/types";
 
-import { SectionHeading } from "./match-stats-shell";
-import styles from "./motorsport-stats-view.module.css";
+import { SectionHeading } from "./match-stats/match-stats-shell";
+import styles from "../css/motorsport-stats-view.module.css";
+import { FilterChips } from "@/lib/components/filter-chips";
+import { HudPanel } from "@/lib/components/hud-panel";
+import { InteractiveLineChart } from "@/lib/components/interactive-line-chart";
 
 const tabs = ["RACE", "WEEKEND", "QUALIFYING"];
 

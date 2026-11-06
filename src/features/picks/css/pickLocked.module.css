@@ -1,0 +1,56 @@
+/* PICK LOCKED: flashes over the page after a pick is bought, then clears. */
+
+.overlay {
+  background: color-mix(in srgb, var(--ds-color-background-primary) 88%, transparent);
+  animation: overlay-out 1850ms both;
+}
+
+.check {
+  border: 2.5px solid var(--ds-color-success);
+  background: color-mix(in srgb, var(--ds-color-success) 12%, transparent);
+  box-shadow: 0 0 26px color-mix(in srgb, var(--ds-color-success) 62%, transparent);
+  animation: check-pop 450ms cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+
+.title {
+  text-shadow: 0 0 16px color-mix(in srgb, var(--ds-color-success) 62%, transparent);
+}
+
+.rise {
+  animation: rise 460ms 220ms both;
+}
+
+.strip {
+  border: 1px solid var(--ds-color-border-default);
+  background: var(--ds-color-background-data);
+}
+
+/* Fully visible until 85% of the run, then fades out. */
+@keyframes overlay-out {
+  0%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes check-pop {
+  from {
+    transform: scale(0);
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .check,
+  .rise {
+    animation: none;
+  }
+}

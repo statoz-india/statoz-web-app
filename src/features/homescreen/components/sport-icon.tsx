@@ -4,15 +4,13 @@ import {
   CricketIcon,
   FootballIcon,
   MotorsportIcon,
-  TennisIcon,
   type IconProps,
-} from "@/utils";
+} from "@/lib/icons";
 
 const glyphs = {
   football: FootballIcon,
   cricket: CricketIcon,
   basketball: BasketballIcon,
-  tennis: TennisIcon,
   racing: MotorsportIcon,
 } as const;
 
