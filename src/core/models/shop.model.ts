@@ -108,5 +108,183 @@ const itemsResponse = <T extends z.ZodType>(item: T) =>
     success: z.boolean(),
   });
 
-export const shopProfilePicsResponseSchema = itemsResponse(shopProfilePicSchema);
-export const shopPlayerCardsResponseSchema = itemsResponse(shopPlayerCardSchema);
+export const shopProfilePicsResponseSchema =
+  itemsResponse(shopProfilePicSchema);
+
+/** A free profile pic. It needs no purchase: `update-user` equips it by `ppId`. */
+export const freeProfilePicSchema = z.object({
+  _id: z.string(),
+  ppId: z.string(),
+  ppName: z.string(),
+  ppUrl: z.string(),
+  assignedUser: z.array(z.unknown()),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  __v: z.number(),
+  coinValue: z.number(),
+  ppDescription: z.string(),
+  team: z.string(),
+  teamAbbreviation: z.string(),
+  isFree: z.boolean(),
+});
+export type FreeProfilePic = z.infer<typeof freeProfilePicSchema>;
+/** Every free pic at once, newest first; `[]` when there are none. */
+export const freeProfilePicsResponseSchema =
+  itemsResponse(freeProfilePicSchema);
+export type FreeProfilePicsResponse = z.infer<
+  typeof freeProfilePicsResponseSchema
+>;
+
+/** A free profile banner. It needs no purchase: `update-user` equips it by `pbId`. */
+export const freeProfileBannerSchema = z.object({
+  _id: z.string(),
+  pbId: z.string(),
+  pbName: z.string(),
+  pbUrl: z.string(),
+  assignedUser: z.array(z.unknown()),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  __v: z.number(),
+  coinValue: z.number(),
+  team: z.string(),
+  teamAbbreviation: z.string(),
+  isFree: z.boolean(),
+});
+export type FreeProfileBanner = z.infer<typeof freeProfileBannerSchema>;
+/** Every free banner at once, newest first; `[]` when there are none. */
+export const freeProfileBannersResponseSchema = itemsResponse(
+  freeProfileBannerSchema,
+);
+export type FreeProfileBannersResponse = z.infer<
+  typeof freeProfileBannersResponseSchema
+>;
+export const shopPlayerCardsResponseSchema =
+  itemsResponse(shopPlayerCardSchema);
+
+/*
+ * Purchases. Each takes the item's code, charges its `coinValue` (nothing for
+ * a free one) and adds it to what the player owns. Buying doesn't equip it.
+ */
+
+export type PurchaseProfilePicBody = { ppId: string };
+export type PurchaseProfileBannerBody = { pbId: string };
+export type PurchasePlayerCardBody = { playerId: string };
+
+const purchasedPicSchema = z.object({
+  _id: z.string(),
+  ppId: z.string(),
+  ppName: z.string(),
+  ppUrl: z.string(),
+  team: z.string(),
+  teamAbbreviation: z.string(),
+  sport: z.string(),
+  coinValue: z.number(),
+  isVisible: z.boolean(),
+  assignedUser: z.array(z.unknown()),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  __v: z.number(),
+});
+
+const purchasedBannerSchema = z.object({
+  _id: z.string(),
+  pbId: z.string(),
+  pbName: z.string(),
+  pbUrl: z.string(),
+  team: z.string(),
+  teamAbbreviation: z.string(),
+  sport: z.string(),
+  coinValue: z.number(),
+  isVisible: z.boolean(),
+  assignedUser: z.array(z.unknown()),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  __v: z.number(),
+});
+
+/** Everything the player owns: every pic and banner, oldest first, not just the new one. */
+export const ownedAssetsResponseSchema = z.object({
+  statusCode: z.number(),
+  data: z.object({
+    _id: z.string(),
+    userId: z.string(),
+    __v: z.number(),
+    createdAt: z.string(),
+    profileBannersPurchased: listOf(
+      z.object({
+        /** The full banner, despite the name. */
+        profileBannerId: purchasedBannerSchema,
+        purchasedAt: z.string(),
+        /** `0` for a free banner. */
+        coinsUsed: z.number(),
+        _id: z.string(),
+      }),
+    ),
+    profilePicsPurchased: listOf(
+      z.object({
+        /** The full pic, despite the name. */
+        profilePicId: purchasedPicSchema,
+        purchasedAt: z.string(),
+        /** `0` for a free pic. */
+        coinsUsed: z.number(),
+        _id: z.string(),
+      }),
+    ),
+    updatedAt: z.string(),
+  }),
+  message: z.string(),
+  success: z.boolean(),
+});
+export type OwnedAssetsResponse = z.infer<typeof ownedAssetsResponseSchema>;
+
+/** The player's whole card collection, with decks. */
+export const cardCollectionResponseSchema = z.object({
+  statusCode: z.number(),
+  data: z.object({
+    _id: z.string(),
+    userId: z.string(),
+    __v: z.number(),
+    actionCards: z.array(z.unknown()),
+    allDecks: z.array(z.unknown()),
+    cards: listOf(
+      z.object({
+        /** The full card, despite the name. */
+        playerCardId: z.object({
+          _id: z.string(),
+          playerId: z.string(),
+          name: z.string(),
+          image: z.string(),
+          team: z.string(),
+          teamAbbreviation: z.string(),
+          drop: z.string(),
+          sport: z.string(),
+          ratings: z.number(),
+          position: z.string(),
+          playerType: z.string().optional(),
+          cardType: z.string(),
+          cardTraining: z.number(),
+          finalRating: z.number(),
+          coinValue: z.number(),
+          isVisible: z.boolean(),
+          __v: z.number(),
+        }),
+        acquiredAt: z.string(),
+        /** `bought` for purchases. */
+        source: z.string(),
+        _id: z.string(),
+      }),
+    ),
+    createdAt: z.string(),
+    currentDeck: z.object({
+      cards: z.array(z.unknown()),
+      actionCards: z.array(z.unknown()),
+    }),
+    nextDrop: z.unknown(),
+    updatedAt: z.string(),
+  }),
+  message: z.string(),
+  success: z.boolean(),
+});
+export type CardCollectionResponse = z.infer<
+  typeof cardCollectionResponseSchema
+>;

@@ -3,8 +3,6 @@
  * the real call when its endpoint exists.
  */
 
-import { IMAGES } from "@/config/images";
-
 /** Total XP each level starts at; level 1 starts at 0. */
 export const LEVEL_XP = [
   0, 50, 120, 200, 300, 450, 600, 800, 1050, 1350, 1700, 2100, 2600, 3200,
@@ -35,19 +33,3 @@ export const COIN_SOURCES: Record<string, string> = {
   ADMIN_ADJUSTMENT: "Adjustment",
   OPENING_BALANCE: "Opening balance",
 };
-
-export const SAMPLE_FRAMES = [
-  { id: "none", label: "NONE", color: null },
-  { id: "cyan", label: "CYAN", color: "var(--ds-color-accent-cyan)" },
-  { id: "violet", label: "VIOLET", color: "var(--ds-color-accent-violet)" },
-  { id: "gold", label: "GOLD", color: "var(--ds-color-accent-gold)" },
-  { id: "lime", label: "LIME", color: "var(--ds-color-accent-lime)" },
-] as const;
-
-export const BANNERS = [
-  { id: "default", label: "Default", src: IMAGES.profile.defaultBanner },
-  { id: "football", label: "Football", src: IMAGES.backgrounds.hub.football.wide },
-  { id: "cricket", label: "Cricket", src: IMAGES.backgrounds.hub.cricket.wide },
-  { id: "basketball", label: "Basketball", src: IMAGES.backgrounds.hub.basketball.wide },
-  { id: "motorsport", label: "Motorsport", src: IMAGES.backgrounds.hub.motorsport.wide },
-];

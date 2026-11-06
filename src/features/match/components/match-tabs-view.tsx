@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
 import { accentVar } from "@/styles";
@@ -13,6 +14,7 @@ import { NoDataState } from "@/lib/ui/no-data-state";
 import type { Event, Prediction } from "@/core";
 import type { Sport } from "@/config/sports";
 import { useRequireAuth } from "@/features/auth";
+import { pickHref } from "@/utils";
 import { useMatchEvents } from "@/features/events/data/getMatchEvent";
 import { TrendingEventWidget } from "@/features/events/widgets/trendingEvent.widget";
 import { FeedError } from "@/features/homescreen/components/feed-states";
@@ -33,8 +35,7 @@ import { MatchScoreboard } from "./match-stats/match-scoreboard";
 
 /**
  * The match surfaces: the quizzes, the markets on the same fixture, and the
- * scoreboard. Only the scoreboard has an API behind it so far, so it is the
- * tab the page opens on and the other two say they are on the way.
+ * scoreboard. The page opens on PREDICT, the match's quizzes.
  */
 
 type MainTab = "predict" | "picks" | "stats";
@@ -62,7 +63,7 @@ export function MatchTabsView({
   statsLoading = false,
   statsFailure,
 }: MatchTabsViewProps) {
-  const [activeTab, setActiveTab] = useState<MainTab>("stats");
+  const [activeTab, setActiveTab] = useState<MainTab>("predict");
   const activeIndex = mainTabs.findIndex((tab) => tab.id === activeTab);
 
   return (
@@ -181,6 +182,7 @@ function isShownEvent(event: Event): boolean {
 function PicksPanel({ matchId, sport }: { matchId: string; sport: Sport }) {
   const predictions = useMatchPredictions(matchId);
   const events = useMatchEvents(matchId);
+  const router = useRouter();
   const requireAuth = useRequireAuth();
 
   const failed = [
@@ -229,8 +231,10 @@ function PicksPanel({ matchId, sport }: { matchId: string; sport: Sport }) {
           <TrendingPredictionsWidget
             key={prediction._id}
             prediction={prediction}
-            // There is no trade sheet yet, so a signed-in player's tap does nothing.
-            onPick={() => requireAuth({ intent: "lock a pick" })}
+            // The guard has already asked a guest to log in.
+            onPick={(side) =>
+              router.push(pickHref("prediction", prediction.predictionId, side))
+            }
             guard={() => requireAuth({ intent: "lock a pick" })}
           />
         ))}

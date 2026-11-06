@@ -15,6 +15,7 @@ import {
   MotorsportIcon,
 } from "@/lib/icons";
 import { colors, liftForContrast } from "@/styles/colors";
+import { pickHref } from "@/utils";
 
 import styles from "./trendingFuture.widget.module.css";
 
@@ -130,7 +131,7 @@ export function TrendingFutureWidget({
 
   const look = SPORTS[sport.toLowerCase()];
   const Icon = look?.icon;
-  const href = `/picks/${encodeURIComponent(future.futureId)}`;
+  const href = pickHref("future", future.futureId);
   const timing = closesIn(future, tag, now);
   // `choices` already come sorted by odds, highest first.
   const visible = future.choices.filter((choice) => choice.isVisible);

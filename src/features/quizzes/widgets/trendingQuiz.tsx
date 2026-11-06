@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import type { ComponentType, CSSProperties } from "react";
 
@@ -9,7 +11,9 @@ import {
   FootballIcon,
   MotorsportIcon,
 } from "@/lib/icons";
+import { useNow } from "@/hooks/useNow";
 
+import { quizLink } from "../adapters";
 import styles from "../css/trendingQuiz.module.css";
 
 type Tag = "open" | "live" | "closed" | "unresolved" | "settled" | "void";
@@ -116,6 +120,7 @@ export function TrendingQuiz({
   reward,
   guard,
 }: TrendingQuizProps) {
+  const now = useNow();
   const tag = TAG_FOR_STATUS[quiz.quizStatus];
   if (tag === null || !quiz.isVisible) return null;
 
@@ -125,7 +130,7 @@ export function TrendingQuiz({
   return (
     // No aria-label: it would replace the status, progress and reward for screen readers.
     <Link
-      href={`/match/${encodeURIComponent(quiz.matchId)}/predict/${encodeURIComponent(quiz.quizId)}`}
+      href={quizLink(quiz, now)}
       onClick={(e) => {
         if (guard && !guard()) e.preventDefault();
       }}

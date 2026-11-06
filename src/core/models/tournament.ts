@@ -14,6 +14,14 @@ export const tournamentSummarySchema = z.object({
 });
 export type TournamentSummary = z.infer<typeof tournamentSummarySchema>;
 
+/** The same fields on a prediction, event or future by id, where the colours can be null. */
+export const pickTournamentSchema = tournamentSummarySchema.extend({
+  primaryColor: z.string().nullable(),
+  secondaryColor: z.string().nullable(),
+  textColor: z.string().nullable(),
+});
+export type PickTournament = z.infer<typeof pickTournamentSchema>;
+
 export const tournamentSchema = tournamentSummarySchema.extend({
   _id: z.string(),
   gameType: z.string(),

@@ -10,8 +10,12 @@ export function formatInt(value: number): string {
   return new Intl.NumberFormat("en-US").format(Math.round(value));
 }
 
-/** Compact Oz volume: 48200 becomes "48.2K". */
+/** Below this, Oz amounts are written in full. */
+const COMPACT_FROM = 10_000;
+
+/** Oz amounts: 9999 stays "9,999"; 48200 becomes "48.2K" and 1.2M "1.2M". */
 export function formatOzCompact(value: number): string {
+  if (Math.abs(value) < COMPACT_FROM) return formatInt(value);
   return new Intl.NumberFormat("en-US", {
     notation: "compact",
     maximumFractionDigits: 1,
@@ -44,4 +48,9 @@ export function formatKickoffDate(iso: string): string {
 /** A probability as the API sends it, 0 to 100, with at most one decimal. */
 export function formatPercent(value: number): string {
   return `${Number(value.toFixed(1))}%`;
+}
+
+/** An API status as shown: "no_result" becomes "NO RESULT". */
+export function formatStatus(status: string): string {
+  return status.replace(/[_-]+/g, " ").trim().toUpperCase();
 }

@@ -5,6 +5,7 @@ import { useSyncExternalStore, type CSSProperties } from "react";
 
 import type { MotorSportMatches, RaceStatus } from "@/core";
 import { MotorsportIcon } from "@/lib/icons";
+import { matchHref } from "@/utils";
 
 import styles from "../css/trendingRace.widget.module.css";
 
@@ -78,7 +79,7 @@ export function TrendingRaceWidget({
 
   return (
     <Link
-      href={`/match/${encodeURIComponent(race.matchId)}`}
+      href={matchHref(race.matchId, "racing")}
       className={styles.plate}
       style={
         { "--match-accent": accentOf(lifecycle, followed) } as CSSProperties

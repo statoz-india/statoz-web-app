@@ -48,6 +48,10 @@ export const gradients = {
   /** Earned streak milestone surface, warming from gold into the dark stack. */
   streakMilestone:
     "linear-gradient(135deg, color-mix(in srgb, var(--ds-color-accent-gold) 24%, transparent) 0%, var(--ds-color-background-secondary) 50%, var(--ds-color-background-elevated) 100%)",
+  /** The soft blue glow behind the match quiz, laid over the page colour. */
+  quizPage: "radial-gradient(at 50% 28%, rgb(43 127 255 / 10%) 0%, transparent 42%)",
+  /** A quiz question's review card. */
+  quizPanel: "linear-gradient(to bottom, #0f172b 0%, #0d111a 100%)",
 } as const;
 
 /**

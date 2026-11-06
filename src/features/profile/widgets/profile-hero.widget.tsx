@@ -17,14 +17,12 @@ const isRemote = (src: string) => /^https?:/.test(src);
 export function ProfileHero({
   profile,
   avatarSrc,
-  frameColor,
   bannerSrc,
   onEditAvatar,
   onEditBanner,
 }: {
   profile: Profile;
   avatarSrc: string;
-  frameColor: string | null;
   bannerSrc: string;
   onEditAvatar: () => void;
   onEditBanner: () => void;
@@ -57,8 +55,6 @@ export function ProfileHero({
           className="absolute bottom-0 left-0 size-24 overflow-hidden border-2 border-cyan bg-surface-elevated lg:size-30"
           style={{
             boxShadow: `0 4px 0 var(--ds-color-fixture-shadow), 0 0 18px -6px color-mix(in srgb, ${CYAN} 75%, transparent)`,
-            outline: frameColor ? `3px solid ${frameColor}` : undefined,
-            outlineOffset: 2,
           }}
         >
           <Image

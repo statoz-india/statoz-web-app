@@ -1,4 +1,10 @@
-import { dataOrThrow, getSportsLeaderboard, getSportsTypes } from "@/core";
+import {
+  dataOrThrow,
+  getLeaderboardTournaments,
+  getSportsLeaderboard,
+  getSportsTypes,
+  getTournamentLeaderboard,
+} from "@/core";
 import { useResource } from "@/hooks/useResource";
 
 /**
@@ -20,5 +26,27 @@ export function useSportLeaderboard(gameType: string) {
       getSportsLeaderboard(gameType).then((result) =>
         dataOrThrow(result, null),
       ),
+  });
+}
+
+/** A sport's tournaments, most players first; nothing for a guest. */
+export function useLeaderboardTournaments(gameType: string, signedIn: boolean) {
+  return useResource(
+    signedIn
+      ? {
+          key: `leaderboard/tournaments/${gameType}`,
+          load: () =>
+            getLeaderboardTournaments(gameType).then((result) => dataOrThrow(result)),
+        }
+      : null,
+  );
+}
+
+/** One tournament's top 100, by its code. */
+export function useTournamentLeaderboard(tournament: string) {
+  return useResource({
+    key: `leaderboard/tournament/${tournament}`,
+    load: () =>
+      getTournamentLeaderboard(tournament).then((result) => dataOrThrow(result)),
   });
 }

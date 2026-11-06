@@ -2,11 +2,14 @@ import type { ComponentType } from "react";
 
 import type {
   AuthUser,
+  FreeProfileBanner,
+  FreeProfilePic,
   SignupSport,
   SignupTeam,
   Team as MatchTeam,
   UserPrediction,
   UserQuiz,
+  UserAssetsResponse,
   UserStatsResponse,
   XpEntry,
 } from "@/core";
@@ -23,7 +26,7 @@ import {
 import { accentVar } from "@/styles";
 
 import { COIN_RANGES, COIN_SOURCES, LEVEL_XP } from "./constants";
-import type { CoinRange, Profile, StatBand, Team } from "./types";
+import type { CoinRange, LookChoice, Profile, StatBand, Team } from "./types";
 
 /**
  * The level `xp` reaches on `table`, 1-based, the XP that level starts at, and
@@ -37,14 +40,58 @@ function levelOn(table: number[], xp: number) {
   return { level, xp, start, next, progress };
 }
 
+/** A Google account photo, which the profile never shows. */
+function isGooglePhoto(url: string): boolean {
+  try {
+    return /(^|\.)googleusercontent\.com$/.test(new URL(url).hostname);
+  } catch {
+    return false;
+  }
+}
+
 export function toProfile(user: AuthUser): Profile {
   return {
     name: (user.userName ?? user.email.split("@")[0]).toUpperCase(),
-    avatarUrl: user.avatarUrl ?? null,
+    // A Google photo counts as none, so the default avatar shows instead.
+    avatarUrl: user.avatarUrl && !isGooglePhoto(user.avatarUrl) ? user.avatarUrl : null,
     bannerUrl: user.bannerUrl ?? null,
     coins: user.coins,
     level: levelOn(LEVEL_XP, user.xp.totalXP),
   };
+}
+
+type UserAssets = UserAssetsResponse["data"];
+
+/** A free item the player bought is in both lists; it shows once, as owned. */
+const once = (choices: LookChoice[]) =>
+  choices.filter((choice, i) => choices.findIndex((c) => c.id === choice.id) === i);
+
+/** Bought pics first, then the free ones; a pic deleted from the store is skipped. */
+export function avatarChoices(assets: UserAssets, free: FreeProfilePic[]): LookChoice[] {
+  const owned = assets.profilePicsPurchased.flatMap((entry) =>
+    entry.profilePicId ? [entry.profilePicId] : [],
+  );
+  return once(
+    [...owned, ...free].map((pic) => ({
+      id: pic.ppId,
+      label: pic.ppName,
+      src: pic.ppUrl,
+    })),
+  );
+}
+
+/** Bought banners first, then the free ones; a deleted banner is skipped. */
+export function bannerChoices(assets: UserAssets, free: FreeProfileBanner[]): LookChoice[] {
+  const owned = assets.profileBannersPurchased.flatMap((entry) =>
+    entry.profileBannerId ? [entry.profileBannerId] : [],
+  );
+  return once(
+    [...owned, ...free].map((banner) => ({
+      id: banner.pbId,
+      label: banner.pbName,
+      src: banner.pbUrl,
+    })),
+  );
 }
 
 /** A share as a whole percent, 0 when nothing was played. */

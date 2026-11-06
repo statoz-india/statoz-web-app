@@ -1,13 +1,8 @@
 import { dataOrThrow } from "./client";
-import {
-  getMatchSportsTypes,
-  getMatchStats,
-  getRaceStats,
-  getSportsTypes,
-} from "./public-api";
+import { getMatchSportsTypes, getSportsTypes } from "./public-api";
 
 /**
- * What the screens ask for: each read of the public API paired with the key
+ * What the screens ask for: each shared read of the API paired with the key
  * the browser store (`@/hooks/useResource`) keeps it under. Two screens that
  * ask for the same thing get the same key, so it is loaded once and shared.
  *
@@ -20,31 +15,15 @@ import {
 /** Every fixture list's key starts with this. */
 export const MATCHES_KEY_PREFIX = "matches/";
 
+/**
+ * Every signed-in home screen's key starts with this; one per player. The
+ * quiz page reads it to drop a revealed result.
+ */
+export const SIGNED_IN_TRENDING_KEY_PREFIX = "trending/signed-in/";
+
 export const resources = {
   matchSportsTypes: () => ({
     key: "sports/matchSportsTypes",
     load: () => getMatchSportsTypes().then((r) => dataOrThrow(r)),
   }),
-
-  /**
-   * A team match's stats. It is kept under the readable `matchId`, but the
-   * endpoint accepts only the database `_id`.
-   */
-  matchStats: (matchId: string, matchObjectId: string) => ({
-    key: `matchStats/${matchId}`,
-    load: () => getMatchStats(matchObjectId).then((r) => dataOrThrow(r, null)),
-  }),
-  /** A race's stats, kept and asked for by its readable `matchId`. */
-  raceStats: (matchId: string) => ({
-    key: `raceStats/${matchId}`,
-    load: () => getRaceStats(matchId).then((r) => dataOrThrow(r, null)),
-  }),
 };
-
-/** The day a fixture-list key is for, or `null` for any other key. */
-export function dayOfMatchesKey(key: string): string | null {
-  // The key is `matches/<sport>/<day>`.
-  return key.startsWith(MATCHES_KEY_PREFIX)
-    ? (key.split("/")[2] ?? null)
-    : null;
-}

@@ -14,6 +14,7 @@ import {
   type ApiResult,
   type AuthUser,
 } from "@/core";
+import { loadedKeys, peekResource, setResource } from "@/hooks/useResource";
 
 const DEVICE_ID_KEY = "statoz.deviceId";
 
@@ -82,6 +83,33 @@ export function useCurrentUser(): AuthUser | null {
   return user;
 }
 
+/**
+ * Takes a placed bet's stake off the balance on screen, as the API already
+ * has. Cached copies of `current-user` (the profile's) are updated too.
+ */
+export function spendCoins(amount: number) {
+  const spend = (user: AuthUser) => ({ ...user, coins: user.coins - amount });
+  const { user } = useUserStore.getState();
+  if (user) useUserStore.setState({ user: spend(user) });
+  for (const key of loadedKeys("user/current-user")) {
+    const cached = peekResource<AuthUser>(key);
+    if (cached) setResource(key, spend(cached));
+  }
+}
+
+/**
+ * Merges what the API saved into the signed-in user, and into cached copies
+ * of `current-user` (the profile's).
+ */
+export function updateCurrentUser(patch: Partial<AuthUser>) {
+  const { user } = useUserStore.getState();
+  if (user) useUserStore.setState({ user: { ...user, ...patch } });
+  for (const key of loadedKeys("user/current-user")) {
+    const cached = peekResource<AuthUser>(key);
+    if (cached) setResource(key, { ...cached, ...patch });
+  }
+}
+
 /** The code is hashed with the exact email, so both calls must send the same string. */
 const normalise = (email: string) => email.trim().toLowerCase();
 
@@ -119,6 +147,12 @@ function returnPath(): string {
     ? returnTo
     : "/";
 }
+
+/** A new account sets up its profile first, then goes where it was heading. */
+const afterLogin = (isNewUser: boolean) =>
+  isNewUser
+    ? `/onboarding?returnTo=${encodeURIComponent(returnPath())}`
+    : returnPath();
 
 /**
  * Email OTP sign-in for the auth screen. `sendCode` mails a code and
@@ -168,7 +202,7 @@ export function useEmailOtpLogin() {
         throw new Error(result.message);
       }
       useUserStore.setState({ user: result.data.user });
-      router.replace(returnPath());
+      router.replace(afterLogin(result.data.isNewUser));
     } catch (cause) {
       setError((current) => current ?? GENERIC_ERROR);
       throw cause;
@@ -250,7 +284,7 @@ export function useGoogleLogin() {
       }
       if (result.success) {
         useUserStore.setState({ user: result.data.user });
-        router.replace(returnPath());
+        router.replace(afterLogin(result.data.isNewUser));
         return;
       }
       setError(messageFor(result));

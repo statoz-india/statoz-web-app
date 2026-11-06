@@ -64,6 +64,10 @@
   --ds-color-overlay-plate: rgb(0 0 0 / 60%);
   --ds-color-overlay-shop-footer: rgb(0 0 0 / 88%);
   --ds-color-overlay-shop-ownership: rgb(0 0 0 / 66%);
+  /** The arena backdrop's scanlines. */
+  --ds-color-scanline: rgb(0 0 0 / 14%);
+  /** Pure black, for darkening a colour with color-mix (a badge's lip). */
+  --ds-color-shade: #000;
 
   /* Fixture-card chrome */
   --ds-color-fixture-shadow: #04060b;
@@ -156,6 +160,16 @@
     color-mix(in srgb, var(--ds-color-accent-gold) 24%, transparent) 0%,
     var(--ds-color-background-secondary) 50%,
     var(--ds-color-background-elevated) 100%
+  );
+  --ds-gradient-quiz-page: radial-gradient(
+    at 50% 28%,
+    rgb(43 127 255 / 10%) 0%,
+    transparent 42%
+  );
+  --ds-gradient-quiz-panel: linear-gradient(
+    to bottom,
+    #0f172b 0%,
+    #0d111a 100%
   );
 
   /* Elevation */
@@ -350,32 +364,66 @@
     var(--font-orbitron), "Orbitron", var(--font-onest), "Onest", system-ui,
     sans-serif;
   --ds-font-mono: ui-monospace, "SFMono-Regular", monospace;
+  --ds-font-grotesk:
+    var(--font-space-grotesk), "Space Grotesk", var(--font-onest), "Onest",
+    system-ui, sans-serif;
   --ds-text-nano: 0.5rem;
+  --ds-text-chip: 0.53125rem;
   --ds-text-micro: 0.5625rem;
   --ds-text-2xs: 0.625rem;
   --ds-text-xs: 0.6875rem;
   --ds-text-compact: 0.75rem;
+  --ds-text-option: 0.78125rem;
   --ds-text-sm: 0.8125rem;
+  --ds-text-review: 0.84375rem;
   --ds-text-md: 0.875rem;
   --ds-text-base: 0.9375rem;
+  --ds-text-question: 1rem;
   --ds-text-lg: 1.0625rem;
   --ds-text-badge: 1.125rem;
   --ds-text-xl: 1.25rem;
+  --ds-text-locked: 1.3125rem;
   --ds-text-2xl: 1.375rem;
+  --ds-text-title: 1.5rem;
+  --ds-text-headline: 1.625rem;
   --ds-text-3xl: 2rem;
+  --ds-text-price: 2.125rem;
+  /* The welcome bonus amount: compact on small screens, then full. */
+  --ds-text-reward-compact: 2.375rem;
   --ds-text-hero: 2.625rem;
+  --ds-text-reward: 3rem;
   --ds-text-celebration: 3.375rem;
   --ds-text-countdown: 4.5rem;
+  --ds-text-flash: 8rem;
   --ds-leading-compact: 1;
+  --ds-leading-close: 1.1;
   --ds-leading-tight: 1.2;
+  --ds-leading-snug: 1.25;
   --ds-leading-body: 1.4;
   --ds-leading-relaxed: 1.6;
+  --ds-tracking-hair: 0.01em;
   --ds-tracking-tight: 0.02em;
+  --ds-tracking-firm: 0.03em;
+  --ds-tracking-fine: 0.04em;
   --ds-tracking-label: 0.05em;
+  --ds-tracking-snug: 0.06em;
   --ds-tracking-wide: 0.07em;
   --ds-tracking-display: 0.075em;
+  --ds-tracking-loose: 0.08em;
+  --ds-tracking-airy: 0.09em;
+  --ds-tracking-broad: 0.1em;
+  --ds-tracking-brisk: 0.11em;
   --ds-tracking-ultra: 0.12em;
+  --ds-tracking-crisp: 0.13em;
+  --ds-tracking-spread: 0.14em;
+  --ds-tracking-stretch: 0.15em;
+  --ds-tracking-reach: 0.16em;
+  --ds-tracking-sweep: 0.17em;
+  --ds-tracking-span: 0.18em;
   --ds-tracking-mega: 0.2em;
   --ds-tracking-max: 0.3em;
+  /* In px, as the ACQUIRED overlay specifies them. */
+  --ds-tracking-title: 1.4px;
+  --ds-tracking-burst: 4.2px;
   --ds-numeric-tabular: "tnum" 1;
 }

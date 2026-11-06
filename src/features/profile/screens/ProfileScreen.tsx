@@ -21,10 +21,6 @@ import {
   SettingsSheet,
 } from "../components/sheets";
 import {
-  BANNERS,
-  SAMPLE_FRAMES,
-} from "../constants";
-import {
   useCoinMap,
   useProfileUser,
   useSignupTournaments,
@@ -98,11 +94,6 @@ function ProfileView({
 }: ProfileScreenProps & { user: AuthUser }) {
   const profile = toProfile(user);
   const [overlay, setOverlay] = useState<OverlayId | null>(null);
-  const [avatar, setAvatar] = useState<"photo" | "default">(
-    profile.avatarUrl ? "photo" : "default",
-  );
-  const [frame, setFrame] = useState("none");
-  const [banner, setBanner] = useState(profile.bannerUrl ? "yours" : "default");
   const tournaments = useSignupTournaments();
   const coinMap = useCoinMap();
   const stats = useUserStats();
@@ -110,14 +101,8 @@ function ProfileView({
   const [now] = useState(() => Date.now());
   const close = () => setOverlay(null);
 
-  const avatarSrc =
-    avatar === "photo" && profile.avatarUrl
-      ? profile.avatarUrl
-      : IMAGES.profile.defaultMale;
-  const bannerSrc =
-    banner === "yours" && profile.bannerUrl
-      ? profile.bannerUrl
-      : (BANNERS.find((b) => b.id === banner) ?? BANNERS[0]).src;
+  const avatarSrc = profile.avatarUrl ?? IMAGES.profile.defaultMale;
+  const bannerSrc = profile.bannerUrl ?? IMAGES.profile.defaultBanner;
   const groups = followedGroups(tournaments.data ?? [], user.clubAndTeams);
 
   return (
@@ -125,7 +110,6 @@ function ProfileView({
       <ProfileHero
         profile={profile}
         avatarSrc={avatarSrc}
-        frameColor={SAMPLE_FRAMES.find((f) => f.id === frame)?.color ?? null}
         bannerSrc={bannerSrc}
         onEditAvatar={() => setOverlay("avatar")}
         onEditBanner={() => setOverlay("banner")}
@@ -183,21 +167,9 @@ function ProfileView({
       ) : overlay === "clubs" ? (
         <ClubsSheet picks={user.clubAndTeams} onClose={close} />
       ) : overlay === "avatar" ? (
-        <AvatarSheet
-          photoUrl={profile.avatarUrl}
-          avatar={avatar}
-          frame={frame}
-          onAvatar={setAvatar}
-          onFrame={setFrame}
-          onClose={close}
-        />
+        <AvatarSheet current={profile.avatarUrl} onClose={close} />
       ) : overlay === "banner" ? (
-        <BannerSheet
-          apiBanner={profile.bannerUrl}
-          banner={banner}
-          onChoose={setBanner}
-          onClose={close}
-        />
+        <BannerSheet current={profile.bannerUrl} onClose={close} />
       ) : overlay === "history" ? (
         <CoinHistorySheet balance={profile.coins} onClose={close} />
       ) : null}

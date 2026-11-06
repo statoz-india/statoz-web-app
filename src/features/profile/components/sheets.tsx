@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useState, type ReactNode } from "react";
 
-import { IMAGES } from "@/config/images";
 import type { Sport } from "@/config/sports";
 import type { AuthUser } from "@/core";
 import { Button } from "@/lib/components/button";
@@ -13,10 +12,23 @@ import {
   LogoutIcon,
   SettingsIcon,
 } from "@/lib/icons";
+import { accentVar, withAlpha } from "@/styles";
 
-import { followableSports, toTeam } from "../adapters";
-import { BANNERS, SAMPLE_FRAMES } from "../constants";
-import { saveClubAndTeams, useSignupTournaments } from "../data/profile.data";
+import {
+  avatarChoices,
+  bannerChoices,
+  followableSports,
+  toTeam,
+} from "../adapters";
+import {
+  saveClubAndTeams,
+  saveProfile,
+  useFreeProfileBanners,
+  useFreeProfilePics,
+  useSignupTournaments,
+  useUserAssets,
+} from "../data/profile.data";
+import type { LookChoice } from "../types";
 import { ClubTile, LeagueCard, SportButton } from "../widgets/clubs.widget";
 import { Overlay } from "./overlay";
 
@@ -246,7 +258,7 @@ export function ClubsSheet({
 }
 
 /** Square picker tile; the chosen one gets a cyan edge. */
-function Choice({
+export function Choice({
   selected,
   label,
   onClick,
@@ -278,122 +290,245 @@ function Choice({
   );
 }
 
+/** A square portrait; the chosen one gets a lime edge, glow and seal. */
+export function AvatarTile({
+  label,
+  src,
+  selected,
+  onClick,
+}: {
+  label: string;
+  src: string;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={selected}
+      aria-label={label}
+      onClick={onClick}
+      className={`relative aspect-square w-full bg-surface transition-[transform,border-color,background-color,box-shadow] duration-150 hover:-translate-y-px active:translate-y-0 motion-reduce:transform-none ${selected ? "border-2 border-lime" : "border border-line-subtle hover:border-line-strong"}`}
+      style={{
+        boxShadow: selected
+          ? `0 0 14px -2px ${withAlpha(accentVar("lime"), 0.18)}`
+          : undefined,
+      }}
+    >
+      <Image
+        src={src}
+        alt=""
+        fill
+        unoptimized
+        sizes="142px"
+        className="object-cover object-top"
+      />
+      {selected ? (
+        <span
+          aria-hidden
+          className="absolute top-0 left-0 grid size-6.5 place-items-center bg-lime text-inverse"
+        >
+          <CheckIcon size={17} />
+        </span>
+      ) : null}
+    </button>
+  );
+}
+
 export function AvatarSheet({
-  photoUrl,
-  avatar,
-  frame,
-  onAvatar,
-  onFrame,
+  current,
   onClose,
 }: {
-  photoUrl: string | null;
-  avatar: "photo" | "default";
-  frame: string;
-  onAvatar: (avatar: "photo" | "default") => void;
-  onFrame: (frame: string) => void;
+  current: string | null;
   onClose: () => void;
 }) {
-  const avatars = [
-    ...(photoUrl
-      ? [{ id: "photo" as const, label: "Google photo", src: photoUrl }]
-      : []),
-    {
-      id: "default" as const,
-      label: "Default",
-      src: IMAGES.profile.defaultMale,
-    },
-  ];
+  const assets = useUserAssets();
+  const free = useFreeProfilePics();
   return (
-    <Overlay title="AVATAR" onClose={onClose}>
-      <div className="px-4.5 py-4">
-        <h3 className="font-display text-micro font-black tracking-ultra text-muted">
-          FACE
-        </h3>
-        <div className="mt-2.5 flex gap-2.5">
-          {avatars.map((a) => (
-            <Choice
-              key={a.id}
-              label={a.label}
-              selected={avatar === a.id}
-              onClick={() => onAvatar(a.id)}
-              className="size-20 bg-surface-elevated"
-            >
-              <Image
-                src={a.src}
-                alt=""
-                fill
-                sizes="80px"
-                unoptimized={a.src.startsWith("http")}
-                className="object-cover object-top"
-              />
-            </Choice>
-          ))}
-        </div>
-
-        <h3 className="mt-5 font-display text-micro font-black tracking-ultra text-muted">
-          FRAME
-        </h3>
-        <div className="mt-2.5 flex flex-wrap gap-2.5">
-          {SAMPLE_FRAMES.map((f) => (
-            <Choice
-              key={f.id}
-              label={`${f.label} frame`}
-              selected={frame === f.id}
-              onClick={() => onFrame(f.id)}
-              className="grid size-14 place-items-center bg-surface"
-            >
-              <span
-                className="size-8 border-2 border-line-strong"
-                style={
-                  f.color ? { outline: `3px solid ${f.color}` } : undefined
-                }
-              />
-            </Choice>
-          ))}
-        </div>
-      </div>
-    </Overlay>
+    <LookSheet
+      kind="avatar"
+      current={current}
+      choices={
+        assets.data && free.data ? avatarChoices(assets.data, free.data) : null
+      }
+      resources={[assets, free]}
+      onSave={(ppId) => saveProfile({ ppId })}
+      onClose={onClose}
+    />
   );
 }
 
 export function BannerSheet({
-  apiBanner,
-  banner,
-  onChoose,
+  current,
   onClose,
 }: {
-  apiBanner: string | null;
-  banner: string;
-  onChoose: (banner: string) => void;
+  current: string | null;
   onClose: () => void;
 }) {
-  const banners = [
-    ...(apiBanner ? [{ id: "yours", label: "Yours", src: apiBanner }] : []),
-    ...BANNERS,
-  ];
+  const assets = useUserAssets();
+  const free = useFreeProfileBanners();
   return (
-    <Overlay title="BANNER" onClose={onClose}>
-      <ul className="grid gap-2.5 px-4.5 py-4">
-        {banners.map((b) => (
-          <li key={b.id}>
-            <Choice
-              label={`${b.label} banner`}
-              selected={banner === b.id}
-              onClick={() => onChoose(b.id)}
-              className="block aspect-4/1 w-full"
+    <LookSheet
+      kind="banner"
+      current={current}
+      choices={
+        assets.data && free.data ? bannerChoices(assets.data, free.data) : null
+      }
+      resources={[assets, free]}
+      onSave={(pbId) => saveProfile({ pbId })}
+      onClose={onClose}
+    />
+  );
+}
+
+const LOOKS = {
+  avatar: { title: "CUSTOMISE PROFILE", noun: "avatars", action: "DONE", size: "full" },
+  banner: { title: "BANNER", noun: "banners", action: "SAVE", size: "sheet" },
+} as const;
+
+/**
+ * The owned and free items in one grid; the footer button equips the one
+ * picked. Closing any other way keeps what was saved.
+ */
+function LookSheet({
+  kind,
+  current,
+  choices,
+  resources,
+  onSave,
+  onClose,
+}: {
+  kind: keyof typeof LOOKS;
+  /** The image on the profile now, to tick its item. */
+  current: string | null;
+  /** `null` until both lists load. */
+  choices: LookChoice[] | null;
+  resources: { status: "loading" | "ready" | "error"; reload: () => void }[];
+  /** Resolves to the message to show, or `null` once saved. */
+  onSave: (id: string) => Promise<string | null>;
+  onClose: () => void;
+}) {
+  const look = LOOKS[kind];
+  const [draft, setDraft] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [failure, setFailure] = useState<string | null>(null);
+  const currentId = choices?.find((c) => c.src === current)?.id ?? null;
+  // The avatar picker always shows a face, so an unknown one starts on the first.
+  const selected =
+    draft ?? currentId ?? (kind === "avatar" ? (choices?.[0]?.id ?? null) : null);
+
+  async function save() {
+    if (!selected) return;
+    if (selected === currentId) return onClose();
+    setSaving(true);
+    setFailure(null);
+    const message = await onSave(selected);
+    setSaving(false);
+    if (message) setFailure(message);
+    else onClose();
+  }
+
+  return (
+    <Overlay
+      title={look.title}
+      size={look.size}
+      onClose={onClose}
+      footer={
+        choices?.length ? (
+          <>
+            {failure ? (
+              <p role="alert" className="mb-3 font-sans text-xs text-danger">
+                {failure}
+              </p>
+            ) : null}
+            <Button
+              fullWidth
+              pending={saving}
+              disabled={kind === "banner" ? !draft || draft === currentId : !selected}
+              onClick={() => void save()}
             >
-              <Image
-                src={b.src}
-                alt=""
-                fill
-                sizes="500px"
-                unoptimized={b.src.startsWith("http")}
-                className="object-cover"
+              {look.action}
+            </Button>
+          </>
+        ) : undefined
+      }
+    >
+      {choices?.length && kind === "avatar" ? (
+        <div className="flex flex-col items-center px-5 pt-5 pb-6">
+          <div className="relative size-27.5 border-2 border-cyan bg-surface-elevated">
+            <Image
+              src={choices.find((c) => c.id === selected)?.src ?? choices[0].src}
+              alt=""
+              fill
+              unoptimized
+              sizes="110px"
+              className="object-cover object-top"
+            />
+          </div>
+          <div className="mt-5 h-px w-full bg-line-muted" />
+          <div
+            role="radiogroup"
+            aria-label="Avatar"
+            className="mt-5 grid w-full max-w-115 grid-cols-3 gap-4"
+          >
+            {choices.map((c) => (
+              <AvatarTile
+                key={c.id}
+                label={c.label}
+                src={c.src}
+                selected={selected === c.id}
+                onClick={() => setDraft(c.id)}
               />
-            </Choice>
-          </li>
-        ))}
-      </ul>
+            ))}
+          </div>
+        </div>
+      ) : choices?.length ? (
+        <ul className="grid gap-2.5 px-4.5 py-4">
+          {choices.map((c) => (
+            <li key={c.id}>
+              <Choice
+                label={`${c.label} banner`}
+                selected={selected === c.id}
+                onClick={() => setDraft(c.id)}
+                className="block aspect-4/1 w-full"
+              >
+                <Image
+                  src={c.src}
+                  alt=""
+                  fill
+                  unoptimized
+                  sizes="500px"
+                  className="object-cover"
+                />
+              </Choice>
+            </li>
+          ))}
+        </ul>
+      ) : resources.some((r) => r.status === "error") ? (
+        <div className="grid justify-items-center gap-3 px-4.5 py-10 text-center">
+          <p className="font-sans text-sm text-muted">
+            Couldn&apos;t load the {look.noun}.
+          </p>
+          <Button
+            variant="tonal"
+            size="sm"
+            onClick={() => resources.forEach((r) => r.reload())}
+          >
+            TRY AGAIN
+          </Button>
+        </div>
+      ) : choices ? (
+        <p className="px-4.5 py-10 text-center font-sans text-sm text-muted">
+          No {look.noun} to choose yet.
+        </p>
+      ) : (
+        <div
+          role="status"
+          aria-label={`Loading ${look.noun}`}
+          className="m-4 h-40 animate-pulse bg-surface-elevated/50"
+        />
+      )}
     </Overlay>
   );
 }

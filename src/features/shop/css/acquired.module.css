@@ -1,0 +1,126 @@
+/* The ACQUIRED moment after a purchase. `--accent` is the item's colour. */
+
+.overlay {
+  background: var(--ds-color-overlay-scrim);
+  cursor: pointer;
+  animation: fade-in 280ms linear both;
+}
+
+.label {
+  color: var(--accent);
+  text-shadow: 0 0 16px color-mix(in srgb, var(--accent) 65%, transparent);
+  animation: fade-in 560ms linear 130ms both;
+}
+
+.slam {
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--accent) 50%, transparent));
+  animation: slam 560ms cubic-bezier(0.175, 0.885, 0.32, 1.275) 130ms both;
+}
+
+.details {
+  animation:
+    fade-in 420ms cubic-bezier(0, 0, 0.58, 1) 300ms both,
+    slide-up 420ms cubic-bezier(0.215, 0.61, 0.355, 1) 300ms both;
+}
+
+.name {
+  text-shadow: 0 0 18px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.continue {
+  opacity: 0.5;
+  animation: continue-in 210ms linear 510ms both;
+}
+
+/* Three full swings from 7px, dying away: sin(p·6π) · 7 · (1 − p). */
+.shake {
+  animation: shake 350ms linear 690ms both;
+}
+
+/* The avatar and banner previews: the shop tile's frame, bottom corners cut. */
+.frame {
+  padding: 1px;
+  background: color-mix(in srgb, var(--accent) 40%, transparent);
+  clip-path: var(--ds-clip-fixture-flat);
+}
+.frameFill {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  clip-path: var(--ds-clip-fixture-flat);
+  background: var(--ds-color-background-primary);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes slam {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(12%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes continue-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shake {
+  0%,
+  16.67%,
+  33.33%,
+  50%,
+  66.67%,
+  83.33%,
+  100% {
+    transform: none;
+  }
+  8.33% {
+    transform: translateX(6.42px);
+  }
+  25% {
+    transform: translateX(-5.25px);
+  }
+  41.67% {
+    transform: translateX(4.08px);
+  }
+  58.33% {
+    transform: translateX(-2.92px);
+  }
+  75% {
+    transform: translateX(1.75px);
+  }
+  91.67% {
+    transform: translateX(-0.58px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .label,
+  .slam,
+  .details,
+  .continue,
+  .shake {
+    animation: none;
+  }
+}

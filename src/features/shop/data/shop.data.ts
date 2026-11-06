@@ -4,10 +4,18 @@ import {
   getShopPlayerCards,
   getShopProfilePics,
   getShopTeams,
+  purchasePlayerCard,
+  purchaseProfileBanner,
+  purchaseProfilePic,
+  type ApiResult,
   type PaidProfileBannersResponse,
   type ShopCatalog,
 } from "@/core";
+import { spendCoins } from "@/features/auth";
 import { useResource, useResources } from "@/hooks/useResource";
+import { formatInt } from "@/utils";
+
+import { itemPrice, type ShopItem } from "../adapters";
 
 /** The teams that have items in `catalog`, A–Z. */
 export function useShopTeams(catalog: ShopCatalog) {
@@ -56,4 +64,42 @@ export function useShopPlayerCards(team: string | null) {
             getShopPlayerCards(team).then((result) => dataOrThrow(result)),
         },
   );
+}
+
+/**
+ * Buys `item` and takes its price off the balance on screen. Resolves to the
+ * message to show, or `null` once it's bought.
+ */
+export async function buyItem(item: ShopItem): Promise<string | null> {
+  try {
+    const result =
+      item.kind === "avatar"
+        ? await purchaseProfilePic({ ppId: item.pic.ppId })
+        : item.kind === "banner"
+          ? await purchaseProfileBanner({ pbId: item.banner.pbId })
+          : await purchasePlayerCard({ playerId: item.card.playerId });
+    if (!result.success) return purchaseError(result);
+    spendCoins(itemPrice(item));
+    return null;
+  } catch {
+    return "Couldn't complete the purchase. Try again.";
+  }
+}
+
+function purchaseError(result: Exclude<ApiResult<unknown>, { success: true }>) {
+  // "Insufficient coins" puts its reason and the amounts in `data`.
+  const data = "data" in result ? result.data : null;
+  if (
+    typeof data === "object" &&
+    data !== null &&
+    "availableCoins" in data &&
+    "requiredCoins" in data &&
+    typeof data.availableCoins === "number" &&
+    typeof data.requiredCoins === "number"
+  ) {
+    return `You need ${formatInt(data.requiredCoins - data.availableCoins)} more coins.`;
+  }
+  // "Profile pic already purchased", "Player card already owned", …
+  if (/already (purchased|owned)/i.test(result.message)) return "You already own this.";
+  return result.message;
 }

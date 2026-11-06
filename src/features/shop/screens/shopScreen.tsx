@@ -17,6 +17,7 @@ import { FilterChips } from "@/lib/components/filter-chips";
 import { UnderlineTabs } from "@/lib/components/underline-tabs";
 import { accentVar } from "@/styles";
 
+import type { ShopItem } from "../adapters";
 import {
   BANNER_PAGE_SIZE,
   usePaidBanners,
@@ -24,6 +25,8 @@ import {
   useShopProfilePics,
   useShopTeams,
 } from "../data/shop.data";
+import { AcquiredOverlay } from "../widgets/acquiredOverlay.widget";
+import { BuyDialog } from "../widgets/buyDialog.widget";
 import { AvatarTile, BannerTile, CardTile } from "../widgets/shopTiles.widget";
 
 const CYAN = accentVar("cyan");
@@ -43,6 +46,9 @@ export function ShopScreen() {
     () => null,
   );
   const [tab, setTab] = useState(0);
+  // A tile tap asks first; a purchase then plays the ACQUIRED overlay.
+  const [buying, setBuying] = useState<ShopItem | null>(null);
+  const [acquired, setAcquired] = useState<ShopItem | null>(null);
 
   // Every catalogue needs a session.
   useEffect(() => {
@@ -59,17 +65,30 @@ export function ShopScreen() {
         label="Shop"
       />
       {signedIn === false ? null : tab === 0 ? (
-        <AvatarsTab />
+        <AvatarsTab onBuy={setBuying} />
       ) : tab === 1 ? (
-        <BannersTab />
+        <BannersTab onBuy={setBuying} />
       ) : (
-        <CardsTab />
+        <CardsTab onBuy={setBuying} />
       )}
+      {buying ? (
+        <BuyDialog
+          item={buying}
+          onClose={() => setBuying(null)}
+          onBought={() => {
+            setAcquired(buying);
+            setBuying(null);
+          }}
+        />
+      ) : null}
+      {acquired ? (
+        <AcquiredOverlay item={acquired} onClose={() => setAcquired(null)} />
+      ) : null}
     </div>
   );
 }
 
-function AvatarsTab() {
+function AvatarsTab({ onBuy }: { onBuy: (item: ShopItem) => void }) {
   const [team, teams] = useTeam("profile-pics");
   const items = useShopProfilePics(team);
   return (
@@ -78,7 +97,11 @@ function AvatarsTab() {
         <ul className="grid grid-cols-3 gap-3 min-[30rem]:grid-cols-4 min-[45rem]:grid-cols-5 lg:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))]">
           {list.map((pic, i) => (
             <li key={pic._id}>
-              <AvatarTile pic={pic} index={i} />
+              <AvatarTile
+                pic={pic}
+                index={i}
+                onSelect={() => onBuy({ kind: "avatar", pic })}
+              />
             </li>
           ))}
         </ul>
@@ -88,7 +111,7 @@ function AvatarsTab() {
 }
 
 /** Every paid banner, all teams; the next page loads as the list's end nears. */
-function BannersTab() {
+function BannersTab({ onBuy }: { onBuy: (item: ShopItem) => void }) {
   const [pages, setPages] = useState(1);
   const feed = usePaidBanners(pages);
   const banners = feed.resources.flatMap((page) => page.data?.items ?? []);
@@ -111,7 +134,11 @@ function BannersTab() {
           {banners.map((banner, i) => (
             <li key={banner._id} className="mx-auto w-full max-w-140">
               {/* Staggered per page, so later pages don't wait behind earlier ones. */}
-              <BannerTile banner={banner} index={i % BANNER_PAGE_SIZE} />
+              <BannerTile
+                banner={banner}
+                index={i % BANNER_PAGE_SIZE}
+                onSelect={() => onBuy({ kind: "banner", banner })}
+              />
             </li>
           ))}
         </ul>
@@ -156,7 +183,7 @@ function OnView({ onView }: { onView: () => void }) {
   return <div ref={ref} aria-hidden className="h-px" />;
 }
 
-function CardsTab() {
+function CardsTab({ onBuy }: { onBuy: (item: ShopItem) => void }) {
   const [team, teams] = useTeam("player-cards");
   const items = useShopPlayerCards(team);
   return (
@@ -165,7 +192,11 @@ function CardsTab() {
         <ul className="grid grid-cols-2 gap-2.5 min-[45rem]:grid-cols-3 lg:grid-cols-[repeat(auto-fill,minmax(11rem,1fr))]">
           {list.map((card, i) => (
             <li key={card._id}>
-              <CardTile card={card} index={i} />
+              <CardTile
+                card={card}
+                index={i}
+                onSelect={() => onBuy({ kind: "card", card })}
+              />
             </li>
           ))}
         </ul>

@@ -1,0 +1,33 @@
+/* The launch countdown's radar ring: a slow breath and a spinning sweep. */
+
+.breathe {
+  animation: ring-breathe 1.8s ease-in-out infinite;
+}
+
+.sweep {
+  animation: ring-sweep 1.8s linear infinite;
+}
+
+@keyframes ring-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.025);
+  }
+}
+
+@keyframes ring-sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* The count still runs; only the ring holds still. */
+@media (prefers-reduced-motion: reduce) {
+  .breathe,
+  .sweep {
+    animation: none;
+  }
+}

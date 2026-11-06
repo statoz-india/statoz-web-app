@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { sportModules, type Sport } from "@/config/sports";
 import type { SignupTournament } from "@/core";
 import { CheckBoxBlankIcon, CheckBoxIcon, CheckIcon } from "@/lib/icons";
@@ -96,16 +98,21 @@ export function LeagueCard({
   );
 }
 
-/** A club to pick; tiles of a league that isn't followed sit dimmer. */
+/**
+ * A club to pick; tiles of a league that isn't followed sit dimmer. `badge`
+ * replaces the club's crest.
+ */
 export function ClubTile({
   team,
   selected,
   dim,
+  badge,
   onClick,
 }: {
   team: Team;
   selected: boolean;
   dim: boolean;
+  badge?: ReactNode;
   onClick: () => void;
 }) {
   return (
@@ -128,7 +135,7 @@ export function ClubTile({
           <CheckIcon size={13} />
         </span>
       ) : null}
-      <ClubCrest team={team} />
+      {badge ?? <ClubCrest team={team} />}
       <span className="w-full truncate text-center font-display text-2xs font-extrabold tracking-tight uppercase">
         {team.name}
       </span>

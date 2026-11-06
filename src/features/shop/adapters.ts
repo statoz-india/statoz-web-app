@@ -1,4 +1,5 @@
 import { isSport, sportModules } from "@/config/sports";
+import type { PaidProfileBanner, ShopPlayerCard, ShopProfilePic } from "@/core";
 import type { RarityName } from "@/styles";
 import { accentVar } from "@/styles";
 
@@ -28,3 +29,32 @@ export const cardRole = (position: string, trait?: string) => ({
   label: trait ? `${position} - ${trait}` : position,
   color: accentVar("cyan"),
 });
+
+/** Something in the shop that can be bought. */
+export type ShopItem =
+  | { kind: "avatar"; pic: ShopProfilePic }
+  | { kind: "banner"; banner: PaidProfileBanner }
+  | { kind: "card"; card: ShopPlayerCard };
+
+/** The overlay's accent: cyan for an avatar, the banner's own, a card's rarity. */
+export function itemAccent(item: ShopItem): string {
+  if (item.kind === "avatar") return accentVar("cyan");
+  if (item.kind === "banner") return sportAccent(item.banner.sport);
+  return CARD_TILE_ACCENT[rarityOf(item.card.cardType)];
+}
+
+export const itemName = (item: ShopItem) =>
+  item.kind === "avatar" ? item.pic.ppName : item.kind === "banner" ? item.banner.pbName : item.card.name;
+
+export const itemPrice = (item: ShopItem) =>
+  item.kind === "avatar" ? item.pic.coinValue : item.kind === "banner" ? item.banner.coinValue : item.card.coinValue;
+
+const ROLE_COLOR: Record<string, string> = {
+  attacker: accentVar("cyan"),
+  defender: accentVar("violet"),
+  goalkeeper: accentVar("gold"),
+};
+
+/** A selected card's edge and bloom: its role's colour, cyan without one. */
+export const roleColor = (playerType?: string) =>
+  (playerType && ROLE_COLOR[playerType]) || accentVar("cyan");

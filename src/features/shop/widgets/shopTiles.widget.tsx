@@ -29,27 +29,42 @@ const SPORT_ICONS = {
   racing: MotorsportIcon,
 };
 
-/** The frame every tile shares; `index` staggers its entrance. */
+/** The frame every tile shares; `index` staggers its entrance. The whole tile is the buy button. */
 function Tile({
   accent,
   index,
+  label,
+  onSelect,
   className,
   children,
 }: {
   accent: string;
   index: number;
+  /** What a screen reader hears, e.g. "Buy CSK Yellow for 250 Oz". */
+  label: string;
+  onSelect: () => void;
   className: string;
   children: ReactNode;
 }) {
   return (
     <div
-      className={`${styles.tile} ${className}`}
+      className={`${styles.tile} relative ${className}`}
       style={{ "--accent": accent, "--delay": `${index * 22}ms` } as CSSProperties}
     >
       <div className={styles.fill}>{children}</div>
+      {/* Laid over the tile: a button can't hold the tile's block content. */}
+      <button
+        type="button"
+        aria-label={label}
+        onClick={onSelect}
+        className="absolute inset-0 cursor-pointer focus-visible:outline-offset-[-2px]"
+      />
     </div>
   );
 }
+
+const buyLabel = (name: string, price: number) =>
+  price === 0 ? `Get ${name} for free` : `Buy ${name} for ${formatInt(price)} Oz`;
 
 /** The price rail; a free item says FREE in the tile's accent. */
 function Price({ value, size }: { value: number; size: "sm" | "md" }) {
@@ -81,9 +96,23 @@ function Price({ value, size }: { value: number; size: "sm" | "md" }) {
   );
 }
 
-export function AvatarTile({ pic, index }: { pic: ShopProfilePic; index: number }) {
+export function AvatarTile({
+  pic,
+  index,
+  onSelect,
+}: {
+  pic: ShopProfilePic;
+  index: number;
+  onSelect: () => void;
+}) {
   return (
-    <Tile accent={accentVar("cyan")} index={index} className="aspect-[0.6]">
+    <Tile
+      accent={accentVar("cyan")}
+      index={index}
+      label={buyLabel(pic.ppName, pic.coinValue)}
+      onSelect={onSelect}
+      className="aspect-[0.6]"
+    >
       <div className="relative aspect-square w-full shrink-0 overflow-hidden">
         <Image
           src={pic.ppUrl}
@@ -104,44 +133,50 @@ export function AvatarTile({ pic, index }: { pic: ShopProfilePic; index: number 
   );
 }
 
+/** A banner's picture, or its painted art without one, in `--accent`. */
+export function BannerArt({ banner }: { banner: PaidProfileBanner }) {
+  const Icon = isSport(banner.sport) ? SPORT_ICONS[banner.sport] : FootballIcon;
+  return banner.pbUrl ? (
+    <Image src={banner.pbUrl} alt="" fill unoptimized sizes="560px" className="object-cover" />
+  ) : (
+    // Painted art: a base wash, mesh, slashes, a burst and the sport crest.
+    <div
+      aria-hidden
+      className="absolute inset-0"
+      style={{
+        background:
+          "linear-gradient(to right, color-mix(in srgb, var(--accent) 30%, var(--ds-color-background-primary)), var(--ds-color-background-primary))",
+      }}
+    >
+      <div className={styles.mesh} />
+      <div className={styles.slashes} />
+      <div className={styles.burst} />
+      <div className={styles.crest}>
+        <Icon size={34} />
+      </div>
+    </div>
+  );
+}
+
 export function BannerTile({
   banner,
   index,
+  onSelect,
 }: {
   banner: PaidProfileBanner;
   index: number;
+  onSelect: () => void;
 }) {
-  const Icon = isSport(banner.sport) ? SPORT_ICONS[banner.sport] : FootballIcon;
   return (
-    <Tile accent={sportAccent(banner.sport)} index={index} className="h-37">
+    <Tile
+      accent={sportAccent(banner.sport)}
+      index={index}
+      label={buyLabel(banner.pbName, banner.coinValue)}
+      onSelect={onSelect}
+      className="h-37"
+    >
       <div className="relative min-h-0 flex-1 overflow-hidden">
-        {banner.pbUrl ? (
-          <Image
-            src={banner.pbUrl}
-            alt=""
-            fill
-            unoptimized
-            sizes="560px"
-            className="object-cover"
-          />
-        ) : (
-          // Painted art: a base wash, mesh, slashes, a burst and the sport crest.
-          <div
-            aria-hidden
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(to right, color-mix(in srgb, var(--accent) 30%, var(--ds-color-background-primary)), var(--ds-color-background-primary))",
-            }}
-          >
-            <div className={styles.mesh} />
-            <div className={styles.slashes} />
-            <div className={styles.burst} />
-            <div className={styles.crest}>
-              <Icon size={34} />
-            </div>
-          </div>
-        )}
+        <BannerArt banner={banner} />
         <span
           className="absolute top-0 left-0 border px-1.5 py-0.5 font-display text-nano font-black tracking-wide"
           style={{
@@ -161,11 +196,21 @@ export function BannerTile({
   );
 }
 
-export function CardTile({ card, index }: { card: ShopPlayerCard; index: number }) {
+export function CardTile({
+  card,
+  index,
+  onSelect,
+}: {
+  card: ShopPlayerCard;
+  index: number;
+  onSelect: () => void;
+}) {
   return (
     <Tile
       accent={CARD_TILE_ACCENT[rarityOf(card.cardType)]}
       index={index}
+      label={buyLabel(card.name, card.coinValue)}
+      onSelect={onSelect}
       className="aspect-[0.68]"
     >
       <div className="flex min-h-0 flex-1 items-center justify-center px-1 pt-0.5 pb-1">

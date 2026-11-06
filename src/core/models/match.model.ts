@@ -87,6 +87,15 @@ export const matchesSchema = z.object({
 });
 export type Matches = z.infer<typeof matchesSchema>;
 
+/** `GET /match/public/match/:id`: one match, by its `_id` or `matchId`. */
+export const matchResponseSchema = z.object({
+  statusCode: z.number(),
+  data: matchesSchema,
+  message: z.string(),
+  success: z.boolean(),
+});
+export type MatchResponse = z.infer<typeof matchResponseSchema>;
+
 /** The backend leaves an unset field out of a race instead of sending null. */
 export const motorSportMatchesSchema = z.object({
   _id: z.string(),
@@ -109,6 +118,17 @@ export const motorSportMatchesSchema = z.object({
   updatedAt: z.string(),
 });
 export type MotorSportMatches = z.infer<typeof motorSportMatchesSchema>;
+
+/** `GET /match/public/motorsport/:id`: one race, by its `_id` or `matchId`. */
+export const motorSportMatchResponseSchema = z.object({
+  statusCode: z.number(),
+  data: motorSportMatchesSchema,
+  message: z.string(),
+  success: z.boolean(),
+});
+export type MotorSportMatchResponse = z.infer<
+  typeof motorSportMatchResponseSchema
+>;
 
 /** What a section's `matches` holds: races for `racing`, fixtures otherwise. */
 export type MatchFor<G extends Sport> = G extends "racing"

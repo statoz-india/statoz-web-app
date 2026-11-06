@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { Suspense, useEffect } from "react";
+import { Suspense, useCallback, useEffect } from "react";
 
 import { AuthGateDialog } from "@/features/auth/components/authGateDialog";
 
@@ -16,6 +16,10 @@ export function AuthGateHost() {
   const request = useAuthGate((state) => state.request);
   // The store's actions never change, so the dialog's focus effect runs once.
   const close = useAuthGate((state) => state.close);
+  const cancel = useCallback(() => {
+    useAuthGate.getState().request?.onCancel?.();
+    close();
+  }, [close]);
 
   return (
     <>
@@ -26,7 +30,7 @@ export function AuthGateHost() {
       {request ? (
         <AuthGateDialog
           request={request}
-          onCancel={close}
+          onCancel={cancel}
           onContinue={() => {
             const returnTo = request.returnTo ?? window.location.pathname;
             close();

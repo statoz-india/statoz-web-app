@@ -14,6 +14,7 @@ import {
   MotorsportIcon,
 } from "@/lib/icons";
 import { colors, liftForContrast } from "@/styles/colors";
+import { pickHref } from "@/utils";
 
 import styles from "../css/trendingPredictions.widget.module.css";
 
@@ -146,7 +147,7 @@ export function TrendingPredictionsWidget({
 
   const sport = SPORTS[prediction.gameType.toLowerCase()];
   const Icon = sport?.icon;
-  const href = `/picks/${encodeURIComponent(prediction.predictionId)}`;
+  const href = pickHref("prediction", prediction.predictionId);
   const league = prediction.tournamentData.tournament || prediction.tournament;
   const all = outcomesOf(prediction);
   const outcomes = featured ? all.slice(0, FEATURED_OUTCOMES) : all;

@@ -9,6 +9,7 @@ import {
 
 import type { EventStatus, TrendingEvent } from "@/core";
 import { colors, liftForContrast } from "@/styles/colors";
+import { pickHref } from "@/utils";
 
 import styles from "./trendingEvent.widget.module.css";
 
@@ -165,7 +166,7 @@ export function TrendingEventWidget({
         return (
           <Link
             key={event._id}
-            href={`/picks/${encodeURIComponent(event.eventId)}`}
+            href={pickHref("event", event.eventId)}
             onClick={(e) => {
               if (guard && !guard()) e.preventDefault();
             }}

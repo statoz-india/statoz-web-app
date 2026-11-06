@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type ComponentType, type ReactNode } from "react";
 
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { CloseIcon, type IconProps } from "@/lib/icons";
 import { accentVar, withAlpha } from "@/styles";
 
@@ -40,16 +41,11 @@ export function Overlay({
 }) {
   const ref = useRef<HTMLDialogElement>(null);
 
+  useScrollLock();
   useEffect(() => {
     const dialog = ref.current;
     dialog?.showModal();
-    // Restored rather than cleared, so a stacked overlay keeps the lock.
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previous;
-      dialog?.close();
-    };
+    return () => dialog?.close();
   }, []);
 
   return (

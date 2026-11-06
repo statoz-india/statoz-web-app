@@ -79,3 +79,60 @@ export const trendingResponseSchema = z.object({
   success: z.boolean(),
 });
 export type TrendingResponse = z.infer<typeof trendingResponseSchema>;
+
+/** A team on a quiz in `results`. */
+export const trendingResultTeamSchema = z.object({
+  _id: z.string(),
+  name: z.string(),
+  displayName: z.string(),
+  abbreviation: z.string(),
+  primaryColor: z.string(),
+  secondaryColor: z.string(),
+  textColor: z.string(),
+  tournament: z.string(),
+});
+
+/** A settled match quiz in `results` whose results the player hasn't opened. */
+export const trendingResultSchema = z.object({
+  _id: z.string(),
+  quizId: z.string(),
+  quizStatus: z.string(),
+  tournament: z.string(),
+  entryStartTime: z.string(),
+  isVisible: z.boolean(),
+  createdAt: z.string(),
+  teamA: trendingResultTeamSchema,
+  teamB: trendingResultTeamSchema,
+  matchId: z.string(),
+  matchEvent: z.unknown().nullable(),
+  matchEventEspnId: z.string().nullable(),
+  gameType: z.string(),
+  matchBanner: z.string().nullable(),
+  matchStartTime: z.string(),
+  isAttempted: z.boolean(),
+  hasViewedResults: z.boolean(),
+  obtainedXP: z.number(),
+  quizSubmissionTime: z.string(),
+});
+export type TrendingResult = z.infer<typeof trendingResultSchema>;
+
+/**
+ * The signed-in home screen. Only match quizzes are modelled in `results`;
+ * any other item there (a motorsport quiz) is left out so the feed still loads.
+ */
+export const signedInTrendingResponseSchema = z.object({
+  statusCode: z.number(),
+  data: trendingSchema.extend({
+    results: z.array(z.unknown()).transform((items) =>
+      items.flatMap((item) => {
+        const parsed = trendingResultSchema.safeParse(item);
+        return parsed.success ? [parsed.data] : [];
+      }),
+    ),
+  }),
+  message: z.string(),
+  success: z.boolean(),
+});
+export type SignedInTrending = z.infer<
+  typeof signedInTrendingResponseSchema
+>["data"];

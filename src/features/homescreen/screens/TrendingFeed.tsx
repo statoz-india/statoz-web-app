@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import {
   useEffect,
   useLayoutEffect,
@@ -18,6 +19,7 @@ import type {
   TrendingRace,
 } from "@/core";
 import { useRequireAuth } from "@/features/auth";
+import { pickHref } from "@/utils";
 import { TrendingEventWidget } from "@/features/events/widgets/trendingEvent.widget";
 import { TrendingFutureWidget } from "@/features/futures/widgets/trendingFuture.widget";
 import { TrendingMatchWidget } from "@/features/match/widgets/trendingMatch.widget";
@@ -25,8 +27,11 @@ import { TrendingRaceWidget } from "@/features/match/widgets/trendingRace.widget
 import { TrendingPredictionsWidget } from "@/features/predictions/widgets/trendingPredictions.widget";
 import { TrendingQuiz } from "@/features/quizzes/widgets/trendingQuiz";
 
+import { isSportHubSelection } from "../adapters";
 import { BentoSkeleton, FeedError } from "../components/feed-states";
 import { useSportsTypes, useTrendingMatches } from "../data/getTrending.data";
+import type { SportHubSelection } from "../types";
+import { RevealResults } from "../widgets/revealResults.widget";
 import { TrendingSportsQuizWidget } from "../widgets/trendingSportsQuiz.widget";
 
 /** How long scrolling must pause before the loop jumps back, where `scrollend` is missing. */
@@ -176,6 +181,7 @@ function LoopCarousel<T>({
 
 /** The trending picks, without a heading. */
 function TrendingPicks({ picks }: { picks: Prediction[] }) {
+  const router = useRouter();
   const requireAuth = useRequireAuth();
   if (picks.length === 0) return null;
   return (
@@ -184,7 +190,8 @@ function TrendingPicks({ picks }: { picks: Prediction[] }) {
         {(pick) => (
           <TrendingPredictionsWidget
             prediction={pick}
-            onPick={() => requireAuth({ intent: "lock a pick" })}
+            // The guard has already asked a guest to log in.
+            onPick={(side) => router.push(pickHref("prediction", pick.predictionId, side))}
             guard={() => requireAuth({ intent: "lock a pick" })}
           />
         )}
@@ -296,6 +303,7 @@ function TrendingPredictions({
 }: {
   predictions: TrendingPrediction[];
 }) {
+  const router = useRouter();
   const requireAuth = useRequireAuth();
   if (predictions.length === 0) return null;
   return (
@@ -317,7 +325,9 @@ function TrendingPredictions({
         {(prediction) => (
           <TrendingPredictionsWidget
             prediction={prediction}
-            onPick={() => requireAuth({ intent: "lock a pick" })}
+            onPick={(side) =>
+              router.push(pickHref("prediction", prediction.predictionId, side))
+            }
             guard={() => requireAuth({ intent: "lock a pick" })}
           />
         )}
@@ -328,6 +338,7 @@ function TrendingPredictions({
 
 /** The trending futures under their heading, in the order the API sent them. */
 function TrendingFutures({ futures }: { futures: Future[] }) {
+  const router = useRouter();
   const requireAuth = useRequireAuth();
   if (futures.length === 0) return null;
   return (
@@ -349,7 +360,9 @@ function TrendingFutures({ futures }: { futures: Future[] }) {
           <TrendingFutureWidget
             future={future}
             maxChoices={FUTURE_CHOICES}
-            onPick={() => requireAuth({ intent: "lock a pick" })}
+            onPick={(choiceId) =>
+              router.push(pickHref("future", future.futureId, choiceId))
+            }
             guard={() => requireAuth({ intent: "lock a pick" })}
           />
         )}
@@ -361,8 +374,9 @@ function TrendingFutures({ futures }: { futures: Future[] }) {
 /**
  * One quiz card per sport the API covers. It loads on its own, so the rest of
  * the feed does not wait for it, and it stays hidden until the list arrives.
+ * A card opens its sport's tab, from the top.
  */
-function SportsQuizzes() {
+function SportsQuizzes({ onSport }: { onSport: (sport: SportHubSelection) => void }) {
   const sports = useSportsTypes();
   if (!sports.data || sports.data.length === 0) return null;
   return (
@@ -374,20 +388,28 @@ function SportsQuizzes() {
         Sports Quiz
       </h2>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {sports.data.map((sport) => (
-          <TrendingSportsQuizWidget
-            key={sport.sportsType}
-            sport={sport.sportsType}
-            icon={sport.icon}
-          />
-        ))}
+        {sports.data.map((sport) => {
+          const tab = sport.sportsType.toLowerCase();
+          return (
+            <TrendingSportsQuizWidget
+              key={sport.sportsType}
+              sport={sport.sportsType}
+              icon={sport.icon}
+              onClick={() => {
+                if (!isSportHubSelection(tab)) return;
+                onSport(tab);
+                window.scrollTo({ top: 0 });
+              }}
+            />
+          );
+        })}
       </div>
     </section>
   );
 }
 
-/** The TRENDING tab. */
-export function TrendingFeed() {
+/** The TRENDING tab. `onSport` switches the hub to a sport's tab. */
+export function TrendingFeed({ onSport }: { onSport: (sport: SportHubSelection) => void }) {
   const trending = useTrendingMatches();
 
   if (!trending.data) {
@@ -405,13 +427,14 @@ export function TrendingFeed() {
   return (
     <>
       <TrendingPicks picks={trending.data.trendingPicks} />
+      <RevealResults results={trending.data.results} />
       <MatchesSection
         id="trending-matches"
         title="Trending Matches"
         matches={trending.data.clubsAndTeamMatches}
       />
       <TrendingFutures futures={trending.data.trendingFutures} />
-      <SportsQuizzes />
+      <SportsQuizzes onSport={onSport} />
       <MatchesSection
         id="more-matches"
         title="More Matches"

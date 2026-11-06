@@ -6,7 +6,6 @@ import {
   HeadsetIcon,
   MenuBookIcon,
   SettingsIcon,
-  StyleIcon,
   type IconProps,
 } from "@/lib/icons";
 
@@ -18,8 +17,12 @@ const ACTIONS: {
   icon: ComponentType<IconProps>;
   href?: string;
 }[] = [
-  { id: "cards", label: "All Cards", icon: StyleIcon },
-  { id: "how-to-play", label: "How To Play", icon: MenuBookIcon, href: "/profile/how-to-play" },
+  {
+    id: "how-to-play",
+    label: "How To Play",
+    icon: MenuBookIcon,
+    href: "/profile/how-to-play",
+  },
   {
     id: "support",
     label: "Talk to StatOz 1:1",

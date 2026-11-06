@@ -1,6 +1,6 @@
 import type { Sport } from "@/config/sports";
 
-export type MatchStatus = "scheduled" | "live" | "finished";
+export type MatchStatus = "scheduled" | "live" | "finished" | "postponed";
 
 export type SportTeam = {
   id: string;
@@ -24,6 +24,8 @@ export type SportMatch = {
   home: SportTeam;
   away: SportTeam;
   status: MatchStatus;
+  /** The API's own match status as shown, such as "POSTPONED"; shown in place of the clock. */
+  statusLabel?: string;
   /** ISO 8601 timestamp. */
   kickoff: string;
   /** Display-ready score. Cricket innings include wickets and overs. */

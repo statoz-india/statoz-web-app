@@ -15,6 +15,7 @@ import type {
   SportTeam,
 } from "./types";
 import type { TournamentSection } from "@/core/models";
+import { formatStatus, matchHref } from "@/utils";
 
 /**
  * Turns the public API's responses into what the hub draws. A record the hub
@@ -30,20 +31,10 @@ function toSport(gameType: string | undefined): Sport | undefined {
   return isSport(value) ? value : undefined;
 }
 
-/** The page of a match, addressed by its readable id and nothing else. */
-function matchHref(matchId: string): string {
-  return `/match/${encodeURIComponent(matchId)}`;
-}
-
 function text(value: unknown): string | undefined {
   if (typeof value === "number" && Number.isFinite(value)) return String(value);
   if (typeof value === "string" && value.trim()) return value.trim();
   return undefined;
-}
-
-/** "no_result" becomes "NO RESULT". */
-function statusText(status: string): string {
-  return status.replace(/[_-]+/g, " ").trim().toUpperCase();
 }
 
 function toTeam(team: Team): SportTeam {
@@ -90,12 +81,13 @@ function stateOf(
   matchStatus: string | undefined,
   startTime: string | undefined,
 ): FixtureState {
-  // A match that has not started is upcoming, whatever status it carries.
-  if (isAhead(startTime)) return { status: "scheduled" };
   const key = String(matchStatus).toLowerCase();
+  // Postponed overrides the start time; otherwise a match that has not
+  // started is upcoming, whatever status it carries.
+  if (key !== "postponed" && isAhead(startTime)) return { status: "scheduled" };
   // A status this app has not seen is shown in the server's own words.
   return (
-    fixtureStates[key] ?? { status: "finished", statusNote: statusText(key) }
+    fixtureStates[key] ?? { status: "finished", statusNote: formatStatus(key) }
   );
 }
 
@@ -138,17 +130,19 @@ function scores(
 export function toFixture(match: Matches): SportFixture | null {
   if (!match.teamA || !match.teamB) return null;
   const state = stateOf(match.matchStatus, match.matchStartTime);
-  // The live-score object exists before kick-off too, with both scores at 0.
+  // The live-score object exists before kick-off too, with both scores at 0;
+  // a postponed match has no score either.
   const [homeScore, awayScore] =
-    state.status === "scheduled"
+    state.status === "scheduled" || match.matchStatus === "postponed"
       ? [undefined, undefined]
       : scores(match.matchEvent, match.teamA, match.teamB);
   return {
     id: match.matchId,
-    href: matchHref(match.matchId),
+    href: matchHref(match.matchId, match.gameType),
     sport: toSport(match.gameType),
     leagueLabel: match.tournament,
     ...state,
+    statusLabel: match.matchStatus ? formatStatus(match.matchStatus) : undefined,
     kickoff: match.matchStartTime,
     home: toTeam(match.teamA),
     away: toTeam(match.teamB),
@@ -168,10 +162,11 @@ function toRaceFixture(
 ): SportFixture {
   return {
     id: race.matchId,
-    href: matchHref(race.matchId),
+    href: matchHref(race.matchId, "racing"),
     sport: "racing",
     leagueLabel: race.tournament,
     ...stateOf(race.matchStatus, race.raceStartTime),
+    statusLabel: formatStatus(race.matchStatus),
     kickoff: race.raceStartTime,
     home: {
       id: race.matchId,

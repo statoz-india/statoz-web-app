@@ -1,12 +1,14 @@
 import type { Sport } from "@/config/sports";
 import {
   updateUserResponseSchema,
+  userAssetsResponseSchema,
   userPredictionsResponseSchema,
   userQuizzesResponseSchema,
   userStatsResponseSchema,
   type ApiResult,
   type AuthUser,
   type UpdateUserResponse,
+  type UserAssetsResponse,
   type UserPredictionsResponse,
   type UserQuizzesResponse,
   type UserStatsResponse,
@@ -71,5 +73,16 @@ export function updateUser(
       body: JSON.stringify(body),
       signal: options.signal,
     },
+  );
+}
+
+/** The pics and banners the player bought. Free ones they never bought aren't listed. */
+export function getUserAssets(
+  options: RequestOptions = {},
+): Promise<ApiResult<UserAssetsResponse["data"]>> {
+  return authenticatedFetch(
+    ENDPOINTS.userAssets,
+    userAssetsResponseSchema.shape.data,
+    { signal: options.signal },
   );
 }

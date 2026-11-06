@@ -63,6 +63,7 @@ Use the `@/` alias for imports across folders, and relative imports inside a fea
 - Write minimal, clean, and efficient code without unnecessary complexity.
 - If by any chance, the user misses selecting the options of the wuestions you asked, ask them again, never take any decisions on your own in any condition.
 - Whenever creating a sample data always create a sampleData.ts file and add in those.
+- Never use any mongo id in navigation or url
 
 ## Before finishing a change
 

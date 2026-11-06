@@ -4,10 +4,14 @@ import { create } from "zustand";
 import { getSignedIn, subscribeSession } from "@/core";
 import type { AuthGateRequest } from "@/features/auth/components/authGateDialog";
 
-import { useCurrentUser } from "./data/authData";
+import {
+  spendCoins,
+  updateCurrentUser,
+  useCurrentUser,
+} from "./data/authData";
 
 export type { AuthGateRequest };
-export { useCurrentUser };
+export { spendCoins, updateCurrentUser, useCurrentUser };
 
 /**
  * Auth adapter. The primary nav reads these hooks, and anything that needs an

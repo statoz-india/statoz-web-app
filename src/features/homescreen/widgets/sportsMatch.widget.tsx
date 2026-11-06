@@ -17,6 +17,7 @@ import type {
 } from "@/core";
 import { TrendingRaceWidget } from "@/features/match/widgets/trendingRace.widget";
 import { ChevronRightIcon } from "@/lib/icons";
+import { formatStatus, matchHref } from "@/utils";
 
 import styles from "../css/sportsMatch.widget.module.css";
 
@@ -200,15 +201,18 @@ function MatchCard({ match }: { match: Matches }) {
 
   // A later day's fixtures come without a status; they are all still to start.
   const lifecycle = LIFECYCLE_FOR_STATUS[match.matchStatus ?? "upcoming"];
+  // A postponed match has no score, whatever the feed holds.
   const scores: [string | undefined, string | undefined] =
-    lifecycle === "open" ? [undefined, undefined] : scoresOf(match);
+    lifecycle === "open" || match.matchStatus === "postponed"
+      ? [undefined, undefined]
+      : scoresOf(match);
   const sport = match.gameType.toLowerCase();
   const rail = RAIL[sport];
   const stacked = lifecycle !== "open" && STACKED_SPORTS.has(sport);
 
   return (
     <Link
-      href={`/match/${encodeURIComponent(match.matchId)}`}
+      href={matchHref(match.matchId, match.gameType)}
       className={styles.card}
       style={
         {
@@ -222,7 +226,7 @@ function MatchCard({ match }: { match: Matches }) {
       </span>
       <div className={styles.status}>
         <span className={styles.tag} data-status={lifecycle}>
-          {LIFECYCLE_LABEL[lifecycle]}
+          {match.matchStatus ? formatStatus(match.matchStatus) : LIFECYCLE_LABEL[lifecycle]}
         </span>
       </div>
       {stacked ? (

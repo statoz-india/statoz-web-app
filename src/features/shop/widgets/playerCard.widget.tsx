@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 import type { ShopPlayerCard } from "@/core";
 import { cardCuts, rarityFoil, type RarityName } from "@/styles";
 
-import { cardRole, rarityOf } from "../adapters";
+import { cardRole, rarityOf, roleColor } from "../adapters";
 import styles from "../css/shop.module.css";
 
 const WHITE = "var(--ds-color-text-default)";
@@ -55,8 +55,17 @@ const { big, small } = cardCuts(128);
 const BADGE_CLIP =
   "polygon(7.68px 0, calc(100% - 2.56px) 0, 100% 2.56px, 100% calc(100% - 7.68px), calc(100% - 7.68px) 100%, 2.56px 100%, 0 calc(100% - 2.56px), 0 7.68px)";
 
-/** The 128 × 192 collectible: portrait, role, rating and nameplate. */
-export function PlayerCard({ card }: { card: ShopPlayerCard }) {
+/**
+ * The 128 × 192 collectible: portrait, role, rating and nameplate. `selected`
+ * tilts it and swaps the rarity edge for a solid one and a bloom in its role colour.
+ */
+export function PlayerCard({
+  card,
+  selected,
+}: {
+  card: ShopPlayerCard;
+  selected?: boolean;
+}) {
   const tier = rarityOf(card.cardType);
   const { width, edge, rest, hover, pips } = TIERS[tier];
   const color = rarityColor(tier);
@@ -66,21 +75,29 @@ export function PlayerCard({ card }: { card: ShopPlayerCard }) {
     "--ds-card-cut-big": `${big}px`,
     "--ds-card-cut-small": `${small}px`,
     "--rarity": color,
-    "--edge-rest": rest,
-    "--edge-hover": hover,
+    "--edge-rest": selected ? 1 : rest,
+    "--edge-hover": selected ? 1 : hover,
+    ...(selected && { transform: "scale(1.06) rotate(3deg)" }),
   } as CSSProperties;
+  const selectedColor = roleColor(card.playerType);
 
   return (
     <div className={`${styles.card} relative h-48 w-32 shrink-0`} style={style}>
       <div
         aria-hidden
         className={styles.glow}
-        style={{ clipPath: "var(--ds-clip-card)" }}
+        style={{
+          clipPath: "var(--ds-clip-card)",
+          ...(selected && {
+            opacity: 1,
+            background: `color-mix(in srgb, ${selectedColor} 40%, transparent)`,
+          }),
+        }}
       />
       <div
         aria-hidden
         className={`${styles.edge} absolute inset-0`}
-        style={{ clipPath: "var(--ds-clip-card)", background: edge }}
+        style={{ clipPath: "var(--ds-clip-card)", background: selected ? selectedColor : edge }}
       />
       <div
         className="absolute overflow-hidden"

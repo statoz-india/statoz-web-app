@@ -32,6 +32,8 @@ export type SportFixture = {
   status: FixtureStatus;
   /** How a fixture ended when it was not played out, for example "Postponed". */
   statusNote?: string;
+  /** The API's own match status as shown, such as "POSTPONED"; shown in place of the state's own text. */
+  statusLabel?: string;
   /** ISO timestamp. A race without a session time yet has none. */
   kickoff?: string;
   /** On a race, the race itself. */

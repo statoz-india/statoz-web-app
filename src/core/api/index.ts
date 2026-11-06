@@ -11,9 +11,13 @@ export {
 } from "./client";
 export * from "./auth";
 export * from "./contact";
+export * from "./leaderboard";
+export * from "./picks";
 export * from "./public-api";
+export * from "./quiz";
 export * from "./resources";
 export * from "./tournament";
 export * from "./shop";
 export * from "./tracker";
+export * from "./trending";
 export * from "./user";

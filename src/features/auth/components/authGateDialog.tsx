@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef } from "react";
 
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { Button } from "@/lib/components/button";
 import { LockIcon } from "@/lib/icons";
 import { HoloCard, holoLayer } from "@/lib/ui/holo-card";
@@ -14,6 +15,8 @@ export type AuthGateRequest = {
   message?: string;
   /** Where to land after login. Not used by the UI itself. */
   returnTo?: string;
+  /** Runs on NOT NOW, for a page that can't be shown without an account. */
+  onCancel?: () => void;
 };
 
 export type AuthGateDialogProps = {
@@ -40,11 +43,9 @@ export function AuthGateDialog({
   const titleId = useId();
   const descriptionId = useId();
 
+  useScrollLock();
   useEffect(() => {
     const previousFocus = document.activeElement as HTMLElement | null;
-    // Restored rather than cleared, so a nested overlay keeps its own lock.
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     // The first control is the close cross, so a stray Enter dismisses rather than navigates.
     panelRef.current?.querySelector<HTMLElement>(FOCUSABLE)?.focus();
 
@@ -72,7 +73,6 @@ export function AuthGateDialog({
 
     window.addEventListener("keydown", onKeyDown);
     return () => {
-      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKeyDown);
       previousFocus?.focus();
     };

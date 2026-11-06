@@ -36,6 +36,9 @@ export const shape = {
   /** The widest HUD chamfer: the bottom sheets a decision is taken in. */
   hudSheetCut: 18,
   hudSheetAccentCut: 4,
+  /** A match quiz's team badge: the HUD chamfer at badge size. */
+  quizBadgeCut: 10,
+  quizBadgeAccentCut: 5,
   /** Octagon corner cut, as a fraction of the badge's shortest side. */
   octagonCutRatio: 0.15,
   /**

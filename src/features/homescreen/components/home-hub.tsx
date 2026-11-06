@@ -71,7 +71,7 @@ export function HomeHub() {
       );
     }
     return selected === "trending" ? (
-      <TrendingFeed />
+      <TrendingFeed onSport={selectTab} />
     ) : (
       <SportsMatchFeed key={selected} sport={selected} />
     );

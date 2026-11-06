@@ -39,3 +39,11 @@ export type Profile = {
     progress: number;
   };
 };
+
+/** A pic or banner the player can put on their profile. */
+export type LookChoice = {
+  /** `ppId` or `pbId`, which `update-user` takes. */
+  id: string;
+  label: string;
+  src: string;
+};

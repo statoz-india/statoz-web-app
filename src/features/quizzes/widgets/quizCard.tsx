@@ -1,9 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import type { CSSProperties, ReactNode } from "react";
 
 import type { Quiz, QuizStatus } from "@/core";
 import { useRequireAuth } from "@/features/auth";
+import { useNow } from "@/hooks/useNow";
 import {
   BlockIcon,
   BoltIcon,
@@ -13,6 +15,7 @@ import {
   ScheduleIcon,
 } from "@/lib/icons";
 
+import { isKickedOff, quizLink } from "../adapters";
 import styles from "../css/quizCard.module.css";
 
 export type QuizChip = {
@@ -276,12 +279,18 @@ function rewardFromTag(tag: string): string | undefined {
 }
 
 /**
- * A match's quiz as a {@link QuizCard}. Its look follows the quiz's status
- * alone: a player's own answers need a login. A tap asks a guest to log in.
+ * A match's quiz as a {@link QuizCard}. Its look follows the quiz's status,
+ * and closes at kick-off: a player's own answers need a login. A tap asks a
+ * guest to log in.
  */
 export function MatchQuizCard({ quiz, index }: { quiz: Quiz; index: number }) {
+  const router = useRouter();
   const requireAuth = useRequireAuth();
-  const look = LOOK_FOR_STATUS[quiz.quizStatus];
+  const now = useNow();
+  const byStatus = LOOK_FOR_STATUS[quiz.quizStatus];
+  // The status can still read open after kick-off; entries close at kick-off.
+  const look =
+    byStatus === OPEN && isKickedOff(quiz.matchStartTime, now) ? CLOSED : byStatus;
   if (look === null || !quiz.isVisible) return null;
 
   const reward = rewardFromTag(quiz.tag);
@@ -300,8 +309,11 @@ export function MatchQuizCard({ quiz, index }: { quiz: Quiz; index: number }) {
       progress={0}
       cta={look.cta}
       showChevron={look.showChevron}
-      // There is no quiz screen yet, so a signed-in player's tap does nothing.
-      onClick={() => requireAuth({ intent: "play this quiz" })}
+      onClick={() => {
+        if (requireAuth({ intent: "play this quiz" })) {
+          router.push(quizLink(quiz, now));
+        }
+      }}
     />
   );
 }

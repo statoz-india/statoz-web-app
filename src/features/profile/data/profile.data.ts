@@ -5,8 +5,11 @@ import {
   getCoinMap,
   getCoinTracker,
   getCurrentUser,
+  getFreeProfileBanners,
+  getFreeProfilePics,
   getSignedIn,
   getSignupTournaments,
+  getUserAssets,
   getUserPredictions,
   getUserQuizzes,
   getUserStats,
@@ -15,6 +18,7 @@ import {
   subscribeSession,
   updateUser,
   type AuthUser,
+  type UpdateUserBody,
   type CoinTrackerResponse,
   type LedgerType,
   type XpTrackerQuery,
@@ -27,6 +31,7 @@ import {
   useResources,
   type ResourceRequest,
 } from "@/hooks/useResource";
+import { updateCurrentUser } from "@/features/auth";
 
 /*
  * Bumped whenever a session ends, so the next player's profile loads under a
@@ -97,6 +102,50 @@ export async function saveClubAndTeams(clubAndTeams: AuthUser["clubAndTeams"]) {
     setResource(userKey(), { ...user, clubAndTeams: result.data.clubAndTeams });
   }
   return result;
+}
+
+/** Every free profile pic, for profile setup. */
+export function useFreeProfilePics() {
+  return useResource({
+    key: "profile-pics/free",
+    load: () => getFreeProfilePics().then((result) => dataOrThrow(result)),
+  });
+}
+
+/** Every free profile banner, for profile setup. */
+export function useFreeProfileBanners() {
+  return useResource({
+    key: "profile-banners/free",
+    load: () => getFreeProfileBanners().then((result) => dataOrThrow(result)),
+  });
+}
+
+/** The pics and banners the player bought; fetched again once 30 s old. */
+export function useUserAssets() {
+  return useResource({
+    key: `user/user-assets/${session}`,
+    load: () => getUserAssets().then((result) => dataOrThrow(result)),
+  });
+}
+
+/**
+ * Saves one profile setup step, and shows the saved name, pictures and clubs
+ * everywhere the player appears. Resolves to the message to show, or `null`.
+ */
+export async function saveProfile(body: UpdateUserBody): Promise<string | null> {
+  try {
+    const result = await updateUser(body);
+    if (!result.success) {
+      return "errors" in result && result.errors?.length
+        ? result.errors.map(String).join(". ")
+        : result.message || "Couldn't save. Try again.";
+    }
+    const { userName, avatarUrl, bannerUrl, clubAndTeams } = result.data;
+    updateCurrentUser({ userName, avatarUrl, bannerUrl, clubAndTeams });
+    return null;
+  } catch {
+    return "Couldn't save. Try again.";
+  }
 }
 
 /** A type chip's server-side filter. */

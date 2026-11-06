@@ -9,6 +9,7 @@ import {
 
 import type { Matches, MatchStatus, Team, TrendingFixture } from "@/core";
 import { BasketballIcon, CricketIcon, FootballIcon } from "@/lib/icons";
+import { formatStatus, matchHref } from "@/utils";
 
 import { TeamBadge } from "../components/team-badge";
 import type { SportTeam } from "../types";
@@ -196,15 +197,17 @@ export function TrendingMatchWidget({
   // A trending fixture sent without a status has, so far, always been one yet to start.
   const lifecycle = LIFECYCLE_FOR_STATUS[match.matchStatus ?? "upcoming"];
   const upcoming = lifecycle === "scheduled";
-  const scores: [string | undefined, string | undefined] = upcoming
-    ? [undefined, undefined]
-    : scoresOf(match);
+  // A postponed match has no score, whatever the feed holds.
+  const scores: [string | undefined, string | undefined] =
+    upcoming || match.matchStatus === "postponed" ? [undefined, undefined] : scoresOf(match);
   const home = toSportTeam(match.teamA);
   const away = toSportTeam(match.teamB);
   const stacked =
     !upcoming && (compact || sport === "cricket" || sport === "basketball");
   const resultLine = text(match.matchEvent?.summary);
-  const label = LIFECYCLE_LABEL[lifecycle];
+  const label = match.matchStatus
+    ? formatStatus(match.matchStatus)
+    : LIFECYCLE_LABEL[lifecycle];
 
   const kickoff = (
     <time dateTime={match.matchStartTime} className={styles.kickoff}>
@@ -217,7 +220,7 @@ export function TrendingMatchWidget({
 
   return (
     <Link
-      href={`/match/${encodeURIComponent(match.matchId)}`}
+      href={matchHref(match.matchId, match.gameType)}
       className={[styles.plate, compact ? styles.compact : ""]
         .filter(Boolean)
         .join(" ")}

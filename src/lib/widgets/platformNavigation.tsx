@@ -39,6 +39,9 @@ const TRAILS: Record<string, Crumb[]> = {
 
 function trailFor(pathname: string): Crumb[] | null {
   if (pathname.startsWith("/match/")) return [HOME, { label: "MATCH" }];
+  if (pathname.startsWith("/picks/")) {
+    return [HOME, { label: "PICKS", href: "/" }, { label: "MARKET DETAILS" }];
+  }
   const guide = pathname.startsWith(`${HOW_TO_PLAY.href}/`)
     ? guideFor(pathname.slice(`${HOW_TO_PLAY.href}/`.length))
     : undefined;

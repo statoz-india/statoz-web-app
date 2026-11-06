@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { matchEventSchema } from "./match.model";
 import { teamSchema } from "./team";
-import { tournamentSummarySchema } from "./tournament";
+import { pickTournamentSchema, tournamentSummarySchema } from "./tournament";
 
 /*
  * Values are case-sensitive, and the casing differs between entities: a team
@@ -96,3 +96,141 @@ export const predictionSchema = z.object({
   winningTeamId: z.string().optional(),
 });
 export type Prediction = z.infer<typeof predictionSchema>;
+
+/** One prediction by id, with its pools and odds. The player's bets aren't included. */
+export const predictionDetailResponseSchema = z.object({
+  statusCode: z.number(),
+  data: z.object({
+    _id: z.string(),
+    predictionId: z.string(),
+    coinsOnTeamA: z.number(),
+    coinsOnTeamB: z.number(),
+    initialCoinsOnTeamA: z.number(),
+    initialCoinsOnTeamB: z.number(),
+    tournament: z.string(),
+    predictionStatus: predictionStatusSchema,
+    isVisible: z.boolean(),
+    createdAt: z.string(),
+    tournamentData: pickTournamentSchema,
+    teamA: teamSchema,
+    teamB: teamSchema,
+    matchId: z.string(),
+    gameType: z.string(),
+    matchEvent: matchEventSchema.nullable(),
+    matchEventEspnId: z.string().nullable(),
+    matchStartTime: z.string(),
+    coinsOnDraw: z.number(),
+    initialCoinsOnDraw: z.number(),
+    totalCoins: z.number(),
+    oddsTeamA: z.number(),
+    oddsTeamB: z.number(),
+    oddsDraw: z.number().nullable(),
+  }),
+  message: z.string(),
+  success: z.boolean(),
+});
+export type PredictionDetail = z.infer<
+  typeof predictionDetailResponseSchema
+>["data"];
+
+export type SubmitPredictionBody = {
+  teamChosen: PredictionSide;
+  coinsBet: number;
+};
+
+/** The prediction with its pools and odds after the bet, not the bet itself. */
+export const submitPredictionResponseSchema = z.object({
+  statusCode: z.number(),
+  data: z.object({
+    _id: z.string(),
+    predictionId: z.string(),
+    matchId: z.string(),
+    coinsOnTeamA: z.number(),
+    coinsOnTeamB: z.number(),
+    initialCoinsOnTeamA: z.number(),
+    initialCoinsOnTeamB: z.number(),
+    tournament: z.string(),
+    predictionStatus: predictionStatusSchema,
+    isVisible: z.boolean(),
+    coinsOnDraw: z.number(),
+    initialCoinsOnDraw: z.number(),
+    pickType: predictionPickTypeSchema,
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    __v: z.number(),
+    totalCoins: z.number(),
+    oddsTeamA: z.number(),
+    oddsTeamB: z.number(),
+    oddsDraw: z.number().nullable(),
+  }),
+  message: z.string(),
+  success: z.boolean(),
+});
+export type SubmitPredictionResponse = z.infer<
+  typeof submitPredictionResponseSchema
+>;
+
+/*
+ * The player's bets on one prediction, newest first; `[]` with none.
+ * `payoutStatus` is `PENDING` until settled, then `PAID` or `LOST`.
+ */
+export const userPredictionBetSchema = z.object({
+  _id: z.string(),
+  userId: z.string(),
+  predictionId: z.string(),
+  /** `A`, `B` or `D` (draw). */
+  teamChosen: z.string(),
+  coinsBet: z.number(),
+  coinsWon: z.number(),
+  totalCoinsReceived: z.number(),
+  optionOddsAtBetTime: z.record(z.string(), z.number()),
+  submissionTime: z.string(),
+  payoutStatus: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  __v: z.number(),
+  prediction: z.object({
+    _id: z.string(),
+    predictionId: z.string(),
+    matchId: z.string(),
+    coinsOnTeamA: z.number(),
+    coinsOnTeamB: z.number(),
+    tournament: z.string(),
+    predictionStatus: z.string(),
+    coinsOnDraw: z.number(),
+    pickType: z.string(),
+    winningTeam: z.string().optional(),
+    winningTeamId: z.string().optional(),
+  }),
+});
+export type UserPredictionBet = z.infer<typeof userPredictionBetSchema>;
+
+export const userPredictionBetsResponseSchema = z.object({
+  statusCode: z.number(),
+  data: z.array(userPredictionBetSchema),
+  message: z.string(),
+  success: z.boolean(),
+});
+export type UserPredictionBetsResponse = z.infer<
+  typeof userPredictionBetsResponseSchema
+>;
+
+/**
+ * How a prediction's odds moved: one point per bet, oldest first, each the
+ * odds right after it. A bet with no saved snapshot is `{}`.
+ */
+export const predictionOddsResponseSchema = z.object({
+  statusCode: z.number(),
+  data: z.array(
+    z.object({
+      /** `A`, `B` and, in football, `D`. */
+      optionOddsAtBetTime: z.record(z.string(), z.number()).optional(),
+      createdAt: z.string().optional(),
+    }),
+  ),
+  message: z.string(),
+  success: z.boolean(),
+});
+export type PredictionOddsResponse = z.infer<
+  typeof predictionOddsResponseSchema
+>;

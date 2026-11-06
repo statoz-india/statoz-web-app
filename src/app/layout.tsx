@@ -22,6 +22,14 @@ const orbitron = localFont({
   display: "swap",
 });
 
+const spaceGrotesk = localFont({
+  src: "./fonts/space-grotesk-variable.ttf",
+  weight: "300 700",
+  style: "normal",
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "StatOz",
   description: "Sports predictions, picks, and games.",
@@ -44,7 +52,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${onest.variable} ${orbitron.variable} h-full antialiased`}
+      className={`${onest.variable} ${orbitron.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {/* The nav shell lives in (app)/layout.tsx, so routes outside that

@@ -3,9 +3,11 @@ import {
   eventSchema,
   listOf,
   matchForSchema,
+  matchResponseSchema,
   matchSportsTypesResponseSchema,
   matchStatsSchema,
   motorSportMatchesSchema,
+  motorSportMatchResponseSchema,
   predictionSchema,
   quizSchema,
   raceStatsSchema,
@@ -16,9 +18,11 @@ import {
   type Event,
   trendingResponseSchema,
   type MatchFor,
+  type MatchResponse,
   type MatchSportsType,
   type MatchStats,
   type MotorSportMatches,
+  type MotorSportMatchResponse,
   type Prediction,
   type Quiz,
   type RaceStats,
@@ -154,6 +158,38 @@ export function getSportsTypes(
   return unauthenticatedFetch(
     ENDPOINTS.sportsType,
     sportsTypesResponseSchema.shape.data,
+    options,
+  );
+}
+
+/**
+ * One football, cricket or basketball match. `id` is its `_id` or readable
+ * `matchId`, such as "IPL26-M12". A race isn't found here; an unknown or
+ * hidden match is a 404.
+ */
+export function getMatch(
+  id: string,
+  options?: RequestOptions,
+): Promise<ApiResult<MatchResponse["data"]>> {
+  return unauthenticatedFetch(
+    ENDPOINTS.match(id),
+    matchResponseSchema.shape.data,
+    options,
+  );
+}
+
+/**
+ * One race. `id` is its `_id` or readable `matchId`, such as "F1-MONACO-26",
+ * in any case. A team match isn't found here; an unknown or hidden race is a
+ * 404.
+ */
+export function getMotorSportMatch(
+  id: string,
+  options?: RequestOptions,
+): Promise<ApiResult<MotorSportMatchResponse["data"]>> {
+  return unauthenticatedFetch(
+    ENDPOINTS.motorSportMatch(id),
+    motorSportMatchResponseSchema.shape.data,
     options,
   );
 }

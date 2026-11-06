@@ -133,11 +133,12 @@ function GrandPrixSummary({ match }: { match: SportMatch }) {
           className={styles.summaryStatus}
           style={{ color: statusColor(match), fontSize: 14 }}
         >
-          {match.status === "scheduled"
-            ? "UPCOMING"
-            : match.status === "live"
-              ? "LIVE"
-              : "FT"}
+          {match.statusLabel ??
+            (match.status === "scheduled"
+              ? "UPCOMING"
+              : match.status === "live"
+                ? "LIVE"
+                : "FT")}
         </span>
         <div className="mt-2.5 line-clamp-2 text-center font-display text-xl font-bold leading-tight">
           {match.home.name.toUpperCase()}
@@ -155,11 +156,14 @@ function GrandPrixSummary({ match }: { match: SportMatch }) {
 
 function statusColor(match: SportMatch): string {
   if (match.status === "live") return "var(--ds-color-danger)";
-  if (match.status === "finished") return "var(--ds-color-text-muted)";
+  if (match.status === "finished" || match.status === "postponed") {
+    return "var(--ds-color-text-muted)";
+  }
   return "var(--ds-color-accent-gold)";
 }
 
 function statusText(match: SportMatch): string {
+  if (match.statusLabel) return match.statusLabel;
   if (match.status === "live") {
     return match.liveMinute == null ? "LIVE" : `LIVE ${match.liveMinute}'`;
   }

@@ -63,7 +63,7 @@ export type LoginSignupBody = {
   /** One per install, so logging in again reuses this device's session. */
   deviceId: string;
   deviceName?: string;
-  platform?: "android" | "ios" | "web";
+  platform: "web";
   appVersion?: string;
   deviceType?: string;
 };
@@ -141,10 +141,14 @@ const LOGOUT_TIMEOUT_MS = 8_000;
  */
 export async function logout(): Promise<void> {
   try {
-    await authenticatedFetch(ENDPOINTS.logout, logoutResponseSchema.shape.data, {
-      method: "POST",
-      signal: AbortSignal.timeout(LOGOUT_TIMEOUT_MS),
-    });
+    await authenticatedFetch(
+      ENDPOINTS.logout,
+      logoutResponseSchema.shape.data,
+      {
+        method: "POST",
+        signal: AbortSignal.timeout(LOGOUT_TIMEOUT_MS),
+      },
+    );
   } catch {
     // Offline, timed out or an unreadable answer: sign out locally anyway.
   }

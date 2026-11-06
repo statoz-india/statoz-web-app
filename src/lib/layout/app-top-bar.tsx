@@ -1,9 +1,13 @@
 "use client";
 
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Suspense } from "react";
+
+import { IMAGES } from "@/config/images";
+import { useAuthSession, useCurrentUser } from "@/features/auth";
 import { accentVar } from "@/styles";
-import { SearchIcon } from "@/lib/icons";
+import { formatOzCompact } from "@/utils";
 
 export type AppTopBarProps = {
   title?: string;
@@ -32,7 +36,32 @@ function RouteTitle() {
         : DEFAULT_TITLE;
 }
 
-/** The persistent header: the wordmark, and search at its end. */
+/**
+ * The signed-in player's Oz Coins, at the bar's end. Hidden for a guest; the
+ * balance reads "—" until the player's account has loaded.
+ */
+function CoinBalance() {
+  const { status } = useAuthSession();
+  const user = useCurrentUser();
+  if (status !== "authenticated") return null;
+  return (
+    <span
+      className="ds-tabular flex shrink-0 items-center gap-1.5 font-display text-sm font-black text-gold"
+      aria-label={user ? `${user.coins} Oz Coins` : "Oz Coins loading"}
+    >
+      <Image
+        src={IMAGES.icons.ozCoins}
+        alt=""
+        width={20}
+        height={20}
+        className="shrink-0"
+      />
+      {user ? formatOzCompact(user.coins) : "—"}
+    </span>
+  );
+}
+
+/** The persistent header: the wordmark, and the player's coins at its end. */
 export function AppTopBar({
   title,
   accent = accentVar("cyan"),
@@ -58,6 +87,7 @@ export function AppTopBar({
           </Suspense>
         )}
       </h1>
+      <CoinBalance />
       {/* <button
         type="button"
         onClick={onSearch}
