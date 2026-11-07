@@ -2,13 +2,13 @@
 
 import { useState, type ReactNode } from "react";
 
+import { useCurrentUser } from "@/features/auth";
+import { BuySheet, PickLocked, type LockedPick } from "@/lib/components/pick-sheet";
 import { formatInt } from "@/utils";
 
 import { leaderOf, sharePrice, type Market, type Outcome, type Ticket } from "../adapters";
-import { BuySheet } from "./buySheet.widget";
 import { MarketHeader } from "./marketHeader.widget";
-import { PickLocked, type LockedPick } from "./pickLocked.widget";
-import { Outcomes } from "./outcomes.widget";
+import { Outcomes, Tickets } from "./outcomes.widget";
 
 /** The market page: header and odds on the left, outcomes and tickets on the right from 960px. */
 export function PickMarket({
@@ -31,6 +31,7 @@ export function PickMarket({
   const [buying, setBuying] = useState<Outcome | null>(null);
   const [placed, setPlaced] = useState<string | null>(null);
   const [locked, setLocked] = useState<LockedPick | null>(null);
+  const balance = useCurrentUser()?.coins ?? null;
   const leader = leaderOf(market.outcomes);
   const selected =
     market.outcomes.find((o) => o.key === picked) ??
@@ -42,13 +43,13 @@ export function PickMarket({
       <div className="flex min-w-0 flex-col gap-3.5">
         <MarketHeader market={market} leader={leader} />
         {chart}
+        <Tickets market={market} tickets={tickets} placed={placed} />
       </div>
       <div className="flex min-w-0 flex-col gap-3.5 min-[60rem]:sticky min-[60rem]:top-0">
         <Outcomes
           market={market}
           selected={selected}
           tickets={tickets}
-          placed={placed}
           onSelect={setPicked}
           onBuy={(outcome) => {
             setPicked(outcome.key);
@@ -60,6 +61,7 @@ export function PickMarket({
         <BuySheet
           market={market}
           outcome={buying}
+          balance={balance}
           onClose={() => setBuying(null)}
           onBuy={async (coins) => {
             // The share price before this bet moves the odds.

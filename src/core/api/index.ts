@@ -13,6 +13,7 @@ export * from "./auth";
 export * from "./contact";
 export * from "./leaderboard";
 export * from "./picks";
+export * from "./pickBets";
 export * from "./public-api";
 export * from "./quiz";
 export * from "./resources";

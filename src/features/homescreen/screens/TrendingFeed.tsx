@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import {
   useEffect,
   useLayoutEffect,
@@ -18,8 +17,9 @@ import type {
   TrendingQuiz as QuizItem,
   TrendingRace,
 } from "@/core";
-import { useRequireAuth } from "@/features/auth";
-import { pickHref } from "@/utils";
+import { spendCoins, useCurrentUser, useRequireAuth } from "@/features/auth";
+import { QuickPick } from "@/lib/components/pick-sheet";
+import type { PickType } from "@/utils";
 import { TrendingEventWidget } from "@/features/events/widgets/trendingEvent.widget";
 import { TrendingFutureWidget } from "@/features/futures/widgets/trendingFuture.widget";
 import { TrendingMatchWidget } from "@/features/match/widgets/trendingMatch.widget";
@@ -179,10 +179,30 @@ function LoopCarousel<T>({
   );
 }
 
+type QuickTarget = { type: PickType; code: string; outcome: string };
+
+/**
+ * A card's option bought in place: `open` starts it on an option, and `sheet`
+ * is what to render. The card's guard has already asked a guest to log in.
+ */
+function useQuickPick() {
+  const [target, setTarget] = useState<QuickTarget | null>(null);
+  const balance = useCurrentUser()?.coins ?? null;
+  const sheet = target ? (
+    <QuickPick
+      {...target}
+      balance={balance}
+      onPlaced={(coins) => spendCoins(coins)}
+      onClose={() => setTarget(null)}
+    />
+  ) : null;
+  return { open: setTarget, sheet };
+}
+
 /** The trending picks, without a heading. */
 function TrendingPicks({ picks }: { picks: Prediction[] }) {
-  const router = useRouter();
   const requireAuth = useRequireAuth();
+  const quick = useQuickPick();
   if (picks.length === 0) return null;
   return (
     <section aria-label="Trending picks">
@@ -190,12 +210,14 @@ function TrendingPicks({ picks }: { picks: Prediction[] }) {
         {(pick) => (
           <TrendingPredictionsWidget
             prediction={pick}
-            // The guard has already asked a guest to log in.
-            onPick={(side) => router.push(pickHref("prediction", pick.predictionId, side))}
+            onPick={(side) =>
+              quick.open({ type: "prediction", code: pick.predictionId, outcome: side })
+            }
             guard={() => requireAuth({ intent: "lock a pick" })}
           />
         )}
       </LoopCarousel>
+      {quick.sheet}
     </section>
   );
 }
@@ -303,8 +325,8 @@ function TrendingPredictions({
 }: {
   predictions: TrendingPrediction[];
 }) {
-  const router = useRouter();
   const requireAuth = useRequireAuth();
+  const quick = useQuickPick();
   if (predictions.length === 0) return null;
   return (
     <section
@@ -326,20 +348,21 @@ function TrendingPredictions({
           <TrendingPredictionsWidget
             prediction={prediction}
             onPick={(side) =>
-              router.push(pickHref("prediction", prediction.predictionId, side))
+              quick.open({ type: "prediction", code: prediction.predictionId, outcome: side })
             }
             guard={() => requireAuth({ intent: "lock a pick" })}
           />
         )}
       </LoopCarousel>
+      {quick.sheet}
     </section>
   );
 }
 
 /** The trending futures under their heading, in the order the API sent them. */
 function TrendingFutures({ futures }: { futures: Future[] }) {
-  const router = useRouter();
   const requireAuth = useRequireAuth();
+  const quick = useQuickPick();
   if (futures.length === 0) return null;
   return (
     <section aria-labelledby="trending-futures" className="flex flex-col gap-3">
@@ -361,12 +384,13 @@ function TrendingFutures({ futures }: { futures: Future[] }) {
             future={future}
             maxChoices={FUTURE_CHOICES}
             onPick={(choiceId) =>
-              router.push(pickHref("future", future.futureId, choiceId))
+              quick.open({ type: "future", code: future.futureId, outcome: choiceId })
             }
             guard={() => requireAuth({ intent: "lock a pick" })}
           />
         )}
       </LoopCarousel>
+      {quick.sheet}
     </section>
   );
 }

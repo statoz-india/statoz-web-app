@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
 import { accentVar } from "@/styles";
@@ -13,8 +12,8 @@ import {
 import { NoDataState } from "@/lib/ui/no-data-state";
 import type { Event, Prediction } from "@/core";
 import type { Sport } from "@/config/sports";
-import { useRequireAuth } from "@/features/auth";
-import { pickHref } from "@/utils";
+import { spendCoins, useCurrentUser, useRequireAuth } from "@/features/auth";
+import { QuickPick } from "@/lib/components/pick-sheet";
 import { useMatchEvents } from "@/features/events/data/getMatchEvent";
 import { TrendingEventWidget } from "@/features/events/widgets/trendingEvent.widget";
 import { FeedError } from "@/features/homescreen/components/feed-states";
@@ -182,8 +181,10 @@ function isShownEvent(event: Event): boolean {
 function PicksPanel({ matchId, sport }: { matchId: string; sport: Sport }) {
   const predictions = useMatchPredictions(matchId);
   const events = useMatchEvents(matchId);
-  const router = useRouter();
   const requireAuth = useRequireAuth();
+  const balance = useCurrentUser()?.coins ?? null;
+  // The prediction option tapped, bought in place.
+  const [quick, setQuick] = useState<{ code: string; outcome: string } | null>(null);
 
   const failed = [
     { subject: "this match's picks", resource: predictions },
@@ -232,9 +233,7 @@ function PicksPanel({ matchId, sport }: { matchId: string; sport: Sport }) {
             key={prediction._id}
             prediction={prediction}
             // The guard has already asked a guest to log in.
-            onPick={(side) =>
-              router.push(pickHref("prediction", prediction.predictionId, side))
-            }
+            onPick={(side) => setQuick({ code: prediction.predictionId, outcome: side })}
             guard={() => requireAuth({ intent: "lock a pick" })}
           />
         ))}
@@ -245,6 +244,15 @@ function PicksPanel({ matchId, sport }: { matchId: string; sport: Sport }) {
           guard={() => requireAuth({ intent: "lock a pick" })}
         />
       </div>
+      {quick ? (
+        <QuickPick
+          type="prediction"
+          {...quick}
+          balance={balance}
+          onPlaced={(coins) => spendCoins(coins)}
+          onClose={() => setQuick(null)}
+        />
+      ) : null}
     </div>
   );
 }

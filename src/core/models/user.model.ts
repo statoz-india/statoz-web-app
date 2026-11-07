@@ -35,6 +35,36 @@ export const profileBannerSchema = z.object({
 });
 export type ProfileBanner = z.infer<typeof profileBannerSchema>;
 
+/** The account as it is after deletion; `userStatus` is `deleted`. */
+export const deleteUserResponseSchema = z.object({
+  statusCode: z.number(),
+  data: z.object({
+    _id: z.string(),
+    userName: z.string(),
+    email: z.string(),
+    authProvider: z.string(),
+    emailVerified: z.boolean(),
+    userType: z.string(),
+    userStatus: z.string(),
+    coins: z.number(),
+    showQuizWalkthrough: z.boolean(),
+    showPredictionWalkThrough: z.boolean(),
+    showPenaltyShootoutTooltip: z.boolean(),
+    showPitchDuelTooltip: z.boolean(),
+    showHomePageInfoBanner: z.boolean(),
+    sportsType: z.array(z.string()),
+    xp: z.object({ totalXP: z.number() }),
+    gameXp: z.object({ totalXP: z.number() }),
+    clubAndTeams: z.array(z.unknown()),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    __v: z.number(),
+  }),
+  message: z.string(),
+  success: z.boolean(),
+});
+export type DeleteUserResponse = z.infer<typeof deleteUserResponseSchema>;
+
 /**
  * The updated user. As in `current-user`, except the chosen pic and banner
  * come as objects.

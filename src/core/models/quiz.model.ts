@@ -124,6 +124,8 @@ export const quizDetailResponseSchema = z.object({
           questionNumber: z.number(),
           selectedAnswerOption: z.string(),
           selectedAnswer: z.string(),
+          correctAnswer: z.string().optional(),
+          correctAnswerOption: z.string().optional(),
           _id: z.string(),
         }),
       ),

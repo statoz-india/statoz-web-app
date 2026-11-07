@@ -7,7 +7,7 @@ import { IMAGES } from "@/config/images";
 import { CheckIcon } from "@/lib/icons";
 import { formatInt } from "@/utils";
 
-import styles from "../css/pickLocked.module.css";
+import styles from "./css/pickLocked.module.css";
 
 /** The overlay is removed this long after it opens; sooner with reduced motion. */
 const SHOW_MS = 1850;

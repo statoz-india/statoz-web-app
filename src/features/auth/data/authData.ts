@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { create } from "zustand";
 
 import {
+  deleteUser,
   FIREBASE_CONFIG,
   getCurrentUser,
   getSignedIn,
@@ -318,4 +319,41 @@ export function useLogout() {
   }
 
   return { pending, logOut };
+}
+
+const DELETE_ERROR = "Couldn't delete your account. Try again.";
+
+/**
+ * Deletes the player's account, then signs this device out and opens the
+ * login screen. `pending` stays true once it succeeds, until the page leaves.
+ */
+export function useDeleteAccount() {
+  const router = useRouter();
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string>();
+
+  async function deleteAccount() {
+    if (pending) return;
+    setPending(true);
+    setError(undefined);
+    try {
+      const result = await deleteUser();
+      if (!result.success) {
+        setError(result.message || DELETE_ERROR);
+        setPending(false);
+        return;
+      }
+    } catch {
+      setError(DELETE_ERROR);
+      setPending(false);
+      return;
+    }
+    // The API has ended every session but left the cookies; logout asks it to
+    // clear them, and signs this device out whatever it answers.
+    await logout();
+    await signOutOfFirebase().catch(() => {});
+    router.replace("/auth");
+  }
+
+  return { pending, error, deleteAccount };
 }

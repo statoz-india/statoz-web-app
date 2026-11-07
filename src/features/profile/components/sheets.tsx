@@ -1,16 +1,23 @@
 "use client";
 
 import Image from "next/image";
-import { useState, type ReactNode } from "react";
+import Link from "next/link";
+import { useState, type ComponentType, type ReactNode } from "react";
 
+import { siteLinks } from "@/config/navigation";
 import type { Sport } from "@/config/sports";
 import type { AuthUser } from "@/core";
 import { Button } from "@/lib/components/button";
 import {
   CheckIcon,
   ChevronRightIcon,
+  ForumIcon,
+  LockIcon,
   LogoutIcon,
+  MenuBookIcon,
+  ProfileIcon,
   SettingsIcon,
+  type IconProps,
 } from "@/lib/icons";
 import { accentVar, withAlpha } from "@/styles";
 
@@ -34,6 +41,17 @@ import { Overlay } from "./overlay";
 
 const DANGER = "var(--ds-color-danger)";
 
+/** The settings above LOG OUT: app pages, then the website's. */
+const SETTINGS: { label: string; icon: ComponentType<IconProps>; href: string }[] = [
+  { label: "ACCOUNT SETTINGS", icon: ProfileIcon, href: "/profile/account-settings" },
+  { label: "TERMS AND CONDITIONS", icon: MenuBookIcon, href: siteLinks.terms },
+  { label: "FAQS", icon: ForumIcon, href: siteLinks.faq },
+  { label: "PRIVACY POLICY", icon: LockIcon, href: siteLinks.privacy },
+];
+
+const SETTING_ROW =
+  "flex w-full items-center gap-3 px-4.5 py-4 text-left transition-colors duration-150 hover:bg-foreground/4";
+
 export function SettingsSheet({
   onClose,
   onLogout,
@@ -46,6 +64,35 @@ export function SettingsSheet({
   const [confirming, setConfirming] = useState(false);
   return (
     <Overlay title="SETTINGS" icon={SettingsIcon} onClose={onClose}>
+      <ul className="border-b border-line">
+        {SETTINGS.map(({ label, icon: Icon, href }) => {
+          const content = (
+            <>
+              <span className="grid size-9 place-items-center border border-cyan/45 bg-cyan/10 text-cyan">
+                <Icon size={20} />
+              </span>
+              <span className="flex-1 font-display text-compact font-black tracking-wide">
+                {label}
+              </span>
+              <ChevronRightIcon size={20} className="text-muted" />
+            </>
+          );
+          return (
+            <li key={label}>
+              {href.startsWith("/") ? (
+                <Link href={href} className={SETTING_ROW}>
+                  {content}
+                </Link>
+              ) : (
+                // The website's pages open in a new tab, so the app stays where it was.
+                <a href={href} target="_blank" rel="noopener noreferrer" className={SETTING_ROW}>
+                  {content}
+                </a>
+              )}
+            </li>
+          );
+        })}
+      </ul>
       <button
         type="button"
         onClick={() => setConfirming(true)}

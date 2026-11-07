@@ -1,5 +1,6 @@
 import type { Sport } from "@/config/sports";
 import {
+  deleteUserResponseSchema,
   updateUserResponseSchema,
   userAssetsResponseSchema,
   userPredictionsResponseSchema,
@@ -7,6 +8,7 @@ import {
   userStatsResponseSchema,
   type ApiResult,
   type AuthUser,
+  type DeleteUserResponse,
   type UpdateUserResponse,
   type UserAssetsResponse,
   type UserPredictionsResponse,
@@ -73,6 +75,20 @@ export function updateUser(
       body: JSON.stringify(body),
       signal: options.signal,
     },
+  );
+}
+
+/**
+ * Deletes the signed-in player's own account and ends every session they
+ * have. It doesn't clear the cookies; `logout()` asks the API to.
+ */
+export function deleteUser(
+  options: RequestOptions = {},
+): Promise<ApiResult<DeleteUserResponse["data"]>> {
+  return authenticatedFetch(
+    ENDPOINTS.deleteUser,
+    deleteUserResponseSchema.shape.data,
+    { method: "DELETE", signal: options.signal },
   );
 }
 

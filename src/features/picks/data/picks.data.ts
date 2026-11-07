@@ -1,23 +1,14 @@
 import {
   dataOrThrow,
-  eventOptionSchema,
-  getEvent,
   getEventBets,
   getEventOdds,
-  getFuture,
   getFutureBets,
   getFutureOdds,
-  getPrediction,
   getPredictionBets,
   getPredictionOdds,
-  predictionSideSchema,
-  submitEventBet,
-  submitFutureBet,
-  submitPrediction,
-  type ApiResult,
-  type EventDetail,
-  type FutureDetail,
-  type PredictionDetail,
+  loadPick,
+  submitPickBet,
+  type Pick,
 } from "@/core";
 import { spendCoins } from "@/features/auth";
 import { setResource, useResource } from "@/hooks/useResource";
@@ -25,21 +16,9 @@ import type { PickType } from "@/utils";
 
 import type { Bet, OddsPoint, Outcome } from "../adapters";
 
-export type Pick =
-  | { type: "prediction"; data: PredictionDetail }
-  | { type: "event"; data: EventDetail }
-  | { type: "future"; data: FutureDetail };
+export type { Pick };
 
 const pickKey = (type: PickType, id: string) => `picks/${type}/${id}`;
-
-const LOAD: Record<PickType, (id: string) => Promise<Pick>> = {
-  prediction: (id) =>
-    getPrediction(id).then((result) => ({ type: "prediction", data: dataOrThrow(result) })),
-  event: (id) =>
-    getEvent(id).then((result) => ({ type: "event", data: dataOrThrow(result) })),
-  future: (id) =>
-    getFuture(id).then((result) => ({ type: "future", data: dataOrThrow(result) })),
-};
 
 /**
  * One prediction, event or future by its code (`predictionId`, `eventId` or
@@ -47,7 +26,7 @@ const LOAD: Record<PickType, (id: string) => Promise<Pick>> = {
  */
 export function usePick(type: PickType, code: string, signedIn: boolean) {
   return useResource(
-    signedIn ? { key: pickKey(type, code), load: () => LOAD[type](code) } : null,
+    signedIn ? { key: pickKey(type, code), load: () => loadPick(type, code) } : null,
   );
 }
 
@@ -150,91 +129,17 @@ function reloadAfterBet(pick: Pick) {
     .catch(() => {});
 }
 
-const REASONS: Record<string, string> = {
-  "Insufficient coins": "Not enough Oz Coins for this stake.",
-};
-
-function betError(result: Exclude<ApiResult<unknown>, { success: true }>) {
-  // The 429 body is plain text, shared by every submit endpoint.
-  if (result.statusCode === 429) return "Too many submissions. Try again in a minute.";
-  // A rejected bet puts its reason in `data.error`; other errors in `message`.
-  const data = "data" in result ? result.data : null;
-  const reason =
-    typeof data === "object" && data !== null && "error" in data && typeof data.error === "string"
-      ? data.error
-      : result.message;
-  return REASONS[reason] ?? reason;
-}
-
 /**
  * Bets `coins` on `outcome`. The pick on screen takes its new pools and odds
  * from the answer, and the stake leaves the balance. Resolves to the error to
  * show, or `null` once the bet is placed.
  */
 export async function placeBet(pick: Pick, outcome: Outcome, coins: number): Promise<string | null> {
+  const result = await submitPickBet(pick, outcome.betValue, coins);
+  if ("error" in result) return result.error;
   // Kept under the code, which is how the page asked for it.
-  const key = pickKey(pick.type, codeOf(pick));
-  try {
-    if (pick.type === "prediction") {
-      const result = await submitPrediction(pick.data._id, {
-        teamChosen: predictionSideSchema.parse(outcome.betValue),
-        coinsBet: coins,
-      });
-      if (!result.success) return betError(result);
-      const { coinsOnTeamA, coinsOnTeamB, coinsOnDraw, totalCoins, oddsTeamA, oddsTeamB, oddsDraw, predictionStatus } =
-        result.data;
-      setResource<Pick>(key, {
-        type: "prediction",
-        data: { ...pick.data, coinsOnTeamA, coinsOnTeamB, coinsOnDraw, totalCoins, oddsTeamA, oddsTeamB, oddsDraw, predictionStatus },
-      });
-    } else if (pick.type === "event") {
-      const result = await submitEventBet(pick.data._id, {
-        chosenOption: eventOptionSchema.parse(outcome.betValue),
-        coinsBet: coins,
-      });
-      if (!result.success) return betError(result);
-      const next = result.data;
-      setResource<Pick>(key, {
-        type: "event",
-        data: {
-          ...pick.data,
-          coinsOnYes: next.coinsOnYes,
-          coinsOnNo: next.coinsOnNo,
-          totalCoins: next.totalCoins,
-          eventStatus: next.eventStatus,
-          // Named `yesOdds`… in this answer.
-          oddsYes: next.yesOdds,
-          oddsNo: next.noOdds,
-          oddsMaybe: next.maybeOdds,
-        },
-      });
-    } else {
-      const result = await submitFutureBet(pick.data._id, {
-        futureChoiceId: outcome.betValue,
-        coinsBet: coins,
-      });
-      if (!result.success) return betError(result);
-      const { future, submission } = result.data;
-      setResource<Pick>(key, {
-        type: "future",
-        data: {
-          ...pick.data,
-          futureStatus: future.futureStatus,
-          totalCoinsPlaced: pick.data.totalCoinsPlaced + submission.coinsBet,
-          // The answer's choices carry no odds; the bet's snapshot has them, by `choiceId`.
-          choices: pick.data.choices.map((choice) => ({
-            ...choice,
-            choiceCoins:
-              future.choices.find((c) => c._id === choice._id)?.choiceCoins ?? choice.choiceCoins,
-            odds: submission.choiceOddsAtBetTime[choice.choiceId] ?? choice.odds,
-          })),
-        },
-      });
-    }
-    spendCoins(coins);
-    reloadAfterBet(pick);
-    return null;
-  } catch {
-    return "Couldn't place your pick. Try again.";
-  }
+  setResource<Pick>(pickKey(pick.type, codeOf(pick)), result.pick);
+  spendCoins(coins);
+  reloadAfterBet(pick);
+  return null;
 }

@@ -3,10 +3,17 @@
 import type { ReactNode } from "react";
 
 import type { QuizDetail, QuizQuestion } from "@/core";
-import { FlagIcon, InsightsIcon, VerifiedIcon } from "@/lib/icons";
+import { CheckIcon, CloseIcon, FlagIcon, InsightsIcon, VerifiedIcon } from "@/lib/icons";
 import { formatInt } from "@/utils";
 
-import { awaitsReveal, crowdAccuracy, crowdRows, isOver, withoutAnswers } from "../adapters";
+import {
+  awaitsReveal,
+  crowdAccuracy,
+  crowdRows,
+  isOver,
+  settledPick,
+  withoutAnswers,
+} from "../adapters";
 import styles from "../css/quizDetail.module.css";
 import { BackBar, FixtureHeader } from "./quizFrame";
 
@@ -26,7 +33,8 @@ export function QuizCrowd({ quiz, footer }: { quiz: QuizDetail; footer?: ReactNo
   const notice = live
     ? `${lead} Follow the crowd signal while the match plays.`
     : `${lead} Study the final answers and the crowd signal.`;
-  const questions = (awaitsReveal(quiz) ? withoutAnswers(quiz) : quiz).questionsArray;
+  const hidden = awaitsReveal(quiz);
+  const questions = (hidden ? withoutAnswers(quiz) : quiz).questionsArray;
   return (
     <div className={`${styles.page} flex h-dvh flex-col overflow-hidden`}>
       <BackBar quiz={quiz} />
@@ -43,7 +51,12 @@ export function QuizCrowd({ quiz, footer }: { quiz: QuizDetail; footer?: ReactNo
         <CrowdSummary questions={questions} />
         <ul className="flex flex-col gap-2.5 px-5 pt-4 pb-4.5">
           {questions.map((question) => (
-            <CrowdCard key={question._id} question={question} />
+            <CrowdCard
+              key={question._id}
+              question={question}
+              // Picks are marked only once the player has revealed the results.
+              pick={hidden ? null : settledPick(quiz, question.questionNumber)}
+            />
           ))}
         </ul>
       </main>
@@ -81,8 +94,17 @@ function CrowdSummary({ questions }: { questions: QuizQuestion[] }) {
   );
 }
 
-/** One question: its real answer, then the options with the crowd's share, 0% before any vote. */
-function CrowdCard({ question }: { question: QuizQuestion }) {
+/**
+ * One question: its real answer, the player's settled pick when there is one,
+ * then the options with the crowd's share, 0% before any vote.
+ */
+function CrowdCard({
+  question,
+  pick,
+}: {
+  question: QuizQuestion;
+  pick: ReturnType<typeof settledPick>;
+}) {
   const answer = question.correctAnswer;
   return (
     <li className={styles.crowdCard}>
@@ -110,6 +132,23 @@ function CrowdCard({ question }: { question: QuizQuestion }) {
             {answer ?? "RESULT UNAVAILABLE"}
           </span>
         </p>
+        {pick ? (
+          <p className="mt-1.5 flex items-center gap-2">
+            <span className="shrink-0 font-display text-micro font-black tracking-ultra text-muted">
+              YOUR PICK
+            </span>
+            <span
+              className={`min-w-0 truncate font-grotesk text-sm font-bold ${pick.correct ? "text-success" : "text-danger"}`}
+            >
+              {pick.picked}
+            </span>
+            {pick.correct ? (
+              <CheckIcon size={18} aria-label="Correct" className="shrink-0 text-success" />
+            ) : (
+              <CloseIcon size={18} aria-label="Wrong" className="shrink-0 text-danger" />
+            )}
+          </p>
+        ) : null}
       </div>
       <div className="border-t border-line-subtle p-3">
         <div className="flex flex-col gap-2">

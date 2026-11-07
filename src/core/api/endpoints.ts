@@ -12,6 +12,7 @@ export const ENDPOINTS = {
   currentUser: "/api/v1/user/current-user",
   updateUser: "/api/v1/user/update-user",
   userAssets: "/api/v1/user/user-assets",
+  deleteUser: "/api/v1/user/delete-user",
   userStats: "/api/v1/user/userStats",
   userQuizzes: "/api/v1/quiz/userQuizzes",
   quiz: (id: string) => `/api/v1/quiz/${encodeURIComponent(id)}`,
