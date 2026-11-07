@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Suspense, useCallback, useEffect } from "react";
 
 import { AuthGateDialog } from "@/features/auth/components/authGateDialog";
+import { track } from "@/lib/analytics";
 
 import { useAuthGate } from "../index";
 
@@ -17,9 +18,15 @@ export function AuthGateHost() {
   // The store's actions never change, so the dialog's focus effect runs once.
   const close = useAuthGate((state) => state.close);
   const cancel = useCallback(() => {
-    useAuthGate.getState().request?.onCancel?.();
+    const open = useAuthGate.getState().request;
+    if (open) track("web_auth_gate_action", { intent: open.intent, action: "not_now" });
+    open?.onCancel?.();
     close();
   }, [close]);
+
+  useEffect(() => {
+    if (request) track("web_auth_gate_shown", { intent: request.intent });
+  }, [request]);
 
   return (
     <>
@@ -33,6 +40,7 @@ export function AuthGateHost() {
           onCancel={cancel}
           onContinue={() => {
             const returnTo = request.returnTo ?? window.location.pathname;
+            track("web_auth_gate_action", { intent: request.intent, action: "log_in" });
             close();
             router.push(`/auth?returnTo=${encodeURIComponent(returnTo)}`);
           }}

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { create } from "zustand";
 
 import {
+  deleteUser,
   FIREBASE_CONFIG,
   getCurrentUser,
   getSignedIn,
@@ -15,6 +16,7 @@ import {
   type AuthUser,
 } from "@/core";
 import { loadedKeys, peekResource, setResource } from "@/hooks/useResource";
+import { track } from "@/lib/analytics";
 
 const DEVICE_ID_KEY = "statoz.deviceId";
 
@@ -148,6 +150,10 @@ function returnPath(): string {
     : "/";
 }
 
+/** GA's sign_up for a new account, login for one that already existed. */
+const trackLogin = (isNewUser: boolean, method: "email_otp" | "google") =>
+  track(isNewUser ? "web_sign_up" : "web_login", { method });
+
 /** A new account sets up its profile first, then goes where it was heading. */
 const afterLogin = (isNewUser: boolean) =>
   isNewUser
@@ -177,6 +183,7 @@ export function useEmailOtpLogin() {
         setError(messageFor(result));
         throw new Error(result.message);
       }
+      track("web_otp_requested");
     } catch (cause) {
       setError((current) => current ?? GENERIC_ERROR);
       throw cause;
@@ -198,10 +205,13 @@ export function useEmailOtpLogin() {
         platform: "web",
       });
       if (!result.success) {
-        setError(messageFor(result));
+        const message = messageFor(result);
+        setError(message);
+        track("web_login_failed", { method: "email_otp", reason: message });
         throw new Error(result.message);
       }
       useUserStore.setState({ user: result.data.user });
+      trackLogin(result.data.isNewUser, "email_otp");
       router.replace(afterLogin(result.data.isNewUser));
     } catch (cause) {
       setError((current) => current ?? GENERIC_ERROR);
@@ -284,14 +294,18 @@ export function useGoogleLogin() {
       }
       if (result.success) {
         useUserStore.setState({ user: result.data.user });
+        trackLogin(result.data.isNewUser, "google");
         router.replace(afterLogin(result.data.isNewUser));
         return;
       }
-      setError(messageFor(result));
+      const message = messageFor(result);
+      setError(message);
+      track("web_login_failed", { method: "google", reason: message });
       await signOutOfFirebase();
     } catch (cause) {
       if (isCancelled(cause)) return;
       setError(GENERIC_ERROR);
+      track("web_login_failed", { method: "google", reason: GENERIC_ERROR });
       await signOutOfFirebase().catch(() => {});
     } finally {
       setPending(false);
@@ -312,10 +326,49 @@ export function useLogout() {
   async function logOut() {
     if (pending) return;
     setPending(true);
+    track("web_logout");
     await logout();
     await signOutOfFirebase().catch(() => {});
     router.replace("/auth");
   }
 
   return { pending, logOut };
+}
+
+const DELETE_ERROR = "Couldn't delete your account. Try again.";
+
+/**
+ * Deletes the player's account, then signs this device out and opens the
+ * login screen. `pending` stays true once it succeeds, until the page leaves.
+ */
+export function useDeleteAccount() {
+  const router = useRouter();
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string>();
+
+  async function deleteAccount() {
+    if (pending) return;
+    setPending(true);
+    setError(undefined);
+    try {
+      const result = await deleteUser();
+      if (!result.success) {
+        setError(result.message || DELETE_ERROR);
+        setPending(false);
+        return;
+      }
+    } catch {
+      setError(DELETE_ERROR);
+      setPending(false);
+      return;
+    }
+    track("web_account_deleted");
+    // The API has ended every session but left the cookies; logout asks it to
+    // clear them, and signs this device out whatever it answers.
+    await logout();
+    await signOutOfFirebase().catch(() => {});
+    router.replace("/auth");
+  }
+
+  return { pending, error, deleteAccount };
 }

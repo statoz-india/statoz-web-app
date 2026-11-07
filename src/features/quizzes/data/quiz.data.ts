@@ -14,6 +14,7 @@ import {
   setResource,
   useResource,
 } from "@/hooks/useResource";
+import { track } from "@/lib/analytics";
 
 import { optionLetter } from "../adapters";
 
@@ -58,14 +59,28 @@ export async function sendAnswers(
   try {
     const sent = await submitQuiz(quiz._id, { answers });
     // 409: already submitted, so the review is what to show.
-    if (!sent.success && sent.statusCode !== 409) return messageFor(sent);
+    if (!sent.success && sent.statusCode !== 409) {
+      const reason = messageFor(sent);
+      track("web_quiz_submit_failed", { quiz_id: quiz.quizId, reason });
+      return reason;
+    }
+    if (sent.success) {
+      track("web_quiz_submit", {
+        quiz_id: quiz.quizId,
+        sport: quiz.gameType.toLowerCase(),
+        answered: answers.length,
+        questions: quiz.questionsArray.length,
+      });
+    }
     const fresh = await getQuiz(quiz._id);
     if (!fresh.success) return "Answers sent. Refresh the page to see them.";
     // Kept under the code, which is how the page asked for it.
     setResource(quizKey(quiz.quizId), fresh.data);
     return null;
   } catch {
-    return "Couldn't send your answers. Try again.";
+    const reason = "Couldn't send your answers. Try again.";
+    track("web_quiz_submit_failed", { quiz_id: quiz.quizId, reason });
+    return reason;
   }
 }
 
@@ -80,6 +95,12 @@ export async function revealResults(
   try {
     const result = await markQuizResultsViewed(quiz.quizId);
     if (!result.success) return { error: result.message || "Couldn't reveal the results. Try again." };
+    const xp = result.data.obtainedXP;
+    const sport = quiz.gameType.toLowerCase();
+    track("web_results_reveal", { quiz_id: quiz.quizId, sport, xp });
+    if (xp > 0) {
+      track("web_earn_virtual_currency", { virtual_currency_name: "XP", value: xp, source: "quiz" });
+    }
     for (const key of loadedKeys(SIGNED_IN_TRENDING_KEY_PREFIX)) {
       const home = peekResource<SignedInTrending>(key);
       if (home) {
@@ -89,7 +110,7 @@ export async function revealResults(
         });
       }
     }
-    return { xp: result.data.obtainedXP };
+    return { xp };
   } catch {
     return { error: "Couldn't reveal the results. Try again." };
   }

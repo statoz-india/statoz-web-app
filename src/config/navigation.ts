@@ -14,3 +14,10 @@ export const navDestinations: NavDestination[] = [
   { id: "leaderboard", label: "TOP", href: "/leaderboard" },
   { id: "profile", label: "PROFILE", href: "/profile" },
 ];
+
+/** Pages on the StatOz website, opened from Settings. */
+export const siteLinks = {
+  terms: "https://www.statoz.in/termsAndConditions",
+  faq: "https://www.statoz.in/faq",
+  privacy: "https://www.statoz.in/privacyPolicy",
+};

@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import {
   useEffect,
   useLayoutEffect,
@@ -18,8 +17,15 @@ import type {
   TrendingQuiz as QuizItem,
   TrendingRace,
 } from "@/core";
-import { useRequireAuth } from "@/features/auth";
-import { pickHref } from "@/utils";
+import {
+  spendCoins,
+  useAuthSession,
+  useCurrentUser,
+  useRequireAuth,
+} from "@/features/auth";
+import { track } from "@/lib/analytics";
+import { QuickPick } from "@/lib/components/pick-sheet";
+import { readableSegment, type PickType } from "@/utils";
 import { TrendingEventWidget } from "@/features/events/widgets/trendingEvent.widget";
 import { TrendingFutureWidget } from "@/features/futures/widgets/trendingFuture.widget";
 import { TrendingMatchWidget } from "@/features/match/widgets/trendingMatch.widget";
@@ -179,10 +185,71 @@ function LoopCarousel<T>({
   );
 }
 
+type QuickTarget = { type: PickType; code: string; outcome: string };
+
+/**
+ * A card's option bought in place: `open` starts it on an option, and `sheet`
+ * is what to render. The card's guard has already asked a guest to log in.
+ */
+function useQuickPick() {
+  const [target, setTarget] = useState<QuickTarget | null>(null);
+  const balance = useCurrentUser()?.coins ?? null;
+  const sheet = target ? (
+    <QuickPick
+      {...target}
+      balance={balance}
+      location="home_card"
+      onPlaced={(coins) => spendCoins(coins)}
+      onClose={() => setTarget(null)}
+    />
+  ) : null;
+  return { open: setTarget, sheet };
+}
+
+type ContentType = "match" | "race" | "quiz" | "prediction" | "future" | "event" | "reveal_result";
+
+/** The item's code in its page's path: `/match/<id>`, `/quiz/<id>`, `/picks/<type>/<id>`. */
+function codeIn(path: string): string {
+  const parts = path.split("/").filter(Boolean);
+  return readableSegment((parts[0] === "picks" ? parts[2] : parts[1]) ?? "");
+}
+
+/**
+ * Counts a card opened through one of its links. A guest's tap on a card that
+ * needs an account (`guarded`) opens the login gate instead, so it isn't one.
+ */
+function Opens({
+  type,
+  guarded = false,
+  children,
+}: {
+  type: ContentType;
+  guarded?: boolean;
+  children: ReactNode;
+}) {
+  const { status } = useAuthSession();
+  return (
+    <div
+      className="contents"
+      onClickCapture={(event) => {
+        const link = event.target instanceof Element ? event.target.closest("a") : null;
+        if (!link || (guarded && status !== "authenticated")) return;
+        track("web_select_content", {
+          content_type: type,
+          content_id: codeIn(link.pathname),
+          location: "home_trending",
+        });
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 /** The trending picks, without a heading. */
 function TrendingPicks({ picks }: { picks: Prediction[] }) {
-  const router = useRouter();
   const requireAuth = useRequireAuth();
+  const quick = useQuickPick();
   if (picks.length === 0) return null;
   return (
     <section aria-label="Trending picks">
@@ -190,12 +257,14 @@ function TrendingPicks({ picks }: { picks: Prediction[] }) {
         {(pick) => (
           <TrendingPredictionsWidget
             prediction={pick}
-            // The guard has already asked a guest to log in.
-            onPick={(side) => router.push(pickHref("prediction", pick.predictionId, side))}
+            onPick={(side) =>
+              quick.open({ type: "prediction", code: pick.predictionId, outcome: side })
+            }
             guard={() => requireAuth({ intent: "lock a pick" })}
           />
         )}
       </LoopCarousel>
+      {quick.sheet}
     </section>
   );
 }
@@ -303,8 +372,8 @@ function TrendingPredictions({
 }: {
   predictions: TrendingPrediction[];
 }) {
-  const router = useRouter();
   const requireAuth = useRequireAuth();
+  const quick = useQuickPick();
   if (predictions.length === 0) return null;
   return (
     <section
@@ -326,20 +395,21 @@ function TrendingPredictions({
           <TrendingPredictionsWidget
             prediction={prediction}
             onPick={(side) =>
-              router.push(pickHref("prediction", prediction.predictionId, side))
+              quick.open({ type: "prediction", code: prediction.predictionId, outcome: side })
             }
             guard={() => requireAuth({ intent: "lock a pick" })}
           />
         )}
       </LoopCarousel>
+      {quick.sheet}
     </section>
   );
 }
 
 /** The trending futures under their heading, in the order the API sent them. */
 function TrendingFutures({ futures }: { futures: Future[] }) {
-  const router = useRouter();
   const requireAuth = useRequireAuth();
+  const quick = useQuickPick();
   if (futures.length === 0) return null;
   return (
     <section aria-labelledby="trending-futures" className="flex flex-col gap-3">
@@ -361,12 +431,13 @@ function TrendingFutures({ futures }: { futures: Future[] }) {
             future={future}
             maxChoices={FUTURE_CHOICES}
             onPick={(choiceId) =>
-              router.push(pickHref("future", future.futureId, choiceId))
+              quick.open({ type: "future", code: future.futureId, outcome: choiceId })
             }
             guard={() => requireAuth({ intent: "lock a pick" })}
           />
         )}
       </LoopCarousel>
+      {quick.sheet}
     </section>
   );
 }
@@ -426,24 +497,42 @@ export function TrendingFeed({ onSport }: { onSport: (sport: SportHubSelection) 
 
   return (
     <>
-      <TrendingPicks picks={trending.data.trendingPicks} />
-      <RevealResults results={trending.data.results} />
-      <MatchesSection
-        id="trending-matches"
-        title="Trending Matches"
-        matches={trending.data.clubsAndTeamMatches}
-      />
-      <TrendingFutures futures={trending.data.trendingFutures} />
+      <Opens type="prediction" guarded>
+        <TrendingPicks picks={trending.data.trendingPicks} />
+      </Opens>
+      <Opens type="reveal_result" guarded>
+        <RevealResults results={trending.data.results} />
+      </Opens>
+      <Opens type="match">
+        <MatchesSection
+          id="trending-matches"
+          title="Trending Matches"
+          matches={trending.data.clubsAndTeamMatches}
+        />
+      </Opens>
+      <Opens type="future" guarded>
+        <TrendingFutures futures={trending.data.trendingFutures} />
+      </Opens>
       <SportsQuizzes onSport={onSport} />
-      <MatchesSection
-        id="more-matches"
-        title="More Matches"
-        matches={trending.data.trendingMatches}
-      />
-      <TrendingRaces races={trending.data.trendingRaces} />
-      <TrendingQuizzes quizzes={trending.data.trendingQuizzes} />
-      <TrendingEvents events={trending.data.trendingEvents} />
-      <TrendingPredictions predictions={trending.data.trendingPredictions} />
+      <Opens type="match">
+        <MatchesSection
+          id="more-matches"
+          title="More Matches"
+          matches={trending.data.trendingMatches}
+        />
+      </Opens>
+      <Opens type="race">
+        <TrendingRaces races={trending.data.trendingRaces} />
+      </Opens>
+      <Opens type="quiz" guarded>
+        <TrendingQuizzes quizzes={trending.data.trendingQuizzes} />
+      </Opens>
+      <Opens type="event" guarded>
+        <TrendingEvents events={trending.data.trendingEvents} />
+      </Opens>
+      <Opens type="prediction" guarded>
+        <TrendingPredictions predictions={trending.data.trendingPredictions} />
+      </Opens>
     </>
   );
 }

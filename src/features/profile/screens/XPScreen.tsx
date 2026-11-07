@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import type { AuthUser } from "@/core";
+// `track` is this screen's chosen XP track.
+import { track as trackEvent } from "@/lib/analytics";
 import { Button } from "@/lib/components/button";
 import { BackButton } from "@/lib/screens/howToPlay/back-button";
 import { todayInIST, toISTDate } from "@/utils";
@@ -128,6 +130,7 @@ function XpView({ user }: { user: AuthUser }) {
           }))}
           active={type.id}
           onSelect={(id) => {
+            if (id !== type.id) trackEvent("web_xp_filter_selected", { filter: id });
             setTypeId(id);
             setTrack(null);
             setPages(1);

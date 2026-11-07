@@ -8,10 +8,11 @@ import {
   spendCoins,
   updateCurrentUser,
   useCurrentUser,
+  useDeleteAccount,
 } from "./data/authData";
 
 export type { AuthGateRequest };
-export { spendCoins, updateCurrentUser, useCurrentUser };
+export { spendCoins, updateCurrentUser, useCurrentUser, useDeleteAccount };
 
 /**
  * Auth adapter. The primary nav reads these hooks, and anything that needs an

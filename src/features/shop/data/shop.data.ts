@@ -13,9 +13,10 @@ import {
 } from "@/core";
 import { spendCoins } from "@/features/auth";
 import { useResource, useResources } from "@/hooks/useResource";
+import { track } from "@/lib/analytics";
 import { formatInt } from "@/utils";
 
-import { itemPrice, type ShopItem } from "../adapters";
+import { itemParams, itemPrice, type ShopItem } from "../adapters";
 
 /** The teams that have items in `catalog`, A–Z. */
 export function useShopTeams(catalog: ShopCatalog) {
@@ -78,11 +79,22 @@ export async function buyItem(item: ShopItem): Promise<string | null> {
         : item.kind === "banner"
           ? await purchaseProfileBanner({ pbId: item.banner.pbId })
           : await purchasePlayerCard({ playerId: item.card.playerId });
-    if (!result.success) return purchaseError(result);
-    spendCoins(itemPrice(item));
+    if (!result.success) {
+      const reason = purchaseError(result);
+      track("web_shop_purchase_failed", { ...itemParams(item), reason });
+      return reason;
+    }
+    const price = itemPrice(item);
+    spendCoins(price);
+    track("web_shop_purchase", itemParams(item));
+    if (price > 0) {
+      track("web_spend_virtual_currency", { virtual_currency_name: "Oz", value: price, item_name: item.kind });
+    }
     return null;
   } catch {
-    return "Couldn't complete the purchase. Try again.";
+    const reason = "Couldn't complete the purchase. Try again.";
+    track("web_shop_purchase_failed", { ...itemParams(item), reason });
+    return reason;
   }
 }
 

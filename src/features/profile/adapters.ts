@@ -145,6 +145,10 @@ export function followableSports(data: SignupSport[]) {
 }
 
 /** A team has no colour of its own until the backend sets one. */
+/** How many clubs are followed, across every league. */
+export const clubCount = (picks: AuthUser["clubAndTeams"]) =>
+  picks.reduce((count, league) => count + league.teams.length, 0);
+
 export const toTeam = (sport: Sport, team: SignupTeam): Team => ({
   id: team._id,
   code: team.abbreviation,

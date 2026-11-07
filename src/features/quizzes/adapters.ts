@@ -120,6 +120,19 @@ export const quizLink = (quiz: QuizTiming, now: number | null) =>
 export const awaitsReveal = (quiz: QuizDetail) =>
   quiz.isAttempted && quiz.quizStatus === "SETTLEMENT_DONE" && !quiz.hasViewedResults;
 
+/**
+ * The player's settled answer to a question: right only when the option they
+ * chose is the settled option. `null` when they skipped it or it isn't settled.
+ */
+export function settledPick(quiz: QuizDetail, questionNumber: number) {
+  const answer = quiz.userAnswers.answers.find((a) => a.questionNumber === questionNumber);
+  if (!answer || answer.correctAnswerOption === undefined) return null;
+  return {
+    picked: answer.selectedAnswer,
+    correct: answer.selectedAnswerOption === answer.correctAnswerOption,
+  };
+}
+
 /** The quiz as the player sees it before the reveal: picks only, no answers. */
 export const withoutAnswers = (quiz: QuizDetail): QuizDetail => ({
   ...quiz,

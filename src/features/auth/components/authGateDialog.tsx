@@ -46,7 +46,7 @@ export function AuthGateDialog({
   useScrollLock();
   useEffect(() => {
     const previousFocus = document.activeElement as HTMLElement | null;
-    // The first control is the close cross, so a stray Enter dismisses rather than navigates.
+    // The first control is NOT NOW, so a stray Enter dismisses rather than navigates.
     panelRef.current?.querySelector<HTMLElement>(FOCUSABLE)?.focus();
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -96,7 +96,6 @@ export function AuthGateDialog({
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
         icon={<LockIcon size={48} />}
-        onClose={onCancel}
         className="flex size-full items-center justify-center px-4 py-12"
         // mousedown, so a text drag that starts in the card and ends beside it does not close it.
         onMouseDown={(event) => {

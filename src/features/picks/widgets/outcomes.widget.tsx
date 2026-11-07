@@ -18,21 +18,18 @@ const TICKET_TONE: Record<Ticket["status"], string> = {
   LOST: feedbackVar("danger"),
 };
 
-/** The outcome rows, the tickets (or the ticket line), the price rule and the quiz link. */
+/** The outcome rows, the price rule and the quiz link. */
 export function Outcomes({
   market,
   selected,
   tickets,
-  placed,
   onSelect,
   onBuy,
 }: {
   market: Market;
   selected: Outcome;
-  /** One per bet, newest first. */
+  /** One per bet, newest first; marks the outcomes backed. */
   tickets: Ticket[];
-  /** The last pick placed here, e.g. "Pick placed: 54 Oz on Draw." */
-  placed: string | null;
   onSelect: (key: string) => void;
   onBuy: (outcome: Outcome) => void;
 }) {
@@ -95,20 +92,6 @@ export function Outcomes({
         })}
       </section>
 
-      {tickets.length ? (
-        tickets.map((ticket) => <TicketPanel key={ticket.id} ticket={ticket} />)
-      ) : (
-        <div className={`${styles.row} flex items-center gap-2.5 p-3.5`}>
-          <Image src={IMAGES.icons.ozCoins} alt="" width={18} height={18} className="shrink-0" />
-          <p className="font-grotesk text-compact text-muted">
-            {placed ??
-              (trading
-                ? "Pick an outcome to create your ticket."
-                : "Market is closed with no ticket held.")}
-          </p>
-        </div>
-      )}
-
       <p className={`${styles.note} p-3.5 font-grotesk text-compact font-bold text-muted`}>
         {priceRule(selected.percent)}
       </p>
@@ -124,6 +107,35 @@ export function Outcomes({
         </Link>
       ) : null}
     </>
+  );
+}
+
+/** One YOUR TICKET per bet, or the line that says why there's none. */
+export function Tickets({
+  market,
+  tickets,
+  placed,
+}: {
+  market: Market;
+  /** One per bet, newest first. */
+  tickets: Ticket[];
+  /** The last pick placed here, e.g. "Pick placed: 54 Oz on Draw." */
+  placed: string | null;
+}) {
+  const now = useNow();
+  if (tickets.length) {
+    return tickets.map((ticket) => <TicketPanel key={ticket.id} ticket={ticket} />);
+  }
+  return (
+    <div className={`${styles.row} flex items-center gap-2.5 p-3.5`}>
+      <Image src={IMAGES.icons.ozCoins} alt="" width={18} height={18} className="shrink-0" />
+      <p className="font-grotesk text-compact text-muted">
+        {placed ??
+          (isTrading(market, now)
+            ? "Pick an outcome to create your ticket."
+            : "Market is closed with no ticket held.")}
+      </p>
+    </div>
   );
 }
 

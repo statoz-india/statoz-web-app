@@ -20,7 +20,7 @@ import { ClubTile, LeagueCard, SportButton } from "./clubs.widget";
 import { StepHeading } from "./setupFrame.widget";
 
 /** The longest name the field takes. */
-const NAME_LIMIT = 48;
+export const NAME_LIMIT = 48;
 
 /** Step 1. Enter submits, like NEXT. */
 export function NameStep({

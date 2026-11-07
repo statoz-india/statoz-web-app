@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 
 import { getSignedIn, submitContactUs } from "@/core";
+import { track } from "@/lib/analytics";
 import { Button } from "@/lib/components/button";
 import { CheckIcon, SendIcon } from "@/lib/icons";
 
@@ -51,17 +52,23 @@ export function TransmissionCompose({ channelId }: { channelId: string }) {
         summary: summary.trim(),
         details: details.trim(),
       });
-      if (result.success) return setSent(true);
+      if (result.success) {
+        track("web_support_message_sent", { channel: channel.id });
+        return setSent(true);
+      }
       if (result.statusCode === 401) return toLogin();
-      setFailure(
+      const reason =
         result.statusCode === 429
           ? "Too many messages. Please try again in a few minutes."
           : "errors" in result && result.errors?.length
             ? result.errors.map(String).join(". ")
-            : "Signal lost. Try again in a moment.",
-      );
+            : "Signal lost. Try again in a moment.";
+      track("web_support_message_failed", { channel: channel.id, reason });
+      setFailure(reason);
     } catch {
-      setFailure("Signal lost. Try again in a moment.");
+      const reason = "Signal lost. Try again in a moment.";
+      track("web_support_message_failed", { channel: channel.id, reason });
+      setFailure(reason);
     } finally {
       setPending(false);
     }

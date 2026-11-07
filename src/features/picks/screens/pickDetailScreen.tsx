@@ -5,6 +5,7 @@ import { useEffect } from "react";
 
 import { useAuthGate, useAuthSession } from "@/features/auth";
 import { Button } from "@/lib/components/button";
+import { trackBuySheet } from "@/lib/components/pick-sheet";
 import { isPickType, readableSegment } from "@/utils";
 
 import { marketOf, openingOdds, ticketsOf } from "../adapters";
@@ -84,6 +85,7 @@ export function PickDetailScreen() {
           <div role="status" aria-label="Loading odds" className="h-52 animate-pulse bg-surface-elevated/50" />
         )
       }
+      onOpen={(outcome) => trackBuySheet(current, outcome, "pick_page")}
       onBuy={(outcome, coins) => placeBet(current, outcome, coins)}
     />
   );

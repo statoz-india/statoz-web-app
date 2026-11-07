@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { RateLimitedError } from "@/core";
+import { TrackView } from "@/lib/analytics/trackView";
 import { SignalOffIcon } from "@/lib/icons";
 import { BentoGrid, BentoSpan, BentoTile } from "@/lib/components/bento-grid";
 
@@ -93,14 +94,22 @@ export type FeedErrorProps = {
  * shared by everyone behind one address, so a retry loop would spend it.
  */
 export function FeedError({ subject, error, onRetry }: FeedErrorProps) {
+  const limited = error instanceof RateLimitedError;
   return (
     <div role="alert">
+      <TrackView
+        event={limited ? "web_rate_limited" : "web_load_failed"}
+        params={{
+          area: subject,
+          ...(limited ? {} : { reason: error instanceof Error ? error.message : "unknown" }),
+        }}
+      />
       <FeedMessage
         icon={<SignalOffIcon size={34} className="text-cyan" />}
         title="SIGNAL UNAVAILABLE"
       >
         <p className="text-sm leading-body">
-          {error instanceof RateLimitedError
+          {limited
             ? "Too many requests from this network. Give it a minute, then try again."
             : `We couldn't load ${subject}. Check your connection and try again.`}
         </p>

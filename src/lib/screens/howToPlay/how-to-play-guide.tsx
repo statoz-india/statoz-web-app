@@ -1,3 +1,5 @@
+import { TrackView } from "@/lib/analytics/trackView";
+
 import type { Guide } from "./guides";
 import {
   AccentPanel,
@@ -17,6 +19,7 @@ export function HowToPlayGuide({ guide }: { guide: Guide }) {
       accent={accent}
       back="/profile/how-to-play"
     >
+      <TrackView event="web_how_to_play_open" params={{ mode: guide.id }} />
       {/* Phones stack the blocks. Desktop: header, strip and facts on the
           left; steps take the right, the full height. */}
       <div className="grid items-start gap-3.5 lg:grid-cols-[21.25rem_minmax(0,1fr)] lg:grid-rows-[auto_1fr]">

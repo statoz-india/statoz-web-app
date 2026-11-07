@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { IMAGES } from "@/config/images";
 import type { AuthUser } from "@/core";
+import { track } from "@/lib/analytics";
 import { SignalOffIcon } from "@/lib/icons";
 import { NoDataState } from "@/lib/ui/no-data-state";
 
@@ -127,7 +128,10 @@ function ProfileView({
             }
             failed={coinMap.status === "error"}
             onRetry={coinMap.reload}
-            onHistory={() => setOverlay("history")}
+            onHistory={() => {
+              track("web_coin_history_open");
+              setOverlay("history");
+            }}
           />
           {stats.data ? (
             toStatBands(stats.data).map((band, index) => (
@@ -154,7 +158,12 @@ function ProfileView({
         </div>
 
         <div className="flex flex-col gap-3.5">
-          <ActionRows onSettings={() => setOverlay("settings")} />
+          <ActionRows
+            onSettings={() => {
+              track("web_settings_open");
+              setOverlay("settings");
+            }}
+          />
         </div>
       </div>
 

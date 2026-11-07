@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useId, useState, type CSSProperties } from "react";
+import { useEffect, useId, useState, type CSSProperties } from "react";
 
 import { IMAGES } from "@/config/images";
 import type { QuizDetail, QuizQuestion } from "@/core";
+import { track } from "@/lib/analytics";
 import { ChevronRightIcon } from "@/lib/icons";
 
 import { isLocked, optionLetter, optionState, totalXp } from "../adapters";
@@ -38,6 +39,14 @@ export function QuizPlay({
   const picked = picks[question.questionNumber];
   const last = current === questions.length - 1;
   const potential = totalXp(questions.filter((q) => q.questionNumber in picks));
+
+  useEffect(() => {
+    track("web_quiz_start", {
+      quiz_id: quiz.quizId,
+      sport: quiz.gameType.toLowerCase(),
+      questions: quiz.questionsArray.length,
+    });
+  }, [quiz.quizId, quiz.gameType, quiz.questionsArray.length]);
 
   return (
     <div className={`${styles.page} flex h-dvh flex-col overflow-hidden`}>

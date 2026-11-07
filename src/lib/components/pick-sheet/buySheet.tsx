@@ -4,13 +4,12 @@ import Image from "next/image";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import { IMAGES } from "@/config/images";
-import { useCurrentUser } from "@/features/auth";
 import { useNow } from "@/hooks/useNow";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { formatInt } from "@/utils";
 
-import { isTrading, multiplier, sharePrice, type Market, type Outcome } from "../adapters";
-import styles from "../css/pickDetail.module.css";
+import styles from "./css/buySheet.module.css";
+import { isTrading, multiplier, sharePrice, type Market, type Outcome } from "./market";
 
 const QUICK = [1, 5, 10, "MAX"] as const;
 
@@ -22,16 +21,18 @@ const QUICK = [1, 5, 10, "MAX"] as const;
 export function BuySheet({
   market,
   outcome,
+  balance,
   onBuy,
   onClose,
 }: {
   market: Market;
   outcome: Outcome;
+  /** The player's Oz; `null` until it loads, when nothing can be confirmed. */
+  balance: number | null;
   onBuy: (coins: number) => Promise<string | null>;
   onClose: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
-  const balance = useCurrentUser()?.coins ?? null;
   const now = useNow();
   const price = sharePrice(outcome);
   const [text, setText] = useState(String(price));

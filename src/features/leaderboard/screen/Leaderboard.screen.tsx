@@ -5,6 +5,7 @@ import { useState } from "react";
 import { isSport, type Sport } from "@/config/sports";
 import { useAuthSession } from "@/features/auth";
 import { SportHubTabs } from "@/features/homescreen/components/sport-hub-tabs";
+import { track } from "@/lib/analytics";
 import { FilterChips } from "@/lib/components/filter-chips";
 import { SignalOffIcon, TrophyIcon } from "@/lib/icons";
 import { NoDataState } from "@/lib/ui/no-data-state";
@@ -57,7 +58,9 @@ export function LeaderboardScreen() {
             destinations={list}
             selected={selected}
             onSelect={(tab) => {
-              if (isSport(tab)) setPicked(tab);
+              if (!isSport(tab)) return;
+              if (tab !== selected) track("web_leaderboard_filter", { sport: tab, tournament: ALL });
+              setPicked(tab);
             }}
           />
           {/* Keyed so a new sport starts from a fresh board. */}
@@ -88,7 +91,10 @@ function SportBoard({ gameType }: { gameType: string }) {
         <FilterChips
           options={[ALL, ...codes]}
           selected={selected}
-          onSelect={setPicked}
+          onSelect={(code) => {
+            if (code !== selected) track("web_leaderboard_filter", { sport: gameType, tournament: code });
+            setPicked(code);
+          }}
           label="Tournament"
           className="py-1"
         />

@@ -6,12 +6,13 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { IMAGES } from "@/config/images";
 import { useCurrentUser } from "@/features/auth";
 import { useScrollLock } from "@/hooks/useScrollLock";
+import { track } from "@/lib/analytics";
 import { Button } from "@/lib/components/button";
 import { ArrowRightIcon } from "@/lib/icons";
 import { withAlpha } from "@/styles";
 import { formatInt } from "@/utils";
 
-import { itemAccent, itemName, itemPrice, type ShopItem } from "../adapters";
+import { itemAccent, itemName, itemParams, itemPrice, type ShopItem } from "../adapters";
 import { buyItem } from "../data/shop.data";
 import { BannerArt } from "./shopTiles.widget";
 
@@ -50,6 +51,10 @@ export function BuyDialog({
     dialog?.showModal();
     return () => dialog?.close();
   }, []);
+
+  useEffect(() => {
+    track("web_view_item", itemParams(item));
+  }, [item]);
 
   return (
     <dialog
