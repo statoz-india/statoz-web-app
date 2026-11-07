@@ -5,11 +5,13 @@ import { createPortal } from "react-dom";
 
 import { loadPick, submitPickBet, type Pick } from "@/core";
 import { useScrollLock } from "@/hooks/useScrollLock";
+import { track } from "@/lib/analytics";
 import { Button } from "@/lib/components/button";
 import type { PickType } from "@/utils";
 
 import { BuySheet } from "./buySheet";
 import { marketOf, sharePrice } from "./market";
+import { trackBet, trackBuySheet, type PickLocation } from "./pickEvents";
 import { PickLocked, type LockedPick } from "./pickLocked";
 
 type Loaded = { status: "loading" } | { status: "error" } | { status: "ready"; pick: Pick };
@@ -34,6 +36,7 @@ function QuickPickFlow({
   code,
   outcome: outcomeKey,
   balance,
+  location,
   onPlaced,
   onClose,
 }: {
@@ -44,6 +47,8 @@ function QuickPickFlow({
   outcome: string;
   /** The player's Oz; `null` until it loads. */
   balance: number | null;
+  /** Which card it was opened from, for analytics. */
+  location: Exclude<PickLocation, "pick_page">;
   /** After the bet is placed, with the stake and the market it moved. */
   onPlaced: (coins: number, pick: Pick) => void;
   onClose: () => void;
@@ -57,13 +62,22 @@ function QuickPickFlow({
   useEffect(() => {
     let live = true;
     loadPick(type, code).then(
-      (pick) => live && setLoaded({ status: "ready", pick }),
-      () => live && setLoaded({ status: "error" }),
+      (pick) => {
+        if (!live) return;
+        setLoaded({ status: "ready", pick });
+        const outcome = marketOf(pick)?.outcomes.find((o) => o.key === outcomeKey);
+        if (outcome) trackBuySheet(pick, outcome, location);
+      },
+      () => {
+        if (!live) return;
+        setLoaded({ status: "error" });
+        track("web_quick_pick_load_failed", { pick_type: type, pick_id: code, location });
+      },
     );
     return () => {
       live = false;
     };
-  }, [type, code, attempt]);
+  }, [type, code, outcomeKey, location, attempt]);
 
   if (locked) return <PickLocked pick={locked} onDone={onClose} />;
   if (loaded.status === "loading") return <Waiting onClose={onClose} />;
@@ -98,6 +112,7 @@ function QuickPickFlow({
       }}
       onBuy={async (coins) => {
         const result = await submitPickBet(pick, outcome.betValue, coins);
+        trackBet(pick, outcome, coins, location, "error" in result ? result.error : null);
         if ("error" in result) return result.error;
         placed.current = true;
         onPlaced(coins, result.pick);

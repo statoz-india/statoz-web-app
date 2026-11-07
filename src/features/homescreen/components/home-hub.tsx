@@ -3,6 +3,7 @@
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
+import { track } from "@/lib/analytics";
 import { SignalOffIcon } from "@/lib/icons";
 
 import { isSportHubSelection } from "../adapters";
@@ -44,7 +45,11 @@ export function HomeHub() {
     picked !== null && list.tabs.includes(picked) ? picked : list.tabs[0];
 
   /** Mirrors the selection in the URL without asking the server for anything. */
-  function selectTab(tab: SportHubSelection) {
+  function selectTab(
+    tab: SportHubSelection,
+    location: "tabs" | "sports_quiz_card" = "tabs",
+  ) {
+    if (tab !== selected) track("web_sport_tab_selected", { sport: tab, location });
     setPicked(tab);
     window.history.replaceState(null, "", `${pathname}?sport=${tab}`);
   }
@@ -71,7 +76,7 @@ export function HomeHub() {
       );
     }
     return selected === "trending" ? (
-      <TrendingFeed onSport={selectTab} />
+      <TrendingFeed onSport={(tab) => selectTab(tab, "sports_quiz_card")} />
     ) : (
       <SportsMatchFeed key={selected} sport={selected} />
     );
@@ -93,7 +98,7 @@ export function HomeHub() {
         <SportHubTabs
           destinations={list.tabs}
           selected={selected}
-          onSelect={selectTab}
+          onSelect={(tab) => selectTab(tab)}
         />
       )}
       <div

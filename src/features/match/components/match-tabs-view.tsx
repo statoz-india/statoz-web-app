@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 
 import { accentVar } from "@/styles";
+import { track } from "@/lib/analytics";
 import {
   QuizIcon,
   ScheduleIcon,
@@ -72,7 +73,13 @@ export function MatchTabsView({
         className={styles.mainTabs}
         tabs={mainTabs}
         activeIndex={activeIndex}
-        onChange={(index) => setActiveTab(mainTabs[index].id)}
+        onChange={(index) => {
+          const tab = mainTabs[index].id;
+          if (tab !== activeTab) {
+            track("web_match_tab_selected", { tab, match_id: match.id, sport: match.sport });
+          }
+          setActiveTab(tab);
+        }}
         accent={accentVar("cyan")}
       />
 
@@ -249,6 +256,7 @@ function PicksPanel({ matchId, sport }: { matchId: string; sport: Sport }) {
           type="prediction"
           {...quick}
           balance={balance}
+          location="match_tab"
           onPlaced={(coins) => spendCoins(coins)}
           onClose={() => setQuick(null)}
         />

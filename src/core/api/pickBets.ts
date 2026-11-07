@@ -24,6 +24,14 @@ export type Pick =
   | { type: "event"; data: EventDetail }
   | { type: "future"; data: FutureDetail };
 
+/** The code a pick is addressed by: its `predictionId`, `eventId` or `futureId`. */
+export const pickCode = (pick: Pick) =>
+  pick.type === "prediction"
+    ? pick.data.predictionId
+    : pick.type === "event"
+      ? pick.data.eventId
+      : pick.data.futureId;
+
 /**
  * One market by its code (`predictionId`, `eventId` or `futureId`). Rejects
  * when the call fails, which is what the resource store expects.

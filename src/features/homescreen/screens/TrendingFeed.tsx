@@ -17,9 +17,15 @@ import type {
   TrendingQuiz as QuizItem,
   TrendingRace,
 } from "@/core";
-import { spendCoins, useCurrentUser, useRequireAuth } from "@/features/auth";
+import {
+  spendCoins,
+  useAuthSession,
+  useCurrentUser,
+  useRequireAuth,
+} from "@/features/auth";
+import { track } from "@/lib/analytics";
 import { QuickPick } from "@/lib/components/pick-sheet";
-import type { PickType } from "@/utils";
+import { readableSegment, type PickType } from "@/utils";
 import { TrendingEventWidget } from "@/features/events/widgets/trendingEvent.widget";
 import { TrendingFutureWidget } from "@/features/futures/widgets/trendingFuture.widget";
 import { TrendingMatchWidget } from "@/features/match/widgets/trendingMatch.widget";
@@ -192,11 +198,52 @@ function useQuickPick() {
     <QuickPick
       {...target}
       balance={balance}
+      location="home_card"
       onPlaced={(coins) => spendCoins(coins)}
       onClose={() => setTarget(null)}
     />
   ) : null;
   return { open: setTarget, sheet };
+}
+
+type ContentType = "match" | "race" | "quiz" | "prediction" | "future" | "event" | "reveal_result";
+
+/** The item's code in its page's path: `/match/<id>`, `/quiz/<id>`, `/picks/<type>/<id>`. */
+function codeIn(path: string): string {
+  const parts = path.split("/").filter(Boolean);
+  return readableSegment((parts[0] === "picks" ? parts[2] : parts[1]) ?? "");
+}
+
+/**
+ * Counts a card opened through one of its links. A guest's tap on a card that
+ * needs an account (`guarded`) opens the login gate instead, so it isn't one.
+ */
+function Opens({
+  type,
+  guarded = false,
+  children,
+}: {
+  type: ContentType;
+  guarded?: boolean;
+  children: ReactNode;
+}) {
+  const { status } = useAuthSession();
+  return (
+    <div
+      className="contents"
+      onClickCapture={(event) => {
+        const link = event.target instanceof Element ? event.target.closest("a") : null;
+        if (!link || (guarded && status !== "authenticated")) return;
+        track("web_select_content", {
+          content_type: type,
+          content_id: codeIn(link.pathname),
+          location: "home_trending",
+        });
+      }}
+    >
+      {children}
+    </div>
+  );
 }
 
 /** The trending picks, without a heading. */
@@ -450,24 +497,42 @@ export function TrendingFeed({ onSport }: { onSport: (sport: SportHubSelection) 
 
   return (
     <>
-      <TrendingPicks picks={trending.data.trendingPicks} />
-      <RevealResults results={trending.data.results} />
-      <MatchesSection
-        id="trending-matches"
-        title="Trending Matches"
-        matches={trending.data.clubsAndTeamMatches}
-      />
-      <TrendingFutures futures={trending.data.trendingFutures} />
+      <Opens type="prediction" guarded>
+        <TrendingPicks picks={trending.data.trendingPicks} />
+      </Opens>
+      <Opens type="reveal_result" guarded>
+        <RevealResults results={trending.data.results} />
+      </Opens>
+      <Opens type="match">
+        <MatchesSection
+          id="trending-matches"
+          title="Trending Matches"
+          matches={trending.data.clubsAndTeamMatches}
+        />
+      </Opens>
+      <Opens type="future" guarded>
+        <TrendingFutures futures={trending.data.trendingFutures} />
+      </Opens>
       <SportsQuizzes onSport={onSport} />
-      <MatchesSection
-        id="more-matches"
-        title="More Matches"
-        matches={trending.data.trendingMatches}
-      />
-      <TrendingRaces races={trending.data.trendingRaces} />
-      <TrendingQuizzes quizzes={trending.data.trendingQuizzes} />
-      <TrendingEvents events={trending.data.trendingEvents} />
-      <TrendingPredictions predictions={trending.data.trendingPredictions} />
+      <Opens type="match">
+        <MatchesSection
+          id="more-matches"
+          title="More Matches"
+          matches={trending.data.trendingMatches}
+        />
+      </Opens>
+      <Opens type="race">
+        <TrendingRaces races={trending.data.trendingRaces} />
+      </Opens>
+      <Opens type="quiz" guarded>
+        <TrendingQuizzes quizzes={trending.data.trendingQuizzes} />
+      </Opens>
+      <Opens type="event" guarded>
+        <TrendingEvents events={trending.data.trendingEvents} />
+      </Opens>
+      <Opens type="prediction" guarded>
+        <TrendingPredictions predictions={trending.data.trendingPredictions} />
+      </Opens>
     </>
   );
 }

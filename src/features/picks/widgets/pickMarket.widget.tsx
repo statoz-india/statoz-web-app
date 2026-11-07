@@ -16,6 +16,7 @@ export function PickMarket({
   initialOutcome,
   tickets,
   chart,
+  onOpen,
   onBuy,
 }: {
   market: Market;
@@ -24,6 +25,8 @@ export function PickMarket({
   tickets: Ticket[];
   /** MARKET ODDS, or its loading or error state, under the header. */
   chart: ReactNode;
+  /** BUY's sheet opened on `outcome`. */
+  onOpen: (outcome: Outcome) => void;
   /** Places the bet; resolves to the error to show, or `null`. */
   onBuy: (outcome: Outcome, coins: number) => Promise<string | null>;
 }) {
@@ -54,6 +57,7 @@ export function PickMarket({
           onBuy={(outcome) => {
             setPicked(outcome.key);
             setBuying(outcome);
+            onOpen(outcome);
           }}
         />
       </div>

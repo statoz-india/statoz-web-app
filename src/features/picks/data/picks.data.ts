@@ -7,11 +7,13 @@ import {
   getPredictionBets,
   getPredictionOdds,
   loadPick,
+  pickCode,
   submitPickBet,
   type Pick,
 } from "@/core";
 import { spendCoins } from "@/features/auth";
 import { setResource, useResource } from "@/hooks/useResource";
+import { trackBet } from "@/lib/components/pick-sheet";
 import type { PickType } from "@/utils";
 
 import type { Bet, OddsPoint, Outcome } from "../adapters";
@@ -29,14 +31,6 @@ export function usePick(type: PickType, code: string, signedIn: boolean) {
     signedIn ? { key: pickKey(type, code), load: () => loadPick(type, code) } : null,
   );
 }
-
-/** The code a pick is addressed by. */
-const codeOf = (pick: Pick) =>
-  pick.type === "prediction"
-    ? pick.data.predictionId
-    : pick.type === "event"
-      ? pick.data.eventId
-      : pick.data.futureId;
 
 // A pick's bets and odds are asked for, and kept, by its `_id`.
 const betsKey = (pick: Pick) => `${pickKey(pick.type, pick.data._id)}/bets`;
@@ -136,9 +130,10 @@ function reloadAfterBet(pick: Pick) {
  */
 export async function placeBet(pick: Pick, outcome: Outcome, coins: number): Promise<string | null> {
   const result = await submitPickBet(pick, outcome.betValue, coins);
+  trackBet(pick, outcome, coins, "pick_page", "error" in result ? result.error : null);
   if ("error" in result) return result.error;
   // Kept under the code, which is how the page asked for it.
-  setResource<Pick>(pickKey(pick.type, codeOf(pick)), result.pick);
+  setResource<Pick>(pickKey(pick.type, pickCode(pick)), result.pick);
   spendCoins(coins);
   reloadAfterBet(pick);
   return null;

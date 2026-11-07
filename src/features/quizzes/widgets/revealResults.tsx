@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore, type CSSProperties } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 
 import type { QuizDetail } from "@/core";
 import { useScrollLock } from "@/hooks/useScrollLock";
+import { track } from "@/lib/analytics";
 import { ArrowRightIcon, CheckIcon, CloseIcon } from "@/lib/icons";
 import { formatInt } from "@/utils";
 
@@ -78,6 +79,8 @@ export function RevealOverlay({
   const [counting, setStage] = useState(0);
   const stage = reduced ? summary : counting;
   const onSummary = stage >= summary;
+  // Whether a tap jumped past the count.
+  const skipped = useRef(false);
 
   useEffect(() => {
     if (onSummary) return;
@@ -102,7 +105,9 @@ export function RevealOverlay({
       aria-label="Prediction settled"
       className={styles.overlay}
       onClick={() => {
-        if (!onSummary) setStage(summary);
+        if (onSummary) return;
+        skipped.current = true;
+        setStage(summary);
       }}
     >
       {onSummary ? (
@@ -123,7 +128,21 @@ export function RevealOverlay({
             <Cell label="CORRECT" value={`${correct}/${rows.length}`} />
           </dl>
           {/* Focused so Enter or Space continues straight away. */}
-          <button type="button" autoFocus onClick={onDone} className={styles.cta}>
+          <button
+            type="button"
+            autoFocus
+            onClick={() => {
+              track("web_results_reveal_complete", {
+                quiz_id: quiz.quizId,
+                correct,
+                questions: rows.length,
+                perfect,
+                skipped_animation: skipped.current,
+              });
+              onDone();
+            }}
+            className={styles.cta}
+          >
             CONTINUE <ArrowRightIcon size={16} aria-hidden />
           </button>
         </div>

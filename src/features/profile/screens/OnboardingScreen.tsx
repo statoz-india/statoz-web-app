@@ -5,8 +5,10 @@ import { useEffect, useState } from "react";
 
 import type { AuthUser, UpdateUserBody } from "@/core";
 import { useAuthSession, useCurrentUser } from "@/features/auth";
+import { track } from "@/lib/analytics";
 
 import styles from "../css/onboarding.module.css";
+import { clubCount } from "../adapters";
 import { saveProfile } from "../data/profile.data";
 import {
   ArenaBackdrop,
@@ -31,6 +33,8 @@ const HELPERS = [
   "STEP 4 OF 4 // PICK SPORTS, LEAGUES, AND CLUBS IN ONE PLACE",
 ];
 const LAST = HELPERS.length - 1;
+/** Each step's name in analytics, in step order. */
+const STEP_NAMES = ["name", "avatar", "banner", "clubs"];
 /** Every new wallet opens with this; the reward screen only shows it. */
 const WELCOME_BONUS = 1000;
 
@@ -79,7 +83,12 @@ export function OnboardingScreen() {
     setStep(next);
   };
   const leave = () => router.replace(returnTo);
-  const launch = () => setPhase("launch");
+  const launch = () => {
+    track("web_321_shown", { clubs_count: clubCount(clubs) });
+    setPhase("launch");
+  };
+  const trackStep = (skipped: boolean) =>
+    track("web_onboarding_step", { step: STEP_NAMES[step], skipped });
 
   async function next() {
     const body: UpdateUserBody | null =
@@ -97,6 +106,7 @@ export function OnboardingScreen() {
       setSaving(false);
       if (failed) return setFailure(failed);
     }
+    trackStep(false);
     if (step === LAST) launch();
     else go(step + 1);
   }
@@ -115,15 +125,33 @@ export function OnboardingScreen() {
     <div className="relative min-h-dvh text-foreground">
       <ArenaBackdrop />
       {phase === "launch" ? (
-        <LaunchCountdown onEnter={() => setPhase("reward")} />
+        <LaunchCountdown
+          onEnter={() => {
+            track("web_earn_virtual_currency", {
+              virtual_currency_name: "Oz",
+              value: WELCOME_BONUS,
+              source: "welcome_bonus",
+            });
+            setPhase("reward");
+          }}
+        />
       ) : splash ? (
-        <WelcomeSplash onDone={() => setSplash(false)} />
+        <WelcomeSplash
+          onDone={() => {
+            track("web_onboarding_started");
+            setSplash(false);
+          }}
+        />
       ) : (
         <div className="relative flex h-dvh flex-col">
           <SetupTopBar
             // No skipping the name; the last step's skip leaves setup.
             skipLabel={step === 0 ? null : step === LAST ? "DECIDE LATER" : "SKIP"}
-            onSkip={() => (step === LAST ? launch() : go(step + 1))}
+            onSkip={() => {
+              trackStep(true);
+              if (step === LAST) launch();
+              else go(step + 1);
+            }}
           />
           <main className="min-h-0 flex-1 overflow-y-auto">
             <div

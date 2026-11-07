@@ -5,6 +5,7 @@ import { useEffect, useId, useState, type ComponentType, type ReactNode } from "
 
 import type { AuthUser } from "@/core";
 import { useDeleteAccount } from "@/features/auth";
+import { track } from "@/lib/analytics";
 import { Button } from "@/lib/components/button";
 import { DeleteIcon, EditIcon, MailIcon, ProfileIcon, type IconProps } from "@/lib/icons";
 import { BackButton } from "@/lib/screens/howToPlay/back-button";
@@ -106,7 +107,10 @@ function NameCard({ user }: { user: AuthUser }) {
     const failed = await saveProfile({ username: trimmed });
     setSaving(false);
     if (failed) setFailure(failed);
-    else setDraft(null);
+    else {
+      track("web_username_changed");
+      setDraft(null);
+    }
   }
 
   return (

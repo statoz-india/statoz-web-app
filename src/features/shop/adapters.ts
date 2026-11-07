@@ -49,6 +49,18 @@ export const itemName = (item: ShopItem) =>
 export const itemPrice = (item: ShopItem) =>
   item.kind === "avatar" ? item.pic.coinValue : item.kind === "banner" ? item.banner.coinValue : item.card.coinValue;
 
+/** The item as analytics reports it. A card has no readable code, so only its name goes. */
+export const itemParams = (item: ShopItem) => ({
+  item_type: item.kind,
+  item_name: itemName(item),
+  price: itemPrice(item),
+  ...(item.kind === "avatar"
+    ? { item_id: item.pic.ppId }
+    : item.kind === "banner"
+      ? { item_id: item.banner.pbId }
+      : {}),
+});
+
 const ROLE_COLOR: Record<string, string> = {
   attacker: accentVar("cyan"),
   defender: accentVar("violet"),

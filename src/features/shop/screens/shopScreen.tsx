@@ -12,6 +12,7 @@ import {
 
 import { getSignedIn, subscribeSession, type ShopCatalog } from "@/core";
 import type { Resource } from "@/hooks/useResource";
+import { track } from "@/lib/analytics";
 import { Button } from "@/lib/components/button";
 import { FilterChips } from "@/lib/components/filter-chips";
 import { UnderlineTabs } from "@/lib/components/underline-tabs";
@@ -60,7 +61,10 @@ export function ShopScreen() {
       <UnderlineTabs
         tabs={TABS}
         activeIndex={tab}
-        onChange={setTab}
+        onChange={(index) => {
+          if (index !== tab) track("web_shop_tab_selected", { tab: TABS[index].id });
+          setTab(index);
+        }}
         accent={CYAN}
         label="Shop"
       />

@@ -7,6 +7,7 @@ import { useState, type ComponentType, type ReactNode } from "react";
 import { siteLinks } from "@/config/navigation";
 import type { Sport } from "@/config/sports";
 import type { AuthUser } from "@/core";
+import { track } from "@/lib/analytics";
 import { Button } from "@/lib/components/button";
 import {
   CheckIcon,
@@ -24,6 +25,7 @@ import { accentVar, withAlpha } from "@/styles";
 import {
   avatarChoices,
   bannerChoices,
+  clubCount,
   followableSports,
   toTeam,
 } from "../adapters";
@@ -42,11 +44,11 @@ import { Overlay } from "./overlay";
 const DANGER = "var(--ds-color-danger)";
 
 /** The settings above LOG OUT: app pages, then the website's. */
-const SETTINGS: { label: string; icon: ComponentType<IconProps>; href: string }[] = [
-  { label: "ACCOUNT SETTINGS", icon: ProfileIcon, href: "/profile/account-settings" },
-  { label: "TERMS AND CONDITIONS", icon: MenuBookIcon, href: siteLinks.terms },
-  { label: "FAQS", icon: ForumIcon, href: siteLinks.faq },
-  { label: "PRIVACY POLICY", icon: LockIcon, href: siteLinks.privacy },
+const SETTINGS: { id: string; label: string; icon: ComponentType<IconProps>; href: string }[] = [
+  { id: "account_settings", label: "ACCOUNT SETTINGS", icon: ProfileIcon, href: "/profile/account-settings" },
+  { id: "terms", label: "TERMS AND CONDITIONS", icon: MenuBookIcon, href: siteLinks.terms },
+  { id: "faq", label: "FAQS", icon: ForumIcon, href: siteLinks.faq },
+  { id: "privacy", label: "PRIVACY POLICY", icon: LockIcon, href: siteLinks.privacy },
 ];
 
 const SETTING_ROW =
@@ -65,7 +67,8 @@ export function SettingsSheet({
   return (
     <Overlay title="SETTINGS" icon={SettingsIcon} onClose={onClose}>
       <ul className="border-b border-line">
-        {SETTINGS.map(({ label, icon: Icon, href }) => {
+        {SETTINGS.map(({ id, label, icon: Icon, href }) => {
+          const onClick = () => track("web_settings_link", { link: id });
           const content = (
             <>
               <span className="grid size-9 place-items-center border border-cyan/45 bg-cyan/10 text-cyan">
@@ -80,12 +83,18 @@ export function SettingsSheet({
           return (
             <li key={label}>
               {href.startsWith("/") ? (
-                <Link href={href} className={SETTING_ROW}>
+                <Link href={href} onClick={onClick} className={SETTING_ROW}>
                   {content}
                 </Link>
               ) : (
                 // The website's pages open in a new tab, so the app stays where it was.
-                <a href={href} target="_blank" rel="noopener noreferrer" className={SETTING_ROW}>
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={onClick}
+                  className={SETTING_ROW}
+                >
                   {content}
                 </a>
               )}
@@ -193,7 +202,10 @@ export function ClubsSheet({
     setFailure(null);
     try {
       const result = await saveClubAndTeams(draft);
-      if (result.success) return onClose();
+      if (result.success) {
+        track("web_clubs_updated", { clubs_count: clubCount(draft) });
+        return onClose();
+      }
       setFailure(
         "errors" in result && result.errors?.length
           ? result.errors.map(String).join(". ")
@@ -400,7 +412,11 @@ export function AvatarSheet({
         assets.data && free.data ? avatarChoices(assets.data, free.data) : null
       }
       resources={[assets, free]}
-      onSave={(ppId) => saveProfile({ ppId })}
+      onSave={async (ppId) => {
+        const failed = await saveProfile({ ppId });
+        if (!failed) track("web_avatar_changed", { item_id: ppId });
+        return failed;
+      }}
       onClose={onClose}
     />
   );
@@ -423,7 +439,11 @@ export function BannerSheet({
         assets.data && free.data ? bannerChoices(assets.data, free.data) : null
       }
       resources={[assets, free]}
-      onSave={(pbId) => saveProfile({ pbId })}
+      onSave={async (pbId) => {
+        const failed = await saveProfile({ pbId });
+        if (!failed) track("web_banner_changed", { item_id: pbId });
+        return failed;
+      }}
       onClose={onClose}
     />
   );
