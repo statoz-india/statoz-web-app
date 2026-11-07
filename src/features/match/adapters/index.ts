@@ -189,6 +189,14 @@ function factsOf(stats: MatchStats): StatsFacts | null {
   }
 }
 
+/** "Final Score - After Extra Time" reads AET, a shoot-out PENS. */
+function finishOf(status: unknown): SportMatch["finish"] {
+  if (typeof status !== "string") return undefined;
+  if (/penalt|pens/i.test(status)) return "PENS";
+  if (/extra time|\baet\b/i.test(status)) return "AET";
+  return undefined;
+}
+
 /**
  * The match as the header and the facts panel read it. The stats win on the
  * score and the state, because they are the fresher of the two; the fixture
@@ -262,6 +270,9 @@ export function toMatch(
     awayScore: noScore ? undefined : facts?.away.score,
     liveMinute: status === "live" ? facts?.liveMinute : undefined,
     volumeOz: fixture?.totalVolume,
+    finish: status === "finished" ? finishOf(fixture?.matchEvent?.status) : undefined,
+    promo:
+      status === "scheduled" && fixture?.quizIds.length ? fixture.tag : undefined,
   };
 }
 

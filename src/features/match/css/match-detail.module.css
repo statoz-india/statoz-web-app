@@ -89,85 +89,6 @@
   letter-spacing: 0.1em;
 }
 
-.summaryTeams {
-  display: flex;
-  min-height: 65px;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-/* Both sides take an equal share of what the badges and score leave, so a
-   long club name ellipsises instead of crushing the side opposite it. */
-.summaryTeam {
-  display: grid;
-  min-width: 0;
-  flex: 1;
-  justify-items: start;
-  gap: 2px;
-}
-
-.summaryTeamEnd {
-  justify-items: end;
-  text-align: right;
-}
-
-.teamName {
-  max-width: 100%;
-  overflow: hidden;
-  color: var(--ds-color-text-default);
-  font-family: var(--ds-font-body);
-  font-size: 14px;
-  font-weight: 800;
-  line-height: 1.1;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Cricket's innings ride under the name -- 161/5 (18.2) never fits a slot. */
-.teamInnings {
-  max-width: 100%;
-  overflow: hidden;
-  color: var(--ds-color-text-default);
-  font-family: var(--ds-font-display);
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* At least the width a football score takes, and wider for a basketball one,
-   which must stay on its line. */
-.summaryScore {
-  min-width: 72px;
-  flex: none;
-  white-space: nowrap;
-  text-align: center;
-  color: var(--ds-color-text-default);
-  font-family: var(--font-display, ui-sans-serif, system-ui, sans-serif);
-  font-size: var(--ds-text-xl);
-  font-weight: 900;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0;
-}
-
-/* Nothing to show yet: a lone dash, in the width one takes. */
-.summaryScoreEmpty {
-  width: 22px;
-  color: var(--ds-color-text-muted);
-  font-size: 17px;
-}
-
-.summaryVs {
-  flex: none;
-  padding: 0 8px;
-  color: var(--ds-color-text-muted);
-  font-family: var(--font-display, ui-sans-serif, system-ui, sans-serif);
-  font-size: 12px;
-  font-weight: 900;
-}
-
 .summarySplit {
   display: flex;
   height: 3px;
@@ -184,19 +105,6 @@
   flex-direction: column;
   background: transparent;
 }
-.teamQualifier {
-  max-width: 100%;
-  overflow: hidden;
-  color: var(--ds-color-text-muted);
-  font-family: var(--ds-font-display);
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-overflow: ellipsis;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
 .mainTabs {
   min-height: 50px;
   background: transparent;

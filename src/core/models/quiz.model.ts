@@ -63,7 +63,8 @@ export const quizSchema = z.object({
   matchBanner: z.string().nullable().optional(),
   tag: z.string(),
   gameType: z.string(),
-  espnLeagueName: z.string(),
+  /** Not every quiz sends it. */
+  espnLeagueName: z.string().optional(),
   tournament: z.string(),
   teamA: teamSchema,
   teamB: teamSchema,

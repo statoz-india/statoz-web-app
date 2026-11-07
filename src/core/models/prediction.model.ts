@@ -73,7 +73,7 @@ export const predictionSchema = z.object({
   matchEventEspnId: z.string().nullable(),
   tag: z.string(),
   gameType: z.string(),
-  espnLeagueName: z.string(),
+  espnLeagueName: z.string().optional(),
   tournament: z.string(),
   tournamentData: tournamentSummarySchema,
   teamA: teamSchema,

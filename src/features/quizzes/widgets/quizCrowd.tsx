@@ -3,7 +3,14 @@
 import type { ReactNode } from "react";
 
 import type { QuizDetail, QuizQuestion } from "@/core";
-import { CheckIcon, CloseIcon, FlagIcon, InsightsIcon, VerifiedIcon } from "@/lib/icons";
+import {
+  CheckIcon,
+  CloseIcon,
+  DangerousIcon,
+  FlagIcon,
+  InsightsIcon,
+  VerifiedIcon,
+} from "@/lib/icons";
 import { formatInt } from "@/utils";
 
 import {
@@ -118,8 +125,15 @@ function CrowdCard({
           <h3 className="min-w-0 flex-1 font-display text-review font-black leading-snug tracking-tight">
             {question.questionText}
           </h3>
-          {answer !== undefined ? (
-            <VerifiedIcon size={20} className="shrink-0 text-success" />
+          {/* The player's result once they have one; otherwise just that it's settled. */}
+          {pick && !pick.correct ? (
+            <DangerousIcon size={20} aria-label="Wrong" className="shrink-0 text-danger" />
+          ) : pick || answer !== undefined ? (
+            <VerifiedIcon
+              size={20}
+              aria-label={pick ? "Correct" : "Settled"}
+              className="shrink-0 text-success"
+            />
           ) : null}
         </div>
         <p className="mt-2.5 flex items-center gap-2">

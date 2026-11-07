@@ -37,4 +37,8 @@ export type SportMatch = {
   liveMinute?: number;
   /** Oz staked across this match's markets. Unknown without the fixture. */
   volumeOz?: number;
+  /** How a finished match was decided beyond normal time. */
+  finish?: "AET" | "PENS";
+  /** The quiz's call to action, such as "Make Predictions and Earn 50 XP"; only before kick-off. */
+  promo?: string;
 };
