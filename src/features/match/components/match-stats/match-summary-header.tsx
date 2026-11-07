@@ -1,15 +1,25 @@
+"use client";
+
+import Image from "next/image";
+
+import { IMAGES } from "@/config/images";
 import type { SportMatch, SportTeam } from "@/features/match/types";
-import { formatKickoffTime } from "@/utils";
+import { useNow } from "@/hooks/useNow";
+import { CalendarIcon } from "@/lib/icons";
+import { formatKickoffTime, formatMatchDate, formatOzCompact } from "@/utils";
 
 import styles from "../../css/match-detail.module.css";
 import { TeamBadge } from "../team-badge";
 
+type Side = "home" | "away";
+
 /**
- * The fixture, above the tabs: the clock or the minute, the two badges either
- * side of the score, and the teams' colours as a split rule under them.
+ * The fixture, above the tabs, as a scoreboard: each side's badge with its
+ * full name under it, the score or the kick-off time between them with the
+ * match state above, then when it starts and the Oz on its markets.
  *
  * Cricket reads differently and says so — an innings does not fit a score
- * slot, so it sits under each side's name and the middle carries only "vs".
+ * slot, so it sits under each side's name and the middle carries only "VS".
  */
 export function MatchSummaryHeader({ match }: { match: SportMatch }) {
   if (match.sport === "racing") {
@@ -17,91 +27,205 @@ export function MatchSummaryHeader({ match }: { match: SportMatch }) {
   }
 
   const cricket = match.sport === "cricket";
-  const hasScore = match.homeScore != null || match.awayScore != null;
+  const winner = winnerOf(match);
 
   return (
     <section className={styles.summary} aria-label="Match summary">
       <div className={styles.summaryBracket}>
-        <time
-          dateTime={
-            match.status === "scheduled" && match.kickoff
-              ? match.kickoff
-              : undefined
-          }
-          className={styles.summaryStatus}
-          style={{ color: statusColor(match) }}
-        >
-          {statusText(match)}
-        </time>
+        <p className="text-center font-display text-xs font-black tracking-ultra text-cyan">
+          {match.leagueLabel.toUpperCase()}
+        </p>
 
-        <div className={styles.summaryTeams}>
-          <TeamBadge team={match.home} size={44} />
-          <TeamDetails
-            team={match.home}
-            score={match.homeScore}
-            cricket={cricket}
-          />
-
-          {cricket ? (
-            <span className={styles.summaryVs}>vs</span>
-          ) : (
-            <span
-              className={`${styles.summaryScore} ${hasScore ? "" : styles.summaryScoreEmpty}`}
-            >
-              {hasScore
-                ? `${match.homeScore ?? "-"} - ${match.awayScore ?? "-"}`
-                : "-"}
-            </span>
-          )}
-
-          <TeamDetails
-            team={match.away}
-            score={match.awayScore}
-            cricket={cricket}
-            alignEnd
-          />
-          <TeamBadge team={match.away} size={44} />
+        <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-3">
+          <TeamColumn team={match.home} score={match.homeScore} cricket={cricket} lost={winner === "away"} />
+          <Centre match={match} cricket={cricket} winner={winner} />
+          <TeamColumn team={match.away} score={match.awayScore} cricket={cricket} lost={winner === "home"} />
         </div>
 
-        <div className={styles.summarySplit} aria-hidden>
+        <div className={`${styles.summarySplit} mt-4`} aria-hidden>
           <span style={{ background: match.home.color }} />
           <span style={{ background: match.away.color, opacity: 0.92 }} />
         </div>
+
+        {match.kickoff ? <Kickoff match={match} /> : null}
+        <Volume match={match} />
+        {match.promo ? (
+          <p className="mt-3 border border-gold/35 bg-gold/8 px-3 py-2.5 text-center font-display text-xs font-black tracking-wide text-gold">
+            {match.promo.toUpperCase()}
+          </p>
+        ) : null}
       </div>
     </section>
   );
 }
 
-/** A side's name, with its innings under it on cricket fixtures. */
-function TeamDetails({
+/** The side ahead on a finished match; none on a draw, or for cricket's innings. */
+function winnerOf(match: SportMatch): Side | null {
+  if (match.status !== "finished" || match.sport === "cricket") return null;
+  const home = Number(match.homeScore);
+  const away = Number(match.awayScore);
+  if (!Number.isFinite(home) || !Number.isFinite(away) || home === away) return null;
+  return home > away ? "home" : "away";
+}
+
+/** The pill above the score: its words and colours for the match's state. */
+function statusPill(match: SportMatch): { text: string; className: string; live?: boolean } {
+  if (match.status === "live") {
+    return {
+      text: match.liveMinute == null ? "LIVE" : `LIVE ${match.liveMinute}'`,
+      className: "border-danger/50 bg-danger/10 text-danger",
+      live: true,
+    };
+  }
+  if (match.status === "scheduled") {
+    return { text: "UPCOMING", className: "border-gold/45 bg-gold/8 text-gold" };
+  }
+  // Postponed, cancelled or no result: the API's own word, in warning colours.
+  const label = match.statusLabel;
+  if (match.status === "postponed" || (label && label !== "RESULT")) {
+    return { text: label ?? "POSTPONED", className: "border-orange/50 bg-orange/10 text-orange" };
+  }
+  return {
+    text: match.sport === "cricket" ? "RESULT" : "FULL TIME",
+    className: "border-line-strong bg-foreground/5 text-foreground",
+  };
+}
+
+/** The middle: the state, then the score, or the kick-off time before the start. */
+function Centre({
+  match,
+  cricket,
+  winner,
+}: {
+  match: SportMatch;
+  cricket: boolean;
+  winner: Side | null;
+}) {
+  const pill = statusPill(match);
+  const hasScore = match.homeScore != null || match.awayScore != null;
+  const digit = (side: Side) => (winner && winner !== side ? "text-muted" : "text-foreground");
+
+  return (
+    <div className="flex flex-col items-center gap-2 pt-1">
+      <span
+        className={`inline-flex items-center gap-1.5 border px-2 py-0.5 font-display text-2xs font-black tracking-ultra whitespace-nowrap ${pill.className}`}
+      >
+        {pill.live ? <span aria-hidden className="size-1.5 animate-pulse rounded-pill bg-danger" /> : null}
+        {pill.text}
+      </span>
+      {match.status === "scheduled" && match.kickoff ? (
+        <time dateTime={match.kickoff} className="flex flex-col items-center">
+          <span className="ds-tabular font-display text-2xl font-black text-gold">
+            {formatKickoffTime(match.kickoff)}
+          </span>
+          <span className="font-display text-2xs font-black tracking-ultra text-muted">IST</span>
+        </time>
+      ) : cricket ? (
+        <span className="font-display text-sm font-black tracking-wide text-muted">VS</span>
+      ) : hasScore ? (
+        <span className="ds-tabular flex items-center gap-2 font-display text-3xl font-black whitespace-nowrap">
+          <span className={digit("home")}>{match.homeScore ?? "-"}</span>
+          <span className="text-muted">–</span>
+          <span className={digit("away")}>{match.awayScore ?? "-"}</span>
+        </span>
+      ) : (
+        <span className="font-display text-xl font-black text-muted">–</span>
+      )}
+      {match.finish ? (
+        <span className="font-display text-2xs font-black tracking-wide text-gold whitespace-nowrap">
+          {match.finish === "AET" ? "AFTER EXTRA TIME" : "AFTER PENALTIES"}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+/** A side's badge and full name; cricket's innings ride under the name. */
+function TeamColumn({
   team,
   score,
   cricket,
-  alignEnd = false,
+  lost,
 }: {
   team: SportTeam;
   score?: number | string;
   cricket: boolean;
-  alignEnd?: boolean;
+  lost: boolean;
 }) {
   const innings =
     cricket && score != null && String(score) !== ""
       ? splitCricketScore(String(score))
       : null;
   return (
-    <span
-      className={`${styles.summaryTeam} ${alignEnd ? styles.summaryTeamEnd : ""}`}
-    >
-      <span className={styles.teamName}>{team.name}</span>
+    <div className="flex min-w-0 flex-col items-center gap-2 text-center">
+      <TeamBadge team={team} size={56} />
+      <span
+        className={`line-clamp-2 font-grotesk text-sm font-bold leading-tight ${lost ? "text-muted" : "text-foreground"}`}
+      >
+        {team.name}
+      </span>
       {innings ? (
-        <>
-          <span className={styles.teamInnings}>{innings.score}</span>
+        <span className="flex flex-col items-center">
+          <span className="ds-tabular font-display text-sm font-black text-foreground">{innings.score}</span>
           {innings.qualifier ? (
-            <span className={styles.teamQualifier}>{innings.qualifier}</span>
+            <span className="font-display text-2xs font-bold text-muted">{innings.qualifier}</span>
           ) : null}
-        </>
+        </span>
       ) : null}
-    </span>
+    </div>
+  );
+}
+
+/** When it starts, in India time, and a countdown until it does. */
+function Kickoff({ match }: { match: SportMatch }) {
+  const now = useNow();
+  const left = now === null ? null : Date.parse(match.kickoff) - now;
+  const countdown =
+    match.status === "scheduled" && left !== null && Number.isFinite(left)
+      ? countdownText(left)
+      : null;
+  return (
+    <div className="mt-3.5 flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+      <p className="flex items-center gap-1.5 font-display text-xs font-bold tracking-wide text-foreground">
+        <CalendarIcon size={15} className="shrink-0 text-muted" />
+        <time dateTime={match.kickoff}>
+          {formatMatchDate(match.kickoff)}
+          <span className="px-1.5 text-muted">·</span>
+          {formatKickoffTime(match.kickoff)} IST
+        </time>
+      </p>
+      {countdown ? (
+        <span className="border border-gold/45 bg-gold/8 px-2 py-0.5 font-display text-2xs font-black tracking-wide text-gold">
+          {countdown}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+const pad = (value: number) => String(value).padStart(2, "0");
+
+/** Days and hours, then hours and minutes, then minutes and seconds. */
+function countdownText(ms: number): string {
+  if (ms <= 0) return "STARTING NOW";
+  const seconds = Math.floor(ms / 1000);
+  const days = Math.floor(seconds / 86_400);
+  const hours = Math.floor((seconds % 86_400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  if (days > 0) return `STARTS IN ${days}D ${pad(hours)}H`;
+  if (hours > 0) return `STARTS IN ${hours}H ${pad(minutes)}M`;
+  return `STARTS IN ${minutes}M ${pad(seconds % 60)}S`;
+}
+
+/** The Oz staked across the match's markets. */
+function Volume({ match }: { match: SportMatch }) {
+  if (!match.volumeOz) return null;
+  return (
+    <p className="mx-auto mt-3.5 flex w-fit items-center gap-2 border border-line bg-foreground/4 px-3.5 py-2 font-display text-2xs font-black tracking-wide text-muted">
+      <Image src={IMAGES.icons.ozCoins} alt="" width={16} height={16} className="shrink-0" />
+      <span className="ds-tabular text-sm text-foreground">{formatOzCompact(match.volumeOz)}</span>
+      OZ TRADED
+    </p>
   );
 }
 
@@ -160,13 +284,4 @@ function statusColor(match: SportMatch): string {
     return "var(--ds-color-text-muted)";
   }
   return "var(--ds-color-accent-gold)";
-}
-
-function statusText(match: SportMatch): string {
-  if (match.statusLabel) return match.statusLabel;
-  if (match.status === "live") {
-    return match.liveMinute == null ? "LIVE" : `LIVE ${match.liveMinute}'`;
-  }
-  if (match.status === "finished") return "FT";
-  return match.kickoff ? formatKickoffTime(match.kickoff) : "UPCOMING";
 }

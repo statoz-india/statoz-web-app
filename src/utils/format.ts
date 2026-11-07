@@ -45,6 +45,20 @@ export function formatKickoffDate(iso: string): string {
     .toUpperCase();
 }
 
+/** Full kick-off date in India time, for example "SUN 12 JUL 2026". */
+export function formatMatchDate(iso: string): string {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: MATCH_TIME_ZONE,
+  }).formatToParts(new Date(iso));
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((p) => p.type === type)?.value ?? "";
+  return `${part("weekday")} ${part("day")} ${part("month")} ${part("year")}`.toUpperCase();
+}
+
 /** A probability as the API sends it, 0 to 100, with at most one decimal. */
 export function formatPercent(value: number): string {
   return `${Number(value.toFixed(1))}%`;
