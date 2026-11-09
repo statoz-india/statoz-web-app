@@ -1,10 +1,9 @@
-import { GoogleAnalytics } from "@next/third-parties/google";
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 
-import { GA_MEASUREMENT_ID } from "@/core";
 import { AuthGateHost } from "@/features/auth/components/auth-gate-host";
 import { IMAGES } from "@/config/images";
+import { GoogleTags } from "@/lib/analytics";
 
 import "./globals.css";
 
@@ -67,11 +66,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </div>
         <AuthGateHost />
       </body>
-      {/* Production builds only, so local testing stays out of the data. Page
-          views on in-app navigation come from GA's enhanced measurement. */}
-      {process.env.NODE_ENV === "production" && GA_MEASUREMENT_ID ? (
-        <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />
-      ) : null}
+      <GoogleTags />
     </html>
   );
 }
